@@ -2,3 +2,6 @@
 .pydevproject
 build/
 *.pyc
+
+*.clus*
+*.lms*
