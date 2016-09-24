@@ -129,13 +129,18 @@ for k, col in zip(unique_labels, colors_final):
             #pass
             #xy = data[class_member_mask & core_samples_mask]
             xy = data[class_member_mask]
-            
+            print("xy: %s" % xy)           
+            bbox = [min(xy[:,0:1]), min(xy[:,1:2]),max(xy[:,0:1]), max(xy[:,1:2])]
+            print("bbox: %s" % bbox)
+            exit
             p_im, phi, p_vals = hough(xy[:,0:1], xy[:,1:2], 200, 361)
 
             p_im_max = np.max(p_im)
             print("max p_im : %s " % (p_im_max))
             num_max = np.sum((p_im>0.95*p_im_max))
             print("pts >= 0.9*p_im_max %s " % (num_max))
+            
+            
             
             if num_max <= 3:
                 has_lines = True
@@ -147,7 +152,7 @@ for k, col in zip(unique_labels, colors_final):
                     print("p,phi: %f,%f" % (p_vals[x],phi[y]))
                         #print("p,phi: %d,%d" % (p_vals[pair[0]], phi[pair[1]]))
                 #else:
-                   # print(inds)
+                    # print(inds)
                     #print("p,phi: %d,%d" % (p_vals[inds[0]], phi[inds[1]]))
 
             #plt.imshow(p_im,cmap="gray")
@@ -157,10 +162,10 @@ for k, col in zip(unique_labels, colors_final):
             
             
             f0 = np.shape(xy)
-            f1=xy.mean(axis=0)        
-            f2=xy.std(axis=0)
-            f3=scipy.stats.skew(xy,0)
-            f4=scipy.stats.kurtosis(xy,0)
+            f1 = xy.mean(axis=0)        
+            f2 = xy.std(axis=0)
+            f3 = scipy.stats.skew(xy,0)
+            f4 = scipy.stats.kurtosis(xy,0)
             
             pca = PCA(n_components=2)
             pca.fit(xy)

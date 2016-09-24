@@ -5,7 +5,7 @@ import matplotlib.image as mpimg
 import time
 from sklearn.cluster import DBSCAN
 
-
+# Clusters to save
 clus_save = range(1,10000, 500)
 
 img=mpimg.imread('image.bmp')
@@ -38,9 +38,11 @@ laser_sensors = [0, lms1, lms2, lms3, 0, lms5, 0, lms7, lms8]
 lms_files = ["", "possi.lms1","possi.lms2","possi.lms3",
              "", "possi.lms5", "", "possi.lms7","possi.lms8"]
 
+# MODIFY HERE: Select Laser scanners to use
 use_laser = [1, 2, 3, 5, 7, 8]
 # use_laser = [1, 8]
 
+#Add laser sensors to Scene
 for laser_n in use_laser:
     laser_sensors[laser_n].set_src_path(lms_files[laser_n])
     scene.add_sensor(laser_sensors[laser_n])
@@ -64,11 +66,13 @@ xos = []
 yos = []
 angs = []
 
+# Extract origins
 for range_sensor in scene.sensors["range"]:
     xos.append(float(range_sensor.dataset["calib_data"]["sx"]))
     yos.append(float(range_sensor.dataset["calib_data"]["sy"]))
     angs.append(float(range_sensor.dataset["calib_data"]["ang"]))
 
+# MODIFY HERE: Select whether to plot process or not
 plot_process = False
 
 if plot_process:
