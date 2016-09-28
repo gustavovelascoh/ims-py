@@ -59,6 +59,7 @@ parser.add_argument('file', metavar='file',
                     help='cluster file')
 parser.add_argument('--features', action='store_true')
 parser.add_argument('--noplot', action='store_true')
+parser.add_argument('--eval', action='store_true')
 
 args = parser.parse_args()
 #print("File: %s" % args.file)
@@ -83,6 +84,12 @@ if not args.noplot:
     
     fig.show()
 
+if args.eval:
+    mfile = open("kmeans3_sk.model", "rb")
+    km = pickle.load(mfile)
+    km_model = km["model"]
+    km_std = km["std"]
+
 
 clusters_data = pickle.load(file)
 
@@ -92,11 +99,11 @@ data = clusters_data["raw"]
 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
 core_samples_mask[db.core_sample_indices_] = True
 labels = db.labels_
-print(db)
-print(db.min_samples)
+#print(db)
+#print(db.min_samples)
 #print(db.core_sample_indices_)
 #     exit()
-
+print(labels)
 # Number of clusters in labels, ignoring noise if present.
 n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
 
@@ -121,7 +128,7 @@ for k, col in zip(unique_labels, colors_final):
         #col = 'k'
 
         class_member_mask = (labels == k)
-        #print(sum(class_member_mask))
+        print(sum(class_member_mask))
         
         has_lines = False
         
@@ -129,27 +136,29 @@ for k, col in zip(unique_labels, colors_final):
             #pass
             #xy = data[class_member_mask & core_samples_mask]
             xy = data[class_member_mask]
-            print("xy: %s" % xy)           
-            bbox = [min(xy[:,0:1]), min(xy[:,1:2]),max(xy[:,0:1]), max(xy[:,1:2])]
-            print("bbox: %s" % bbox)
+            #print("xy: %s" % xy)           
+            bbox = np.array([min(xy[:,0:1]), min(xy[:,1:2]),max(xy[:,0:1]), max(xy[:,1:2])])
+            area = (bbox[2]-bbox[0])*(bbox[3]-bbox[1])
+            dens = len(xy)/area
+            #print("bbox: %s, area: %s, dens: %s" % (bbox, area, dens))
             exit
             p_im, phi, p_vals = hough(xy[:,0:1], xy[:,1:2], 200, 361)
 
             p_im_max = np.max(p_im)
-            print("max p_im : %s " % (p_im_max))
+            #print("max p_im: %s " % (p_im_max))
             num_max = np.sum((p_im>0.95*p_im_max))
-            print("pts >= 0.9*p_im_max %s " % (num_max))
+            #print("pts >= 0.9*p_im_max: %s " % (num_max))
             
-            
+            inds = 0
             
             if num_max <= 3:
                 has_lines = True
                 inds = np.where(p_im>0.95*p_im_max)
-                print(inds)
+               # print(inds)
                 #if num_max > 1:
                     
-                for x,y in zip(inds[0], inds[1]):
-                    print("p,phi: %f,%f" % (p_vals[x],phi[y]))
+                #for x,y in zip(inds[0], inds[1]):
+                #    print("p,phi: %f,%f" % (p_vals[x],phi[y]))
                         #print("p,phi: %d,%d" % (p_vals[pair[0]], phi[pair[1]]))
                 #else:
                     # print(inds)
@@ -171,20 +180,41 @@ for k, col in zip(unique_labels, colors_final):
             pca.fit(xy)
             f5 = pca.explained_variance_ratio_
             
+            f6 = inds
+            f7 = dens
+            f8 = area
+            
             output_str = ''
             
             if not args.features:
                 output_str = str(k) + "\t"
-            output_str += str(float(f0[0])) + "\t"
-                
+                output_str += str(float(f0[0])) + "\t"
+            delimiter = ", "
             #output_str += "\t".join(str(x) for x in f1) + "\t"
-            output_str += "\t".join(str(x) for x in f2) + "\t"
-            output_str += "\t".join(str(x) for x in f3) + "\t"
-            output_str += "\t".join(str(x) for x in f4) + "\t"
-            output_str += "\t".join(str(x) for x in f5)
+            feats_str = ""
+            feats_str += delimiter.join(str(x) for x in f2) + delimiter
+            feats_str += delimiter.join(str(x) for x in f3) + delimiter
+            feats_str += delimiter.join(str(x) for x in f4) + delimiter
+            feats_str += delimiter.join(str(x) for x in f5) + delimiter
+            feats_str += str(0 if f6 == 0 else len(f6)) + delimiter
+            feats_str += str(f7[0]) + delimiter
+            feats_str += str(f8[0])
+            
+            output_str += feats_str
+            if not args.eval:
+                print(output_str)
+            
+            feats = np.fromstring(feats_str,sep=',')
+            
+            print ("array: %s" % feats)
             
             
-            print(output_str)
+            
+            if args.eval:
+               
+                feats_wh = (feats.reshape(1,-1) / km_std)
+                label_eval = km_model.predict(feats_wh)[0]
+                print("cluster %s classified as LABEL: %s " % (str(k), label_eval))
             
             
             #print("Size data %s" % str(np.shape(data)))
@@ -199,10 +229,13 @@ for k, col in zip(unique_labels, colors_final):
                 #         markeredgecolor='k', markersize=4)
                 
                 ax.plot(f1[0], f1[1],marker='x', markersize=4)
-                if has_lines:
-                    ax.text(f1[0], f1[1], 'C' + str(k), color='r')
+                if not args.eval:
+                    if has_lines:
+                        ax.text(f1[0], f1[1], 'C' + str(k), color='r')
+                    else:
+                        ax.text(f1[0], f1[1], 'C' + str(k))
                 else:
-                    ax.text(f1[0], f1[1], 'C' + str(k))
+                    ax.text(f1[0], f1[1], 'C' + str(k) + "class " + str(label_eval))
                 #input() 
                 #exit()
 
