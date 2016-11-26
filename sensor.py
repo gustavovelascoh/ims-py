@@ -14,15 +14,7 @@ def pol2cart(rho, phi):
     y = rho * np.sin(phi)
     return(x, y)
 
-def apply_roi(data, roi):
-    data = data[data[:,0] >= roi["xmin"]]
-    data = data[data[:,0] <= roi["xmax"]]
-    
-    data = data[data[:,1] >= roi["ymin"]]
-    data = data[data[:,1] <= roi["ymax"]]
-    
-    return data
-            
+
 class Sensor():
     TYPE_IMAGE = "image"
     TYPE_RANGE = "range"
@@ -95,9 +87,9 @@ class Laser(Sensor):
         del self.dataset["scans"][0]
         
         if self.dataset["scans"]:
-            return 0
+            return False
         else:
-            return 1
+            return True
         #print(self.scan)
     def remove_bg(self):
         
@@ -124,6 +116,9 @@ class Scene():
     sensors = {Sensor.TYPE_IMAGE: [],
                Sensor.TYPE_RANGE: [],
                }
+    roi = {}
+    
+    
     def __init__(self):
         pass
     
@@ -132,3 +127,53 @@ class Scene():
         
     def read_data(self):
         pass
+    
+    def preprocess_data(self):
+        '''
+        Preprocessing (Background removal, calibration, conversion 
+        to cartesian coordinates and low-level fusion of multiple 
+        range sensors. Also a roi is applied if it was configured)
+        @type (np.array, Bool)
+        @return (data, last): xy np.array of points in scene (N x 2),
+        True if is the last frame in sensor dataset 
+        '''
+        
+        x = None
+        y = None
+        
+        for range_sensor in self.sensors["range"]:
+            last = range_sensor.read_scan()
+            range_sensor.remove_bg()
+            range_sensor.calibrate()
+            #print(len(range_sensor.x_nobg))
+            #print(range_sensor.x_nobg)
+            if x != None:
+                #print("x %s" % x)
+                #print("xnbg %s" % range_sensor.x_nobg)
+                x = np.concatenate((x, range_sensor.x_nobg))
+                y = np.concatenate((y, range_sensor.y_nobg))
+            else:
+                x = range_sensor.x_nobg
+                y = range_sensor.y_nobg
+            
+        x = x/100
+        y = y/100
+        
+        data = np.array([x,y]).transpose()
+        
+        if self.roi:
+            data = self._apply_roi(data, self.roi)
+                
+        return data, last       
+    
+    def set_roi(self, roi):
+        self.roi = {"ymin":-24,"ymax":30,"xmin":-30,"xmax":40}
+        
+    @staticmethod
+    def _apply_roi(data, roi):
+        data = data[data[:,0] >= roi["xmin"]]
+        data = data[data[:,0] <= roi["xmax"]]
+        
+        data = data[data[:,1] >= roi["ymin"]]
+        data = data[data[:,1] <= roi["ymax"]]
+        return data

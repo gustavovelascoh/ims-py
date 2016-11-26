@@ -1,14 +1,33 @@
+#!/usr/bin/python3
 import sensor
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import time
 from sklearn.cluster import DBSCAN
+import argparse
+import os
 
+
+cwd = os.getcwd()
+description_str='Process scene using specified parameters'
+parser = argparse.ArgumentParser(description=description_str)
+parser.add_argument('laser_list',
+                    metavar='L',
+                    type=int,
+                    nargs='+',
+                    help="List of scanners to use. (Available 1, 2, 3, 5, 7, 8)")
+parser.add_argument('--sds', action='store_true', help="Save data stats")
+args = parser.parse_args()
+
+print("laser_list %s",args.laser_list)
+print("sds %s",args.sds)
 # Clusters to save
-clus_save = range(1,10000, 500)
+clus_save = range(1,20000, 250)
 
 img=mpimg.imread('image.bmp')
+
+
 
 # map_scale = 5.13449
 map_scale = 4.1345
@@ -39,8 +58,22 @@ lms_files = ["", "possi.lms1","possi.lms2","possi.lms3",
              "", "possi.lms5", "", "possi.lms7","possi.lms8"]
 
 # MODIFY HERE: Select Laser scanners to use
-use_laser = [1, 2, 3, 5, 7, 8]
+use_laser = args.laser_list
+# use_laser = [1, 2, 3, 5, 7, 8]
 # use_laser = [1, 8]
+
+dir_path = "scene_" + "".join([str(x) for x in use_laser])
+        
+if not os.path.exists(dir_path):
+    os.makedirs(dir_path)
+
+sds_filename=dir_path + "/data.log"
+scene_filename=dir_path + "/scene.log"
+
+if args.sds:
+    with open(sds_filename, '+w') as out:
+        data_log="Frame   Clusters\n"
+        out.write(data_log)
 
 #Add laser sensors to Scene
 for laser_n in use_laser:
@@ -52,6 +85,7 @@ for range_sensor in scene.sensors["range"]:
 
 #lms1.set_src_path("possi.lms3")
 #lms1.load()
+process_log="Range sensors in the scene: %d" % len(scene.sensors["range"]) + "\n"
 
 print("Range sensors in the scene: %d" % len(scene.sensors["range"]))
 
@@ -105,57 +139,17 @@ if plot_process:
 nf = 1
 
 roi={"ymin":-24,"ymax":30,"xmin":-30,"xmax":40}
+scene.set_roi(roi)
 
 tstart = time.time()
 while not last:
-    print("Frame %d" % nf)
+    #print("Frame %d" % nf)
+    data_log = ("%05d   " % nf)
     
     #plt.pause(1)
-    x = None
-    y = None
-    #y = []
-    
-    for range_sensor in scene.sensors["range"]:
-        last = range_sensor.read_scan()
-        range_sensor.remove_bg()
-        range_sensor.calibrate()
-        #print(len(range_sensor.x_nobg))
-        #print(range_sensor.x_nobg)
-        if x != None:
-            #print("x %s" % x)
-            #print("xnbg %s" % range_sensor.x_nobg)
-            x = np.concatenate((x, range_sensor.x_nobg))
-            y = np.concatenate((y, range_sensor.y_nobg))
-        else:
-            x = range_sensor.x_nobg
-            y = range_sensor.y_nobg
-        
-        #print(range_sensor.ts)
-            
-        
-    #print("new x %s " % x)
-    #print(lms1.scan)
-    #dir(lms1.scan)
-    #laser_data = lms1.scan["data"]
-    x = x/100
-    y = y/100
-    
-    #print(lms1.scan.data)
-    #print("len data %d" % len(lms1.scan.data))
-    
-    # For plotting raw data
-    # theta = lms1.raw_theta
-    # laser_data = lms1.scan
-    
-    # For plotting no bg data (uncalibrated)
-    #theta = lms1.theta_nobg
-    #laser_data = lms1.data_nobg
-    #print(len(laser_data))
-    #if 
-    #x=range_sensor.x_nobg
-    #y=range_sensor.y_nobg
-    
-    #ax = plt.subplot(111)
+    # Preprocessing
+    data, last = scene.preprocess_data()
+         
     if plot_process:
         ax.clear()
     #rdata.set_xdata(theta)
@@ -204,10 +198,11 @@ while not last:
     
     
     #print("shape x: %s, shape y: %s" % (str(np.shape(x)), str(np.shape(y))))
-    data = np.array([x,y]).transpose()
-    #print(data)
-#print("shape data: %s" % (str(np.shape(data))))
-    data = sensor.apply_roi(data, roi)
+#     data = np.array([x,y]).transpose()
+#     print(data)
+#     print("shape data: %s" % (str(np.shape(data))))
+#     exit()
+#     data = sensor.apply_roi(data, roi)
     #data.transpose()
     #print(x.reshape(1,-1))
     #print(data)
@@ -225,16 +220,18 @@ while not last:
     # Number of clusters in labels, ignoring noise if present.
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
     
-    print('Estimated number of clusters: %d' % n_clusters_)
+    #print('Estimated number of clusters: %d' % n_clusters_)
+    data_log += str(n_clusters_) + "\n"
+    
+    if args.sds:
+        with open(sds_filename, '+a') as out:            
+            out.write(data_log)
     
     if plot_process:
         unique_labels = set(labels)
         #colors = plt.cm.Jet(np.linspace(0, 1, len(unique_labels)))
         colors = ['b', 'g', 'r', 'm']
-        colors+= colors+colors
-        colors+= colors+colors
-        colors+= colors+colors
-        colors+= colors+colors
+        colors = colors*50
         
         colors_final = colors[0:len(unique_labels)]
         
@@ -272,7 +269,7 @@ while not last:
         ax.plot(xos,yos, '.', marker='v', markerfacecolor='g', markeredgecolor='k', markersize=10)
         #print(ax)
         #imgplot.set_data(img)
-        #ax.draw_artist(imgplot)
+        #ax.draw_a rtist(imgplot)
         #ax.draw_artist(lasers_pts)
         #fig.canvas.blit(ax.bbox)
         #fig.canvas.restore_region(background)
@@ -282,21 +279,26 @@ while not last:
         
         import pickle
         
-        cluster_data = {"raw": data,
+        #dir_path = "scene_" + "".join([str(x) for x in use_laser])
+        
+        clusters_data = {"raw": data,
                         "db": db,
                         "frame": nf,
                         "lasers": use_laser,
                         }
-        output_file = format(nf,'05') + "_" + "".join([str(x) for x in use_laser]) + ".clus"
-        
+        output_file = dir_path + "/" + format(nf,'05') + ".clus"        
         fo = open(output_file, "wb")
-        pickle.dump(cluster_data, fo, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(clusters_data, fo, pickle.HIGHEST_PROTOCOL)
     
     nf+=1   
     
     #input()
-    if nf == 12000:
+    if nf == 22000:
         break
 
-print('FPS:' , (nf-1)/(time.time()-tstart))
+process_log += 'FPS: %s ' % ((nf-1)/(time.time()-tstart))
+#print('FPS:' , (nf-1)/(time.time()-tstart))
+print(process_log)
+with open(scene_filename, '+w') as out:
+    out.write(process_log)
 
