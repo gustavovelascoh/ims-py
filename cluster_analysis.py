@@ -49,8 +49,6 @@ def hough(x, y, m=100, n=181):
     #print("pts >= 0.9*p_im_max %s " % (np.sum((p_im>0.9*p_im_max))))
     return (p_im, phi, p_vals,)
     
-    
-    
 
 cwd = os.getcwd()
 
@@ -103,7 +101,7 @@ labels = db.labels_
 #print(db.min_samples)
 #print(db.core_sample_indices_)
 #     exit()
-print(labels)
+#print(labels)
 # Number of clusters in labels, ignoring noise if present.
 n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
 
@@ -128,7 +126,7 @@ for k, col in zip(unique_labels, colors_final):
         #col = 'k'
 
         class_member_mask = (labels == k)
-        print(sum(class_member_mask))
+        #print(sum(class_member_mask))
         
         has_lines = False
         
@@ -154,7 +152,7 @@ for k, col in zip(unique_labels, colors_final):
             if num_max <= 3:
                 has_lines = True
                 inds = np.where(p_im>0.95*p_im_max)
-               # print(inds)
+                # print(inds)
                 #if num_max > 1:
                     
                 #for x,y in zip(inds[0], inds[1]):
@@ -168,6 +166,25 @@ for k, col in zip(unique_labels, colors_final):
             #plt.show()            
             #input()
             #exit()
+            
+            xy_max = np.max(xy,axis=0)
+            xy_min = np.min(xy,axis=0)
+            xy_delta = xy_max - xy_min
+            
+            #print("xy_max %s xy_min %s xy_delta %s" % (xy_max, xy_min, xy_delta))
+            
+            xy_scaled = ((xy - xy_min)/xy_delta)-0.5
+            
+            #print(xy_scaled)
+            
+            if (xy_delta[0] >= xy_delta[1]):
+                xy_scaled = xy_scaled/np.array([1, xy_delta[0]/xy_delta[1]])
+            else:
+                xy_scaled = xy_scaled/np.array([xy_delta[1]/xy_delta[0], 1])
+            #print(xy_scaled)
+            
+            xy_copy = xy
+            xy = xy_scaled
             
             
             f0 = np.shape(xy)
@@ -192,6 +209,7 @@ for k, col in zip(unique_labels, colors_final):
             delimiter = ", "
             #output_str += "\t".join(str(x) for x in f1) + "\t"
             feats_str = ""
+            feats_str += delimiter.join(str(x) for x in f1) + delimiter
             feats_str += delimiter.join(str(x) for x in f2) + delimiter
             feats_str += delimiter.join(str(x) for x in f3) + delimiter
             feats_str += delimiter.join(str(x) for x in f4) + delimiter
@@ -206,9 +224,9 @@ for k, col in zip(unique_labels, colors_final):
             
             feats = np.fromstring(feats_str,sep=',')
             
-            print ("array: %s" % feats)
+            #print ("array: %s" % feats)
             
-            
+            #exit()
             
             if args.eval:
                
@@ -220,14 +238,17 @@ for k, col in zip(unique_labels, colors_final):
             #print("Size data %s" % str(np.shape(data)))
             #print("Size xy %s" % str(np.shape(xy)))
             #print(xy)
+            
+            
             if not args.noplot:
+                xy = xy_copy
                 ax.plot(xy[:, 0], xy[:, 1], '.', markerfacecolor=col,
                          markeredgecolor='k', markersize=10)
             
                 #xy = data[class_member_mask & ~core_samples_mask]
                 #ax.plot(xy[:, 0], xy[:, 1], '.', markerfacecolor=col,
                 #         markeredgecolor='k', markersize=4)
-                
+                f1 = xy.mean(axis=0)
                 ax.plot(f1[0], f1[1],marker='x', markersize=4)
                 if not args.eval:
                     if has_lines:

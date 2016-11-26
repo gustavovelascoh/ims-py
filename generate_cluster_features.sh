@@ -1,13 +1,16 @@
 #!/bin/bash
-
+scene_path=$1
+echo $scene_path
+cd $scene_path
 files=$(ls *.clus)
-#echo $files
+echo $files
+
 init_samp=0
 > cluster_features
 
 for file in $files
 do
-	cmd="python3 cluster_analysis.py $file --features --noplot > feat_tmp"
+	cmd="python3 ../cluster_analysis.py $file --features --noplot > feat_tmp"
 	copy="cat feat_tmp >> cluster_features"
 	echo "Executing $cmd"
 	eval $cmd
