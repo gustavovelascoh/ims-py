@@ -50,7 +50,7 @@ elif args.action == "kmeans3":
     np.random.seed((1300,2000))
     codes = 3
     k1 = kmeans(whitened,codes)
-    k2 = sk_kmeans(n_clusters=5 )
+    k2 = sk_kmeans(n_clusters=2 )
     k2.fit(whitened)
     k2.cluster_centers_
     
@@ -67,6 +67,30 @@ elif args.action == "kmeans3":
     
     pass
 elif args.action == "kmeans4":
+    pass
+elif args.action == "PCA":
+    pass
+elif args.action == "plot":
+    s,f = np.shape(features)
+    print("shape %s,%s" % (s, f))
+    
+    fig, ax = plt.subplots(f-1, f-1)
+    
+    #print(features[:,12])
+    #print(ax)
+    
+    for i in range(0, f-1):
+        row=''
+        for j in range(i+1, f-1):
+            row+='%s,%s\t' % (i,j)
+            ax[i,j].plot(features[:,i],features[:,j],'. ')
+            
+        print(row)
+        
+    plt.show()
+            
+    
+    
     pass
 else:
     print("Invalid action")
