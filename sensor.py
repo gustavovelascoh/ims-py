@@ -50,6 +50,8 @@ class Camera(Sensor):
 class Laser(Sensor):
     SUBTYPE_SINGLELAYER = "Single layer"
     SUBTYPE_MULTILAYER = "Multilayer"
+    scan = None
+    ts = None
     
     def __init__(self, laser_type):
         self.subtype = laser_type
@@ -141,8 +143,11 @@ class Scene():
         x = None
         y = None
         
+        ts_array = []
+        
         for range_sensor in self.sensors["range"]:
             last = range_sensor.read_scan()
+            ts_array.append(range_sensor.ts)
             range_sensor.remove_bg()
             range_sensor.calibrate()
             #print(len(range_sensor.x_nobg))
@@ -156,6 +161,8 @@ class Scene():
                 x = range_sensor.x_nobg
                 y = range_sensor.y_nobg
             
+        #print("ts_array: %s, span: %s" % (ts_array,(max(ts_array)-min(ts_array))))
+        ts = max(ts_array)
         x = x/100
         y = y/100
         
@@ -164,7 +171,7 @@ class Scene():
         if self.roi:
             data = self._apply_roi(data, self.roi)
                 
-        return data, last       
+        return data, last, ts       
     
     def set_roi(self, roi):
         self.roi = {"ymin":-24,"ymax":30,"xmin":-30,"xmax":40}
@@ -177,3 +184,52 @@ class Scene():
         data = data[data[:,1] >= roi["ymin"]]
         data = data[data[:,1] <= roi["ymax"]]
         return data
+    
+class Blob():
+    def __init__(self, data, ts, nf, blob_id):
+        self.data = data
+        self.ts = ts
+        self.nf = nf
+        self.id = blob_id
+        self.next_blobs = []
+        self.prev_blobs = []
+        
+    def get_features(self):
+        xy = self.data
+        bbox = np.array([min(xy[:,0:1]), min(xy[:,1:2]),max(xy[:,0:1]), max(xy[:,1:2])])
+        self.area = (bbox[2]-bbox[0])*(bbox[3]-bbox[1])
+        self.dens = len(xy)/self.area
+        self.bbox = bbox
+        self.mean = xy.mean(axis=0)
+        
+    def get_distance_from(self, blob):
+        return abs(self.mean - blob.mean)
+    
+    def set_connection_from(self, blob):
+        self.prev_blobs.append(blob)
+        blob.next_blobs.append(self.id)
+        
+        self.vel = self.get_distance_from(blob)/(self.ts - blob.ts)
+        self.ang = self._angle_between(self.mean, blob.mean)
+    
+    def add_connection_to(self, blob):
+        self.next_blobs.append(blob.id)
+
+    @staticmethod
+    def _unit_vector(vector):
+        """ Returns the unit vector of the vector.  """
+        return vector / np.linalg.norm(vector)
+
+     
+    def _angle_between(self, v1, v2):
+        v1_u = self._unit_vector(v1)
+        v2_u = self._unit_vector(v2)
+        return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
+        
+        
+        
+    
+            
+            
+        
+    

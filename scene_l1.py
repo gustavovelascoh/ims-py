@@ -141,6 +141,9 @@ nf = 1
 roi={"ymin":-24,"ymax":30,"xmin":-30,"xmax":40}
 scene.set_roi(roi)
 
+blob_list = []
+blob_count = 1
+
 tstart = time.time()
 while not last:
     #print("Frame %d" % nf)
@@ -148,7 +151,10 @@ while not last:
     
     #plt.pause(1)
     # Preprocessing
-    data, last = scene.preprocess_data()
+    data, last, ts = scene.preprocess_data()
+    
+#     if (nf > 10):
+#         exit()
          
     if plot_process:
         ax.clear()
@@ -220,6 +226,37 @@ while not last:
     # Number of clusters in labels, ignoring noise if present.
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
     
+    clusters_data = {"raw": data,
+                       "db": db,
+                       "frame": nf,
+                       "ts": ts,
+                       "lasers": use_laser,
+                       }
+    
+    unique_labels = set(labels)
+    temp_blob_list = []
+    
+    for k in unique_labels:
+        if k != -1:
+            class_member_mask = (labels == k)
+            
+            if (sum(class_member_mask) >= db.min_samples):
+                blob = sensor.Blob(data[class_member_mask],
+                                      ts,
+                                      nf,
+                                      blob_count)
+                blob.get_features()
+                temp_blob_list.append(blob)
+                blob_count += 1
+    
+    blob_list.append(temp_blob_list)
+    
+    print("blobs %s" % [b.mean for b in blob_list[nf-1]])
+    
+    if nf > 4:
+        print(blob_list)
+        exit()
+    
     #print('Estimated number of clusters: %d' % n_clusters_)
     data_log += str(n_clusters_) + "\n"
     
@@ -284,6 +321,7 @@ while not last:
         clusters_data = {"raw": data,
                         "db": db,
                         "frame": nf,
+                        "ts": ts,
                         "lasers": use_laser,
                         }
         output_file = dir_path + "/" + format(nf,'05') + ".clus"        
