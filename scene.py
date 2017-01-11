@@ -9,9 +9,9 @@ import matplotlib.image as mpimg
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import time
 from sklearn.cluster import DBSCAN
-import tkinter
 import threading
-
+import matplotlib
+matplotlib.use('TkAgg')
 
 
 class RangeSensors(tk.Frame):
@@ -96,11 +96,11 @@ class SceneApp(tk.Frame):
         self.loop = False
         
         self.fig = plt.figure(figsize=(30/3,22.5/3))
-        #ax = fig.add_subplot(111, projection='polar')
+         #ax = fig.add_subplot(111, projection='polar')
         self.ax = self.fig.add_subplot(111)
-        
-        # a tk.DrawingArea
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self)
+         
+         # a tk.DrawingArea
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.master)
         self.canvas.show()
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         
@@ -239,7 +239,9 @@ class SceneApp(tk.Frame):
         
 if __name__ == "__main__":
     main = tk.Tk()
+    main.wm_title("Intersection Management System")
     # Code to add widgets will go here...
     SceneApp(main).pack(side="top", fill="both", expand="True")
     
-    main.mainloop()
+    tk.mainloop()
+    
