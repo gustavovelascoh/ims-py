@@ -7,6 +7,7 @@ import threading
 import time
 import tkinter as tk
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
@@ -22,7 +23,7 @@ class Viewer(tk.Frame):
         
         self.master = master        
         self.loop = False        
-        self.fig = plt.figure(figsize=(30/3,22.5/3))
+        self.fig = Figure(figsize=(30/3,22.5/3))
         #ax = fig.add_subplot(111, projection='polar')
         self.ax = self.fig.add_subplot(111)
          
