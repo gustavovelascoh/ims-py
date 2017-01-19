@@ -9,6 +9,7 @@ import matplotlib.image as mpimg
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import time
 from sklearn.cluster import DBSCAN
+from gui import viewer
 import threading
 import matplotlib
 matplotlib.use('TkAgg')
@@ -68,7 +69,6 @@ class DatasetPath(tk.Frame):
         self.dataset_path = tk.filedialog.askdirectory(initialdir=ims_path)
         print("FOLDER OK -> %s" % self.dataset_path)
         self.e.insert(0, self.dataset_path)
-        pass
         
 class SceneApp(tk.Frame):
     def __init__(self, master):
@@ -93,16 +93,11 @@ class SceneApp(tk.Frame):
         sbutton.pack(side="top")
         button_frame.pack(side="top")
         
+        self.viewer = viewer.Viewer(self)
+        
         self.loop = False
         
-        self.fig = plt.figure(figsize=(30/3,22.5/3))
-         #ax = fig.add_subplot(111, projection='polar')
-        self.ax = self.fig.add_subplot(111)
-         
-         # a tk.DrawingArea
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.master)
-        self.canvas.show()
-        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        self.viewer.pack()
         
         
     def _loop(self):
@@ -212,29 +207,39 @@ class SceneApp(tk.Frame):
                              ((np.array([0,max_x])/map_scale)+d_x),
                              ((np.array([0,max_y])/map_scale)+d_y)
                              ))
-        img=mpimg.imread(self.dataset_path.dataset_path +
-                                                '/' +'image.bmp')
-        self.ax.clear()
-        imgplot = self.ax.imshow(img, extent=limits, aspect='auto')
         
-        lasers_pts, = self.ax.plot(xos,yos, '.', markerfacecolor='g', markeredgecolor='k', markersize=10)
-        plt.ylim(ymin=-25,ymax=32)
-        plt.xlim(xmin=-30,xmax=40)
-        
-        nf = 1
-
         roi={"ymin":-24,"ymax":30,"xmin":-30,"xmax":40}
         self.scene.set_roi(roi)
+        self.viewer.set_roi(roi)
+        self.viewer.draw_img(self.dataset_path.dataset_path +
+                                                '/' +'image.bmp', limits)        
+        self.viewer.plot(xos,yos, '.', markerfacecolor='g', markeredgecolor='k',
+                         markersize=10)
+        self.viewer.save_background()
         
-        self.canvas.show()
-        self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
-        
-        data, last, self.ts = self.scene.preprocess_data()
-        plt.ylim(ymin=roi["ymin"],ymax=roi["ymax"])
-        plt.xlim(xmin=roi["xmin"],xmax=roi["xmax"])
-        
-        self.plot_data, = self.ax.plot(data[:,0], data[:,1], 'b. ')
-        self.canvas.show()
+#         img=mpimg.imread(self.dataset_path.dataset_path +
+#                                                 '/' +'image.bmp')
+#         self.ax.clear()
+#         imgplot = self.ax.imshow(img, extent=limits, aspect='auto')
+#         
+#         lasers_pts, = self.ax.plot(xos,yos, '.', markerfacecolor='g', markeredgecolor='k', markersize=10)
+#         plt.ylim(ymin=-25,ymax=32)
+#         plt.xlim(xmin=-30,xmax=40)
+#         
+#         nf = 1
+# 
+#         roi={"ymin":-24,"ymax":30,"xmin":-30,"xmax":40}
+#         self.scene.set_roi(roi)
+#         
+#         self.canvas.show()
+#         self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
+#         
+#         data, last, self.ts = self.scene.preprocess_data()
+#         plt.ylim(ymin=roi["ymin"],ymax=roi["ymax"])
+#         plt.xlim(xmin=roi["xmin"],xmax=roi["xmax"])
+#         
+#         self.plot_data, = self.ax.plot(data[:,0], data[:,1], 'b. ')
+#         self.canvas.show()
         
         
 if __name__ == "__main__":

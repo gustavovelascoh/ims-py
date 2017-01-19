@@ -33,15 +33,16 @@ class Viewer(tk.Frame):
         self.canvas.show()
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         
-    def draw_img(self, img_path):
+    def draw_img(self, img_path, limits=None):
         img = mpimg.imread(img_path)
-        imgplot = self.ax.imshow(img, aspect='auto')
+        imgplot = self.ax.imshow(img, aspect='auto', extent=limits)
         self.__fit_to_roi()
+        self.canvas.show()
         
         
     def __fit_to_roi(self):
-        plt.ylim(ymin=self.roi["ymin"],ymax=self.roi["ymax"])
-        plt.xlim(xmin=self.roi["xmin"],xmax=self.roi["xmax"])    
+        self.ax.set_ylim(ymin=self.roi["ymin"],ymax=self.roi["ymax"])
+        self.ax.set_xlim(xmin=self.roi["xmin"],xmax=self.roi["xmax"])    
         
      
     def set_roi(self, roi): 
@@ -50,10 +51,18 @@ class Viewer(tk.Frame):
     def plot(self, *args, **kwargs):
         self.ax.plot(*args, **kwargs)
         self.__fit_to_roi()
+        self.canvas.show()
             
     def save_background(self):
+        self.__fit_to_roi()
         self.canvas.show()
         self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
+        self.plot_data, = self.ax.plot(0, 0, 'k. ')
+    
+    def update_plot_data(self, *args):
+        self.plot_data.set_data(*args)
+        self.ax.draw_artist(self.plot_data)
+        self.canvas.show()
                 
 
 if __name__ == "__main__":
