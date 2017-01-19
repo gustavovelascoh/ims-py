@@ -152,7 +152,7 @@ class Scene():
             range_sensor.calibrate()
             #print(len(range_sensor.x_nobg))
             #print(range_sensor.x_nobg)
-            if x != None:
+            if x is not None:
                 #print("x %s" % x)
                 #print("xnbg %s" % range_sensor.x_nobg)
                 x = np.concatenate((x, range_sensor.x_nobg))

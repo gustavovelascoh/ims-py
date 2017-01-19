@@ -3,10 +3,7 @@ Created on Jan 16, 2017
 
 @author: gustavo
 '''
-import threading
-import time
 import tkinter as tk
-import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -57,7 +54,10 @@ class Viewer(tk.Frame):
         self.__fit_to_roi()
         self.canvas.show()
         self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
-        self.plot_data, = self.ax.plot(0, 0, 'k. ')
+        self.plot_data_tup = self.ax.plot(0, 0, 'b. ')
+        print(self.plot_data_tup)
+        self.plot_data = self.plot_data_tup[0]
+        self.canvas.show()
     
     def update_plot_data(self, *args):
         self.plot_data.set_data(*args)

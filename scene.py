@@ -4,9 +4,6 @@
 import tkinter as tk
 import sensor
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import time
 from sklearn.cluster import DBSCAN
 from gui import viewer
@@ -94,11 +91,8 @@ class SceneApp(tk.Frame):
         button_frame.pack(side="top")
         
         self.viewer = viewer.Viewer(self)
-        
-        self.loop = False
-        
         self.viewer.pack()
-        
+        self.loop = False   
         
     def _loop(self):
         self.loop = True
@@ -114,9 +108,7 @@ class SceneApp(tk.Frame):
             data, last, self.ts = self.scene.preprocess_data()
             diff = self.ts - last_ts
             time.sleep(diff/1000.0)
-            self.plot_data.set_data(data[:,0], data[:,1])
-            self.ax.draw_artist(self.plot_data)
-            self.canvas.show()     
+            self.viewer.update_plot_data(data[:,0], data[:,1])     
     
     def _stop(self):
         self.loop = False
@@ -126,9 +118,7 @@ class SceneApp(tk.Frame):
         #self.canvas.show()
         print("clear")
         data, last, self.ts = self.scene.preprocess_data()
-        self.plot_data.set_data(data[:,0], data[:,1])
-        self.ax.draw_artist(self.plot_data)
-        self.canvas.show()
+        self.viewer.update_plot_data(data[:,0], data[:,1])
     
     def _create_scene(self):
         l=[0,0,0,0,0,0,0,0,0]
