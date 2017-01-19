@@ -1,5 +1,10 @@
-clus files:
+Intersection Management System
+==============================
 
-N_(S).clus
-N: Frame
-S: Laser scanners used (e.g. 12,135,123578)
+This project is intended for handle an intersection management system based on laser sensors (for now) and cameras (coming soon).
+
+For now, it only uses a laserscanner data set from POSSI research group.
+
+The aim is to have a representation of the scene based on data from different sensors and detect abnormal conditions and notificate traffic incidents.
+
+This is part of my MSc project "Multisensor architecture for an intersection management system"
