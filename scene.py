@@ -79,19 +79,26 @@ class SceneApp(tk.Frame):
         button = tk.Button(button_frame, text="Create Scene",
                            command=self._create_scene)
         button.pack(side="left")
-        nbutton = tk.Button(button_frame, text="Next",
-                           command=self._next_frame)
-        nbutton.pack(side="top")
-        lbutton = tk.Button(button_frame, text="Loop",
-                           command=self._loop)
-        lbutton.pack(side="top")
-        sbutton = tk.Button(button_frame, text="Stop",
-                           command=self._stop)
-        sbutton.pack(side="top")
         button_frame.pack(side="top")
-        
+                
         self.viewer = viewer.Viewer(self)
         self.viewer.pack()
+        
+        viewer_toolbar_frame = tk.Frame(self)
+        
+        self.date_label = tk.Label(viewer_toolbar_frame, text="time: NA")
+        self.date_label.pack(side="left")
+        nbutton = tk.Button(viewer_toolbar_frame, text="Next",
+                           command=self._next_frame)
+        nbutton.pack(side="left")
+        lbutton = tk.Button(viewer_toolbar_frame, text="Loop",
+                           command=self._loop)
+        lbutton.pack(side="left")
+        sbutton = tk.Button(viewer_toolbar_frame, text="Stop",
+                           command=self._stop)
+        sbutton.pack(side="left")
+        viewer_toolbar_frame.pack(side="top")
+        
         self.loop = False   
         
     def _loop(self):
@@ -104,11 +111,18 @@ class SceneApp(tk.Frame):
     def _loop_thread(self):
         while self.loop:
             last_ts = self.ts
-            print("clear")
+            start_time = time.time()
+            #print("clear")
             data, last, self.ts = self.scene.preprocess_data()
+            
+            self.date_label.config(text="%s" % self.ts)
+            print("Elapsed time %s" % (time.time() - start_time))
+            print("Elapsed ts %s" % (self.ts - last_ts))
             diff = self.ts - last_ts
-            time.sleep(diff/1000.0)
-            self.viewer.update_plot_data(data[:,0], data[:,1])     
+            time.sleep(0.1*diff/1000.0)
+            plot_time = time.time()
+            self.viewer.update_plot_data(data[:,0], data[:,1])
+            print("Elapsed time %s" % (time.time() - plot_time))
     
     def _stop(self):
         self.loop = False
@@ -116,8 +130,9 @@ class SceneApp(tk.Frame):
     def _next_frame(self):
         #self.ax.clear()
         #self.canvas.show()
-        print("clear")
+        #print("clear")
         data, last, self.ts = self.scene.preprocess_data()
+        self.date_label.config(text="%s" % self.ts)
         self.viewer.update_plot_data(data[:,0], data[:,1])
     
     def _create_scene(self):
