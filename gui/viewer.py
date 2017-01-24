@@ -62,7 +62,7 @@ class Viewer(tk.Frame):
     def update_plot_data(self, *args):
         self.plot_data.set_data(*args)
         self.ax.draw_artist(self.plot_data)
-        self.canvas.show()
+        self.canvas.draw()
                 
 
 if __name__ == "__main__":

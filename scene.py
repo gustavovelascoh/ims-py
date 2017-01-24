@@ -122,7 +122,7 @@ class SceneApp(tk.Frame):
             time.sleep(0.1*diff/1000.0)
             plot_time = time.time()
             self.viewer.update_plot_data(data[:,0], data[:,1])
-            print("Elapsed time %s" % (time.time() - plot_time))
+            print("Plotting time %s" % (time.time() - plot_time))
     
     def _stop(self):
         self.loop = False
