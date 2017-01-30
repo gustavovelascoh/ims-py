@@ -14,6 +14,9 @@ class Multiplot(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master)
         button_frame = tk.Frame(self)
+        button_bg = tk.Button(button_frame, text="Plot BG",
+                           command=self.plot_bg)
+        button_bg.pack(side="left")
         button_a = tk.Button(button_frame, text="Plot A",
                            command=self.plot_a)
         button_a.pack(side="left")
@@ -31,6 +34,9 @@ class Multiplot(tk.Frame):
         self.viewer = Viewer(self)
         self.viewer.pack()
         
+    def plot_bg(self):
+        self.viewer.save_background()
+            
     def plot_a(self):
         pass
     
