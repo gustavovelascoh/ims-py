@@ -4,7 +4,11 @@ Created on Jan 29, 2017
 @author: gustavo
 '''
 import tkinter as tk
+import sys
 
+sys.path.append("..")
+
+from gui.viewer import Viewer
 
 class Multiplot(tk.Frame):
     def __init__(self, master):
@@ -23,6 +27,9 @@ class Multiplot(tk.Frame):
                            command=self.plot_clr)
         button_clr.pack(side="left")
         button_frame.pack(side="top")
+        
+        self.viewer = Viewer(self)
+        self.viewer.pack()
         
     def plot_a(self):
         pass
