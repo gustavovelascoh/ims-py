@@ -19,7 +19,8 @@ class Viewer(tk.Frame):
         '''        
         tk.Frame.__init__(self, master)
         
-        self.master = master        
+        self.master = master
+        self.roi = None
         self.loop = False        
         self.fig = Figure(figsize=(30/3,22.5/3))
         #ax = fig.add_subplot(111, projection='polar')
@@ -38,8 +39,9 @@ class Viewer(tk.Frame):
         
         
     def __fit_to_roi(self):
-        self.ax.set_ylim(ymin=self.roi["ymin"],ymax=self.roi["ymax"])
-        self.ax.set_xlim(xmin=self.roi["xmin"],xmax=self.roi["xmax"])    
+        if self.roi != None:
+            self.ax.set_ylim(ymin=self.roi["ymin"],ymax=self.roi["ymax"])
+            self.ax.set_xlim(xmin=self.roi["xmin"],xmax=self.roi["xmax"])    
         
      
     def set_roi(self, roi): 
