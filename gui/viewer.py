@@ -31,6 +31,9 @@ class Viewer(tk.Frame):
         self.canvas.show()
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         
+        self.fixed_lines = 0
+        self.total_lines = 0
+        
     def draw_img(self, img_path, limits=None):
         img = mpimg.imread(img_path)
         imgplot = self.ax.imshow(img, aspect='auto', extent=limits)
@@ -57,14 +60,22 @@ class Viewer(tk.Frame):
         self.canvas.show()
         self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
         self.plot_data_tup = self.ax.plot(0, 0, 'b. ')
+        print("tuple")
         print(self.plot_data_tup)
+        self.cur_lines = len(self.plot_data_tup)
         self.plot_data = self.plot_data_tup[0]
         self.canvas.show()
+        self.fixed_lines = len(self.ax.get_lines())
     
-    def update_plot_data(self, *args):
-        self.plot_data.set_data(*args)
-        self.ax.draw_artist(self.plot_data)
+    def update_plot_data(self, *args, line_idx=0):
+        
+        print(self.plot_data)
+        print(self.ax.get_lines())
+        curr_line = self.plot_data_tup[line_idx]
+        curr_line.set_data(*args)
+        self.ax.draw_artist(curr_line)
         self.canvas.draw()
+        return self.plot_data
                 
 
 if __name__ == "__main__":

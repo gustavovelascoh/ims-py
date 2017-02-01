@@ -5,6 +5,8 @@ Created on Jan 29, 2017
 '''
 import tkinter as tk
 import sys
+from numpy import arange, sin, pi
+
 
 sys.path.append("..")
 
@@ -31,14 +33,25 @@ class Multiplot(tk.Frame):
         button_clr.pack(side="left")
         button_frame.pack(side="top")
         
+        
+        
         self.viewer = Viewer(self)
         self.viewer.pack()
         
+        roi={"ymin":-2,"ymax":2,"xmin":-10,"xmax":10}
+        self.viewer.set_roi(roi)
+        
     def plot_bg(self):
+        self.viewer.canvas.show()
         self.viewer.save_background()
             
     def plot_a(self):
-        pass
+        t = arange(0.0, 3.0, 0.01)
+        s = sin(2*pi*t)
+        
+        self.viewer.update_plot_data(t,s)
+        
+            
     
     def plot_b(self):
         pass
