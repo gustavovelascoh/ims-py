@@ -5,7 +5,7 @@ Created on Jan 29, 2017
 '''
 import tkinter as tk
 import sys
-from numpy import arange, sin, pi
+from numpy import arange, sin, pi, random
 
 
 sys.path.append("..")
@@ -42,6 +42,8 @@ class Multiplot(tk.Frame):
         self.viewer.set_roi(roi)
         
     def plot_bg(self):
+        t1 = arange(0.0, 3.0, 0.01)
+        self.viewer.plot(t1,t1,'xr')
         self.viewer.canvas.show()
         self.viewer.save_background()
             
@@ -49,14 +51,29 @@ class Multiplot(tk.Frame):
         t = arange(0.0, 3.0, 0.01)
         s = sin(2*pi*t)
         
-        self.viewer.update_plot_data(t,s)
+        self.viewer.plot(t,s)
+        self.viewer.update()
         
             
     
     def plot_b(self):
-        pass
+        t1 = arange(0.0, 3.0, 0.01)
+        s1 = sin(pi*t1)-1
+        t2 = arange(-1.0, 1.0, 0.01)
+        s2 = sin(4*pi*t2) + 1
+        
+        self.viewer.plot(t1,s1)
+        self.viewer.plot(t2,s2)
+        self.viewer.update()
     
     def plot_c(self):
+        x = 3*random.rand(1,20)
+        y = 2*random.rand(1,20)-1
+        
+        self.viewer.plot(x,y,'ok ')
+        
+        self.viewer.update()
+        
         pass
     
     def plot_clr(self):

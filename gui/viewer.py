@@ -33,6 +33,8 @@ class Viewer(tk.Frame):
         
         self.fixed_lines = 0
         self.total_lines = 0
+        self.used_lines = 0
+        self.bg_saved = 0
         
     def draw_img(self, img_path, limits=None):
         img = mpimg.imread(img_path)
@@ -51,32 +53,77 @@ class Viewer(tk.Frame):
         self.roi = roi
      
     def plot(self, *args, **kwargs):
-        self.ax.plot(*args, **kwargs)
-        self.__fit_to_roi()
-        self.canvas.show()
+        
+        self.available_lines = self.total_lines - self.fixed_lines - self.used_lines
+        print("Available lines: %d-%d-%d : %d" % (self.total_lines,
+                                               self.fixed_lines,
+                                               self.used_lines,
+                                               self.available_lines))
+        if self.available_lines > 0:
+            print("Updating line ")
+            self.update_plot_data( *args, line_idx = (self.fixed_lines + self.used_lines))
+        else:
+            print("Creating new line")
+            self.ax.plot(*args, **kwargs)
+            self.__fit_to_roi()
+            #self.canvas.show()
+            self.total_lines = len(self.ax.get_lines())
+        
+        if self.bg_saved:    
+            self.used_lines += 1
+        
             
     def save_background(self):
         self.__fit_to_roi()
         self.canvas.show()
         self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
-        self.plot_data_tup = self.ax.plot(0, 0, 'b. ')
-        print("tuple")
-        print(self.plot_data_tup)
-        self.cur_lines = len(self.plot_data_tup)
-        self.plot_data = self.plot_data_tup[0]
+#         self.plot_data_tup = self.ax.plot(0, 0, 'b. ')
+#         print("tuple")
+#         print(self.plot_data_tup)
+#         self.cur_lines = len(self.plot_data_tup)
+#         self.plot_data = self.plot_data_tup[0]
         self.canvas.show()
         self.fixed_lines = len(self.ax.get_lines())
+        self.bg_saved = 1
     
     def update_plot_data(self, *args, line_idx=0):
         
-        print(self.plot_data)
-        print(self.ax.get_lines())
-        curr_line = self.plot_data_tup[line_idx]
-        curr_line.set_data(*args)
+        #print(self.plot_data)
+        list_of_lines = self.ax.get_lines()
+        print("Length lol %d" % len(list_of_lines))
+        curr_line = list_of_lines[line_idx]
+        if len(args) == 2:
+            curr_line.set_data(*args)
+        else:
+            curr_line.set_data(*args[0:2])
+            curr_line.set_linestyle(args[2])
         self.ax.draw_artist(curr_line)
-        self.canvas.draw()
-        return self.plot_data
-                
+        #self.canvas.draw()
+        #return self.plot_data
+    
+    def add_plot(self, *args, **kwargs):
+        self.ax.plot(*args, **kwargs)
+        self.__fit_to_roi()
+        #self.canvas.show()
+        self.total_lines = len(self.ax.get_lines())
+    
+    def update(self):
+        
+        
+        lines_to_discard = self.total_lines - self.fixed_lines - self.used_lines
+        print("l2d: %d", lines_to_discard)
+        
+        lines = self.ax.get_lines()
+        print("Length lol %d" % len(lines))
+        for i in range(0,lines_to_discard):
+            print("removing...")
+            lines[-1].remove()
+        
+        self.used_lines = 0
+        lines = self.ax.get_lines()
+        self.total_lines = len(lines)
+        print("Length lol %d" % len(lines))
+        self.canvas.draw() 
 
 if __name__ == "__main__":
     main = tk.Tk()
