@@ -51,7 +51,7 @@ class Multiplot(tk.Frame):
         t = arange(0.0, 3.0, 0.01)
         s = sin(2*pi*t)
         
-        self.viewer.plot(t,s)
+        self.viewer.plot(t,s,color='black')
         self.viewer.update()
         
             
@@ -62,15 +62,15 @@ class Multiplot(tk.Frame):
         t2 = arange(-1.0, 1.0, 0.01)
         s2 = sin(4*pi*t2) + 1
         
-        self.viewer.plot(t1,s1)
-        self.viewer.plot(t2,s2)
+        self.viewer.plot(t1,s1,color='purple')
+        self.viewer.plot(t2,s2,color='green')
         self.viewer.update()
     
     def plot_c(self):
         x = 3*random.rand(1,20)
         y = 2*random.rand(1,20)-1
         
-        self.viewer.plot(x,y,'ok ')
+        self.viewer.plot(x,y,color='blue', linestyle=" ", marker='o')
         
         self.viewer.update()
         

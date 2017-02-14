@@ -61,16 +61,20 @@ class Viewer(tk.Frame):
                                                self.available_lines))
         if self.available_lines > 0:
             print("Updating line ")
-            self.update_plot_data( *args, line_idx = (self.fixed_lines + self.used_lines))
+            line_idx = (self.fixed_lines + self.used_lines)            
+            self.update_plot_data( *args, line_idx=line_idx)
+            self.update_style(line_idx, **kwargs)
+            
         else:
             print("Creating new line")
             self.ax.plot(*args, **kwargs)
+            self.update_style(line_idx="last", **kwargs)
             self.__fit_to_roi()
             #self.canvas.show()
             self.total_lines = len(self.ax.get_lines())
         
-        if self.bg_saved:    
-            self.used_lines += 1
+        #if self.bg_saved:    
+        self.used_lines += 1
         
             
     def save_background(self):
@@ -97,9 +101,35 @@ class Viewer(tk.Frame):
         else:
             curr_line.set_data(*args[0:2])
             curr_line.set_linestyle(args[2])
+            
+        
         self.ax.draw_artist(curr_line)
         #self.canvas.draw()
         #return self.plot_data
+    
+    def update_style(self, line_idx, **kwargs):
+        list_of_lines = self.ax.get_lines()
+        if line_idx == "last":
+            curr_line = list_of_lines[-1]
+        else:
+            curr_line = list_of_lines[line_idx]
+        
+        if "color" in kwargs.keys():        
+            curr_line.set_color(kwargs["color"])
+        else:
+            curr_line.set_color("blue")
+        
+        if "marker" in kwargs.keys():        
+            curr_line.set_marker(kwargs["marker"])
+        else:
+            curr_line.set_marker(" ")
+        
+        if "linestyle" in kwargs.keys():        
+            curr_line.set_linestyle(kwargs["linestyle"])
+        else:
+            curr_line.set_linestyle('-')
+        
+        self.ax.draw_artist(curr_line)
     
     def add_plot(self, *args, **kwargs):
         self.ax.plot(*args, **kwargs)
