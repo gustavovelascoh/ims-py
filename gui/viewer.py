@@ -62,7 +62,7 @@ class Viewer(tk.Frame):
         if self.available_lines > 0:
             print("Updating line ")
             line_idx = (self.fixed_lines + self.used_lines)            
-            self.update_plot_data( *args, line_idx=line_idx)
+            self.__update_plot_data( *args, line_idx=line_idx)
             self.update_style(line_idx, **kwargs)
             
         else:
@@ -90,7 +90,7 @@ class Viewer(tk.Frame):
         self.fixed_lines = len(self.ax.get_lines())
         self.bg_saved = 1
     
-    def update_plot_data(self, *args, line_idx=0):
+    def __update_plot_data(self, *args, line_idx=0):
         
         #print(self.plot_data)
         list_of_lines = self.ax.get_lines()

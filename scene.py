@@ -121,7 +121,8 @@ class SceneApp(tk.Frame):
             diff = self.ts - last_ts
             time.sleep(0.1*diff/1000.0)
             plot_time = time.time()
-            self.viewer.update_plot_data(data[:,0], data[:,1])
+            self.viewer.plot(data[:,0], data[:,1], linestyle=' ', marker='.', color='blue')
+            self.viewer.update()
             print("Plotting time %s" % (time.time() - plot_time))
     
     def _stop(self):
@@ -133,7 +134,8 @@ class SceneApp(tk.Frame):
         #print("clear")
         data, last, self.ts = self.scene.preprocess_data()
         self.date_label.config(text="%s" % self.ts)
-        self.viewer.update_plot_data(data[:,0], data[:,1])
+        self.viewer.plot(data[:,0], data[:,1], linestyle=' ', marker='.', color='blue')
+        self.viewer.update()
     
     def _create_scene(self):
         l=[0,0,0,0,0,0,0,0,0]
@@ -218,7 +220,7 @@ class SceneApp(tk.Frame):
         self.viewer.set_roi(roi)
         self.viewer.draw_img(self.dataset_path.dataset_path +
                                                 '/' +'image.bmp', limits)        
-        self.viewer.plot(xos,yos, '.', markerfacecolor='g', markeredgecolor='k',
+        self.viewer.plot(xos,yos, marker='o', linestyle=' ', markerfacecolor='g', markeredgecolor='k',
                          markersize=10)
         self.viewer.save_background()
         
