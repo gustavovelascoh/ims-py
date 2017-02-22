@@ -55,18 +55,18 @@ class Viewer(tk.Frame):
     def plot(self, *args, **kwargs):
         
         self.available_lines = self.total_lines - self.fixed_lines - self.used_lines
-        print("Available lines: %d-%d-%d : %d" % (self.total_lines,
-                                               self.fixed_lines,
-                                               self.used_lines,
-                                               self.available_lines))
+#         print("Available lines: %d-%d-%d : %d" % (self.total_lines,
+#                                                self.fixed_lines,
+#                                                self.used_lines,
+#                                                self.available_lines))
         if self.available_lines > 0:
-            print("Updating line ")
+#             print("Updating line ")
             line_idx = (self.fixed_lines + self.used_lines)            
             self.__update_plot_data( *args, line_idx=line_idx)
             self.update_style(line_idx, **kwargs)
             
         else:
-            print("Creating new line")
+#             print("Creating new line")
             self.ax.plot(*args, **kwargs)
             self.update_style(line_idx="last", **kwargs)
             self.__fit_to_roi()
@@ -94,7 +94,7 @@ class Viewer(tk.Frame):
         
         #print(self.plot_data)
         list_of_lines = self.ax.get_lines()
-        print("Length lol %d" % len(list_of_lines))
+#         print("Length lol %d" % len(list_of_lines))
         curr_line = list_of_lines[line_idx]
         if len(args) == 2:
             curr_line.set_data(*args)
@@ -141,18 +141,18 @@ class Viewer(tk.Frame):
         
         
         lines_to_discard = self.total_lines - self.fixed_lines - self.used_lines
-        print("l2d: %d", lines_to_discard)
+        #print("l2d: %d", lines_to_discard)
         
         lines = self.ax.get_lines()
-        print("Length lol %d" % len(lines))
+        #print("Length lol %d" % len(lines))
         for i in range(0,lines_to_discard):
-            print("removing...")
+            #print("removing...")
             lines[-1].remove()
         
         self.used_lines = 0
         lines = self.ax.get_lines()
         self.total_lines = len(lines)
-        print("Length lol %d" % len(lines))
+        #print("Length lol %d" % len(lines))
         self.canvas.draw() 
 
 if __name__ == "__main__":
