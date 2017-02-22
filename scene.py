@@ -60,9 +60,12 @@ class DatasetPath(tk.Frame):
         button.pack(side="left")
         
         self.pack(side="top")
+        ims_path="/home/gustavo/devel/personal/python/ims-py/possi"
+        self.dataset_path = ims_path
         
     def select_folder(self):
-        ims_path="/home/gustavo/devel/python/ims"
+        ims_path="/home/gustavo/devel/python/ims/possi"
+        self.dataset_path = ims_path
         self.dataset_path = tk.filedialog.askdirectory(initialdir=ims_path)
         print("FOLDER OK -> %s" % self.dataset_path)
         self.e.insert(0, self.dataset_path)
@@ -99,7 +102,14 @@ class SceneApp(tk.Frame):
         sbutton.pack(side="left")
         viewer_toolbar_frame.pack(side="top")
         
-        self.loop = False   
+        self.loop = False
+        self.first_frame = True
+        self.last_ts = 0
+        self.frame_cnt = 0
+        self.processing_time_avg = 0
+        self.plotting_time_avg = 0
+        self.total_time_avg = 0
+        self.elapsed_time = 0
         
     def _loop(self):
         self.loop = True
@@ -110,32 +120,54 @@ class SceneApp(tk.Frame):
             
     def _loop_thread(self):
         while self.loop:
-            last_ts = self.ts
-            start_time = time.time()
-            #print("clear")
-            data, last, self.ts = self.scene.preprocess_data()
-            
-            self.date_label.config(text="%s" % self.ts)
-            print("Elapsed time %s" % (time.time() - start_time))
-            print("Elapsed ts %s" % (self.ts - last_ts))
-            diff = self.ts - last_ts
-            time.sleep(0.1*diff/1000.0)
-            plot_time = time.time()
-            self.viewer.plot(data[:,0], data[:,1], linestyle=' ', marker='.', color='blue')
-            self.viewer.update()
-            print("Plotting time %s" % (time.time() - plot_time))
+            if not self.first_frame:
+                if self.last_ts == 0:
+                    self.last_ts = self.ts              
+                diff = self.ts - self.last_ts
+                self.last_ts = self.ts
+                time.sleep((diff/1000.0)-self.elapsed_time)
+                print("Elapsed ts %s" % (self.ts - self.last_ts))
+            else:
+                self.first_frame = False                
+            self._next_frame()
     
     def _stop(self):
         self.loop = False
         
     def _next_frame(self):
-        #self.ax.clear()
-        #self.canvas.show()
-        #print("clear")
+        start_time = time.time()
         data, last, self.ts = self.scene.preprocess_data()
-        self.date_label.config(text="%s" % self.ts)
+        p_proc_time = time.time() - start_time
+        self.frame_cnt += 1
+        self.processing_time_avg = ((self.processing_time_avg * (self.frame_cnt-1) + p_proc_time)/self.frame_cnt) 
+        proc_fps = (1/self.processing_time_avg)
+        print("Processing: %s, Avg: %s, FPS: %4.4f" % (p_proc_time,
+                                                        self.processing_time_avg,
+                                                        proc_fps))
+                    
+        plot_time = time.time()
         self.viewer.plot(data[:,0], data[:,1], linestyle=' ', marker='.', color='blue')
         self.viewer.update()
+        p_plot_time = time.time() - plot_time
+        
+        self.plotting_time_avg = ((self.plotting_time_avg * (self.frame_cnt-1) + p_plot_time)/self.frame_cnt) 
+        plot_fps = (1/self.plotting_time_avg)
+        total_time = self.plotting_time_avg+self.processing_time_avg
+        self.total_time_avg = ((self.total_time_avg * (self.frame_cnt-1) + p_plot_time)/self.frame_cnt)
+        total_fps = 1/self.total_time_avg
+        print("Plotting: %s, Avg: %s, FPS: %4.4f" % (p_plot_time,
+                                                         self.plotting_time_avg,
+                                                         plot_fps ))
+        print("Total: %s, Avg: %s, FPS: %4.4f" % (p_plot_time+p_proc_time,
+                                                      total_time,
+                                                      total_fps))
+        label_str = "avg(proc/plot/total): %4.2f/%4.2f/%4.2f" % (self.processing_time_avg,
+                                                     self.plotting_time_avg,
+                                                     self.total_time_avg)
+        label_str += "\n FPS(proc/plot/total): %4.2f/%4.2f/%4.2f" % (proc_fps,
+                                                     plot_fps,
+                                                     total_fps)
+        self.date_label.config(text=label_str)
     
     def _create_scene(self):
         l=[0,0,0,0,0,0,0,0,0]
