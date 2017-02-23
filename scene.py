@@ -212,7 +212,7 @@ class SceneApp(tk.Frame):
         #lms1.load()
         process_log="Range sensors in the scene: %d" % len(self.scene.sensors["range"]) + "\n"
         
-        print("Range sensors in the scene: %d" % len(self.scene.sensors["range"]))
+        print(process_log)
         
         #exit()
         

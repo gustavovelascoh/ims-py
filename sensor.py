@@ -1,5 +1,6 @@
 import pickle
 import numpy as np
+from sklearn.cluster import DBSCAN
 
 
 def pdk(a,level=0):
@@ -136,8 +137,8 @@ class Scene():
         to cartesian coordinates and low-level fusion of multiple 
         range sensors. Also a roi is applied if it was configured)
         @type (np.array, Bool)
-        @return (data, last): xy np.array of points in scene (N x 2),
-        True if is the last frame in sensor dataset 
+        @return (data, last, ts): xy np.array of points in scene (N x 2),
+        True if is the last frame in sensor dataset, timestamp of the current frame 
         '''
         
         x = None
@@ -184,6 +185,21 @@ class Scene():
         data = data[data[:,1] >= roi["ymin"]]
         data = data[data[:,1] <= roi["ymax"]]
         return data
+    
+    def get_clusters(self):
+        
+        data, last, ts = self.scene.preprocess_data()
+        
+        dbscan_params = {'eps':0.3, 'min_samples':5}
+        db = DBSCAN(**dbscan_params).fit(data)
+        core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
+        core_samples_mask[db.core_sample_indices_] = True
+        labels = db.labels_
+        
+        # Number of clusters in labels, ignoring noise if present.
+        n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
+        
+        
     
 class Blob():
     def __init__(self, data, ts, nf, blob_id):
