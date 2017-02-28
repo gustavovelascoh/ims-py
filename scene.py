@@ -135,6 +135,8 @@ class SceneApp(tk.Frame):
         self.loop = False
         
     def _next_frame(self):
+        
+        '''
         start_time = time.time()
         data, last, self.ts = self.scene.preprocess_data()
         p_proc_time = time.time() - start_time
@@ -161,6 +163,41 @@ class SceneApp(tk.Frame):
         print("Total: %s, Avg: %s, FPS: %4.4f" % (p_plot_time+p_proc_time,
                                                       total_time,
                                                       total_fps))
+        '''
+        
+        start_time = time.time()
+        blob_list = self.scene.get_blobs()
+        self.ts = self.scene.ts
+        p_proc_time = time.time() - start_time
+        self.frame_cnt += 1
+        self.processing_time_avg = ((self.processing_time_avg * (self.frame_cnt-1) + p_proc_time)/self.frame_cnt) 
+        proc_fps = (1/self.processing_time_avg)
+        print("Processing: %s, Avg: %s, FPS: %4.4f" % (p_proc_time,
+                                                        self.processing_time_avg,
+                                                        proc_fps))
+                    
+        plot_time = time.time()
+        
+        colors_list = ['blue', 'red', 'green', 'purple']
+        
+        for b in blob_list:            
+            self.viewer.plot(b.data[:,0], b.data[:,1], linestyle=' ', marker='.', color=colors_list[(b.id-1)%4])
+        
+        self.viewer.update()  
+        p_plot_time = time.time() - plot_time
+        
+        self.plotting_time_avg = ((self.plotting_time_avg * (self.frame_cnt-1) + p_plot_time)/self.frame_cnt) 
+        plot_fps = (1/self.plotting_time_avg)
+        total_time = self.plotting_time_avg+self.processing_time_avg
+        self.total_time_avg = ((self.total_time_avg * (self.frame_cnt-1) + p_plot_time)/self.frame_cnt)
+        total_fps = 1/self.total_time_avg
+        print("Plotting: %s, Avg: %s, FPS: %4.4f" % (p_plot_time,
+                                                         self.plotting_time_avg,
+                                                         plot_fps ))
+        print("Total: %s, Avg: %s, FPS: %4.4f" % (p_plot_time+p_proc_time,
+                                                      total_time,
+                                                      total_fps))
+        
         label_str = "avg(proc/plot/total): %4.2f/%4.2f/%4.2f" % (self.processing_time_avg,
                                                      self.plotting_time_avg,
                                                      self.total_time_avg)
