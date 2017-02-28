@@ -94,7 +94,7 @@ class Viewer(tk.Frame):
         
         #print(self.plot_data)
         list_of_lines = self.ax.get_lines()
-#         print("Length lol %d" % len(list_of_lines))
+        #print("Length lol %d" % len(list_of_lines))
         curr_line = list_of_lines[line_idx]
         if len(args) == 2:
             curr_line.set_data(*args)
@@ -146,6 +146,7 @@ class Viewer(tk.Frame):
         lines = self.ax.get_lines()
         #print("Length lol %d" % len(lines))
         for i in range(0,lines_to_discard):
+            lines = self.ax.get_lines()
             #print("removing...")
             lines[-1].remove()
         
