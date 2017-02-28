@@ -120,9 +120,10 @@ class Scene():
                Sensor.TYPE_RANGE: [],
                }
     roi = {}
-    
+    nf = 0
     
     def __init__(self):
+        self.blob_count = 0
         pass
     
     def add_sensor(self, sensor):
@@ -143,7 +144,7 @@ class Scene():
         
         x = None
         y = None
-        
+        self.nf += 1
         ts_array = []
         
         for range_sensor in self.sensors["range"]:
@@ -188,17 +189,41 @@ class Scene():
     
     def get_clusters(self):
         
-        data, last, ts = self.scene.preprocess_data()
+        self.data, self.last, self.ts = self.preprocess_data()
         
         dbscan_params = {'eps':0.3, 'min_samples':5}
-        db = DBSCAN(**dbscan_params).fit(data)
-        core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
-        core_samples_mask[db.core_sample_indices_] = True
-        labels = db.labels_
+        self.db = DBSCAN(**dbscan_params).fit(self.data)
+        core_samples_mask = np.zeros_like(self.db.labels_, dtype=bool)
+        core_samples_mask[self.db.core_sample_indices_] = True
+        labels = self.db.labels_
         
         # Number of clusters in labels, ignoring noise if present.
         n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
         
+        return n_clusters_
+        
+    def get_blobs(self):
+        
+        self.get_clusters()
+        
+        labels = self.db.labels_
+        unique_labels = set(labels)
+        self.blob_list = []
+        
+        for k in unique_labels:
+            if k != -1:
+                class_member_mask = (labels == k)
+                
+                if (sum(class_member_mask) >= self.db.min_samples):
+                    blob = Blob(self.data[class_member_mask],
+                                          self.ts,
+                                          self.nf,
+                                          self.blob_count)
+                    blob.get_features()
+                    self.blob_list.append(blob)
+                    self.blob_count += 1
+        
+        return self.blob_list
         
     
 class Blob():
