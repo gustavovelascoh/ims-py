@@ -56,7 +56,8 @@ class DatasetPath(tk.Frame):
         l.pack(side="left")
         self.e = tk.Entry(self)
         self.e.pack(side="left")
-        button = tk.Button(self, text="Browse", command=self.select_folder, width=10)
+        button = tk.Button(self, text="Browse", command=self.select_folder, 
+                           width=10)
         button.pack(side="left")
         
         self.pack(side="top")
@@ -170,7 +171,9 @@ class SceneApp(tk.Frame):
         self.ts = self.scene.ts
         p_proc_time = time.time() - start_time
         self.frame_cnt += 1
-        self.processing_time_avg = ((self.processing_time_avg * (self.frame_cnt-1) + p_proc_time)/self.frame_cnt) 
+        self.processing_time_avg = (
+            (self.processing_time_avg * (self.frame_cnt-1) + p_proc_time) /
+            self.frame_cnt) 
         proc_fps = (1/self.processing_time_avg)
         print("Processing: %s, Avg: %s, FPS: %4.4f" % (p_proc_time,
                                                         self.processing_time_avg,
@@ -181,15 +184,20 @@ class SceneApp(tk.Frame):
         colors_list = ['blue', 'red', 'green', 'purple']
         
         for b in blob_list:            
-            self.viewer.plot(b.data[:,0], b.data[:,1], linestyle=' ', marker='.', color=colors_list[(b.id-1)%4])
+            self.viewer.plot(b.data[:,0], b.data[:,1], linestyle=' ',
+                             marker='.', color=colors_list[(b.id-1)%4])
         
         self.viewer.update()  
         p_plot_time = time.time() - plot_time
         
-        self.plotting_time_avg = ((self.plotting_time_avg * (self.frame_cnt-1) + p_plot_time)/self.frame_cnt) 
+        self.plotting_time_avg = (
+            (self.plotting_time_avg * (self.frame_cnt-1) + p_plot_time) /
+            self.frame_cnt) 
         plot_fps = (1/self.plotting_time_avg)
         total_time = self.plotting_time_avg+self.processing_time_avg
-        self.total_time_avg = ((self.total_time_avg * (self.frame_cnt-1) + p_plot_time)/self.frame_cnt)
+        self.total_time_avg = (
+            (self.total_time_avg * (self.frame_cnt-1) + p_plot_time)/
+            self.frame_cnt)
         total_fps = 1/self.total_time_avg
         print("Plotting: %s, Avg: %s, FPS: %4.4f" % (p_plot_time,
                                                          self.plotting_time_avg,
@@ -198,9 +206,10 @@ class SceneApp(tk.Frame):
                                                       total_time,
                                                       total_fps))
         
-        label_str = "avg(proc/plot/total): %4.2f/%4.2f/%4.2f" % (self.processing_time_avg,
-                                                     self.plotting_time_avg,
-                                                     self.total_time_avg)
+        label_str = "avg(proc/plot/total): %4.2f/%4.2f/%4.2f" % (
+            self.processing_time_avg,
+            self.plotting_time_avg,
+            self.total_time_avg)
         label_str += "\n FPS(proc/plot/total): %4.2f/%4.2f/%4.2f" % (proc_fps,
                                                      plot_fps,
                                                      total_fps)
@@ -289,7 +298,8 @@ class SceneApp(tk.Frame):
         self.viewer.set_roi(roi)
         self.viewer.draw_img(self.dataset_path.dataset_path +
                                                 '/' +'image.bmp', limits)        
-        self.viewer.plot(xos,yos, marker='o', linestyle=' ', markerfacecolor='g', markeredgecolor='k',
+        self.viewer.plot(xos,yos, marker='o', linestyle=' ', 
+                         markerfacecolor='g', markeredgecolor='k',
                          markersize=10)
         self.viewer.save_background()
         
