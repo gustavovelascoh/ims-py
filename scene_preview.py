@@ -4,7 +4,7 @@ import numpy as np
 from time import sleep
 
 
-img=mpimg.imread('image.bmp')
+img=mpimg.imread('possi/image.bmp')
 
 # map_scale = 5.13449
 map_scale = 4.1345
@@ -34,6 +34,6 @@ angs = [0.150098, -3.344051, -4.174827, -0.059341, 3.679154, -1.933825]
 ax.plot(xos,yos, '.', markerfacecolor='b', markeredgecolor='k', markersize=10)
 
 
-fig.show()
+plt.show()
 
 sleep(15)
