@@ -122,7 +122,14 @@ class Scene():
     roi = {}
     nf = 0
     
-    def __init__(self):
+    def __init__(self, legs_file=None):
+        
+        if legs_file is not None:
+            import json
+
+            json_data=open(legs_file).read()            
+            self.legs_data = json.loads(json_data)
+            self.has_legs_data = True
         self.blob_count = 0
         pass
     
