@@ -2,13 +2,15 @@
 
 # note that module name has changed from Tkinter in Python 2 to tkinter in Python 3
 import tkinter as tk
-import sensor
+from models import sensor
 import numpy as np
 import time
 from sklearn.cluster import DBSCAN
 from gui import viewer
 import threading
 import matplotlib
+from models import scene
+
 matplotlib.use('TkAgg')
 
 
@@ -127,7 +129,7 @@ class SceneApp(tk.Frame):
                 diff = self.ts - self.last_ts
                 self.last_ts = self.ts
                 time.sleep((diff/1000.0)-self.elapsed_time)
-                print("Elapsed ts %s" % (self.ts - self.last_ts))
+#                 print("Elapsed ts %s" % (self.ts - self.last_ts))
             else:
                 self.first_frame = False                
             self._next_frame()
@@ -168,6 +170,7 @@ class SceneApp(tk.Frame):
         
         start_time = time.time()
         blob_list = self.scene.get_blobs()
+        blob_list = self.scene.process_blobs()
         self.ts = self.scene.ts
         p_proc_time = time.time() - start_time
         self.frame_cnt += 1
@@ -175,17 +178,24 @@ class SceneApp(tk.Frame):
             (self.processing_time_avg * (self.frame_cnt-1) + p_proc_time) /
             self.frame_cnt) 
         proc_fps = (1/self.processing_time_avg)
-        print("Processing: %s, Avg: %s, FPS: %4.4f" % (p_proc_time,
-                                                        self.processing_time_avg,
-                                                        proc_fps))
+#         print("Processing: %s, Avg: %s, FPS: %4.4f" % (p_proc_time,
+#                                                         self.processing_time_avg,
+#                                                         proc_fps))
                     
         plot_time = time.time()
         
         colors_list = ['blue', 'red', 'green', 'purple']
         
-        for b in blob_list:            
+        for b in blob_list:
+            
+            c_id = b.id
+            
+            if len(b.prev_blobs) != 0:
+                c_id = min(b.prev_blobs)
+                       
             self.viewer.plot(b.data[:,0], b.data[:,1], linestyle=' ',
-                             marker='.', color=colors_list[(b.id-1)%4])
+                             marker='.', color=colors_list[(c_id-1)%4])
+            self.viewer.plot([b.bbox[0],b.bbox[2]],[b.bbox[1], b.bbox[3]],linestyle='-', marker='x', color=colors_list[(c_id-1)%4])
         
         self.viewer.update()  
         p_plot_time = time.time() - plot_time
@@ -199,14 +209,15 @@ class SceneApp(tk.Frame):
             (self.total_time_avg * (self.frame_cnt-1) + p_plot_time)/
             self.frame_cnt)
         total_fps = 1/self.total_time_avg
-        print("Plotting: %s, Avg: %s, FPS: %4.4f" % (p_plot_time,
-                                                         self.plotting_time_avg,
-                                                         plot_fps ))
-        print("Total: %s, Avg: %s, FPS: %4.4f" % (p_plot_time+p_proc_time,
-                                                      total_time,
-                                                      total_fps))
+#         print("Plotting: %s, Avg: %s, FPS: %4.4f" % (p_plot_time,
+#                                                          self.plotting_time_avg,
+#                                                          plot_fps ))
+#         print("Total: %s, Avg: %s, FPS: %4.4f" % (p_plot_time+p_proc_time,
+#                                                       total_time,
+#                                                       total_fps))
         
-        label_str = "avg(proc/plot/total): %4.2f/%4.2f/%4.2f" % (
+        label_str = "Frame # %d \n" % (self.scene.nf)
+        label_str += "avg(proc/plot/total): %4.2f/%4.2f/%4.2f" % (
             self.processing_time_avg,
             self.plotting_time_avg,
             self.total_time_avg)
@@ -225,7 +236,7 @@ class SceneApp(tk.Frame):
         l[8] = self.range_sensors.l8.get()                
         # map_scale = 5.13449       
         
-        self.scene = sensor.Scene("possi.legs")
+        self.scene = scene.Scene("possi.legs")
         
         lms1 = sensor.Laser(sensor.Laser.SUBTYPE_SINGLELAYER)
         lms2 = sensor.Laser(sensor.Laser.SUBTYPE_SINGLELAYER)

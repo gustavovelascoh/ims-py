@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import sensor
+from models import sensor
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -10,7 +10,7 @@ import os
 
 
 cwd = os.getcwd()
-description_str='Process scene using specified parameters'
+description_str='Process scene_app using specified parameters'
 parser = argparse.ArgumentParser(description=description_str)
 parser.add_argument('laser_list',
                     metavar='L',
@@ -44,7 +44,7 @@ limits = np.concatenate((
                          ))
 
 
-scene = sensor.Scene()
+scene = scene.Scene()
 
 lms1 = sensor.Laser(sensor.Laser.SUBTYPE_SINGLELAYER)
 lms2 = sensor.Laser(sensor.Laser.SUBTYPE_SINGLELAYER)
@@ -68,7 +68,7 @@ if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 
 sds_filename=dir_path + "/data.log"
-scene_filename=dir_path + "/scene.log"
+scene_filename=dir_path + "/scene_app.log"
 
 if args.sds:
     with open(sds_filename, '+w') as out:
@@ -85,9 +85,9 @@ for range_sensor in scene.sensors["range"]:
 
 #lms1.set_src_path("possi.lms3")
 #lms1.load()
-process_log="Range sensors in the scene: %d" % len(scene.sensors["range"]) + "\n"
+process_log="Range sensors in the scene_app: %d" % len(scene.sensors["range"]) + "\n"
 
-print("Range sensors in the scene: %d" % len(scene.sensors["range"]))
+print("Range sensors in the scene_app: %d" % len(scene.sensors["range"]))
 
 #exit()
 
@@ -241,7 +241,7 @@ while not last:
             class_member_mask = (labels == k)
             
             if (sum(class_member_mask) >= db.min_samples):
-                blob = sensor.Blob(data[class_member_mask],
+                blob = scene.Blob(data[class_member_mask],
                                       ts,
                                       nf,
                                       blob_count)

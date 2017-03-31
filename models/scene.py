@@ -1,119 +1,11 @@
-import pickle
+'''
+Created on Mar 30, 2017
+
+@author: gustavo
+'''
+from models.sensor import Sensor
 import numpy as np
 from sklearn.cluster import DBSCAN
-
-
-def pdk(a,level=0):
-    t=''.join(['.' for x in range(0,level)])
-    if isinstance(a,dict):
-        for k in a.keys():
-            print("%s %s:"%(t,k))
-            pdk(a[k],level+1)
-
-def pol2cart(rho, phi):
-    x = rho * np.cos(phi)
-    y = rho * np.sin(phi)
-    return(x, y)
-
-
-class Sensor():
-    TYPE_IMAGE = "image"
-    TYPE_RANGE = "range"
-    
-    SRC_TYPE_DATASET = "Dataset"
-    SRC_TYPE_STREAM = "Stream"
-    
-    src_type = ''
-    src_subtype = ''
-    src_path = ''
-    
-    def __init__(self,sensor_type):
-        self.type = sensor_type
-
-    def set_src_type(self, src_type):
-        self.src_type = src_type
-        
-    def set_src_path(self, src_path):
-        self.src_path = src_path
-    
-    def load_src(self):
-        f = open(self.src_path, "rb")         
-
-class Camera(Sensor):
-    SUBTYPE_BW = "Black/White"
-    SUBTYPE_RGB = "RGB"
-   
-    def __init__(self, camera_type):
-        self.subtype = camera_type
-        super().__init__(Sensor.TYPE_IMAGE)
-
-
-class Laser(Sensor):
-    SUBTYPE_SINGLELAYER = "Single layer"
-    SUBTYPE_MULTILAYER = "Multilayer"
-    scan = None
-    ts = None
-    
-    def __init__(self, laser_type):
-        self.subtype = laser_type
-        super().__init__(Sensor.TYPE_RANGE)
-    
-    def load(self):
-        f = open(self.src_path,"rb")
-        self.dataset = pickle.load(f)
-        
-#         pdk(self.dataset)
-#         ang_range:
-#         bg_model:
-#         . ms:
-#         . data:
-#         range_unit:
-#         scans:
-#         ang_res:
-#         calib_data:
-#         . sy:
-#         . ang:
-#         . sx:
-        
-        self.raw_theta = np.arange(0, 180.5, 0.5)
-        self.raw_theta = self.raw_theta * np.pi / 180.0
-        
-        self.bg_data = np.array(self.dataset["bg_model"]["data"])
-        self.calib_data = self.dataset["calib_data"]
-        print(self.calib_data)
-    
-    def read_scan(self):
-        #print(len(self.dataset["scans"]))
-        self.scan = np.array(self.dataset["scans"][0]["data"])
-        self.ts = self.dataset["scans"][0]["ms"]
-        #print(self.scan)
-        del self.dataset["scans"][0]
-        
-        if self.dataset["scans"]:
-            return False
-        else:
-            return True
-        #print(self.scan)
-    def remove_bg(self):
-        
-        bg_delta = abs(self.bg_data - self.scan)
-        
-        self.data_nobg = self.scan[bg_delta > 15]
-        self.theta_nobg = self.raw_theta[bg_delta > 15]
-    
-    def calibrate(self):
-        
-        d_th = float(self.calib_data["ang"])
-        d_x = float(self.calib_data["sx"])
-        d_y = float(self.calib_data["sy"])
-        
-        #print(self.theta_nobg)
-        self.theta_nobg += d_th
-        #print(self.theta_nobg)
-        
-        self.x_nobg, self.y_nobg = pol2cart(self.data_nobg, self.theta_nobg)
-        self.x_nobg += d_x*100
-        self.y_nobg += d_y*100
 
 class Scene():
     sensors = {Sensor.TYPE_IMAGE: [],
@@ -131,6 +23,9 @@ class Scene():
             self.legs_data = json.loads(json_data)
             self.has_legs_data = True
         self.blob_count = 0
+        self.curr_blobs = []
+        self.past_blobs = []
+        self.lost_blobs = []
         pass
     
     def add_sensor(self, sensor):
@@ -145,7 +40,7 @@ class Scene():
         to cartesian coordinates and low-level fusion of multiple 
         range sensors. Also a roi is applied if it was configured)
         @type (np.array, Bool)
-        @return (data, last, ts): xy np.array of points in scene (N x 2),
+        @return (data, last, ts): xy np.array of points in scene_app (N x 2),
         True if is the last frame in sensor dataset, timestamp of the current frame 
         '''
         
@@ -231,6 +126,30 @@ class Scene():
                     self.blob_count += 1
         
         return self.blob_list
+    
+    def process_blobs(self):
+        
+        self.curr_blobs = self.get_blobs()
+        
+        if len(self.past_blobs) > 0:
+            
+            d_mat = np.zeros((len(self.past_blobs), len(self.curr_blobs)))
+            
+            for i, blob in enumerate(self.curr_blobs):
+                for j, p_blob in enumerate(self.past_blobs):
+                    distance = blob.get_distance_from(p_blob)
+                    d_mat[j][i] = distance
+                    
+                    if distance < 0.6:
+                        blob.set_connection_from(p_blob)
+            
+            np.set_printoptions(precision=4)
+            print(d_mat)
+            
+        
+        self.past_blobs = self.curr_blobs
+        
+        return self.curr_blobs
         
     
 class Blob():
@@ -251,10 +170,10 @@ class Blob():
         self.mean = xy.mean(axis=0)
         
     def get_distance_from(self, blob):
-        return abs(self.mean - blob.mean)
+        return abs(np.linalg.norm(self.mean - blob.mean))
     
     def set_connection_from(self, blob):
-        self.prev_blobs.append(blob)
+        self.prev_blobs.append(blob.id)
         blob.next_blobs.append(self.id)
         
         self.vel = self.get_distance_from(blob)/(self.ts - blob.ts)
@@ -273,11 +192,3 @@ class Blob():
         v1_u = self._unit_vector(v1)
         v2_u = self._unit_vector(v2)
         return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
-        
-        
-        
-    
-            
-            
-        
-    
