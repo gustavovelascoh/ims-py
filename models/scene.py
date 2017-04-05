@@ -143,7 +143,7 @@ class Scene():
                     if distance < 0.6:
                         blob.set_connection_from(p_blob)
             
-            np.set_printoptions(precision=4)
+            np.set_printoptions(precision=2)
             print(d_mat)
             
         
@@ -160,6 +160,8 @@ class Blob():
         self.id = blob_id
         self.next_blobs = []
         self.prev_blobs = []
+        self.vel = None
+        self.ang = None
         
     def get_features(self):
         xy = self.data
@@ -173,7 +175,7 @@ class Blob():
         return abs(np.linalg.norm(self.mean - blob.mean))
     
     def set_connection_from(self, blob):
-        self.prev_blobs.append(blob.id)
+        self.prev_blobs = blob.prev_blobs + [blob.id]
         blob.next_blobs.append(self.id)
         
         self.vel = self.get_distance_from(blob)/(self.ts - blob.ts)

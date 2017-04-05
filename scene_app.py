@@ -192,6 +192,7 @@ class SceneApp(tk.Frame):
             
             if len(b.prev_blobs) != 0:
                 c_id = min(b.prev_blobs)
+                print("c_id: %d, prev: %s" % (c_id, b.prev_blobs))
                        
             self.viewer.plot(b.data[:,0], b.data[:,1], linestyle=' ',
                              marker='.', color=colors_list[(c_id-1)%4])
