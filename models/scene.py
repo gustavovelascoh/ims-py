@@ -13,6 +13,8 @@ class Scene():
                }
     roi = {}
     nf = 0
+    ts = 0
+    BLOB_TIMEOUT = 5000
     
     def __init__(self, legs_file=None):
         
@@ -24,8 +26,8 @@ class Scene():
             self.has_legs_data = True
         self.blob_count = 0
         self.curr_blobs = []
-        self.past_blobs = []
-        self.lost_blobs = []
+        self.prev_blobs = []
+        self.hist_blobs = []
         pass
     
     def add_sensor(self, sensor):
@@ -66,7 +68,7 @@ class Scene():
                 y = range_sensor.y_nobg
             
         #print("ts_array: %s, span: %s" % (ts_array,(max(ts_array)-min(ts_array))))
-        ts = max(ts_array)
+        self.ts = max(ts_array)
         x = x/100
         y = y/100
         
@@ -75,7 +77,7 @@ class Scene():
         if self.roi:
             data = self._apply_roi(data, self.roi)
                 
-        return data, last, ts       
+        return data, last, self.ts       
     
     def set_roi(self, roi):
         self.roi = {"ymin":-24,"ymax":30,"xmin":-30,"xmax":40}
@@ -131,12 +133,12 @@ class Scene():
         
         self.curr_blobs = self.get_blobs()
         
-        if len(self.past_blobs) > 0:
+        if len(self.prev_blobs) > 0:
             
-            d_mat = np.zeros((len(self.past_blobs), len(self.curr_blobs)))
+            d_mat = np.zeros((len(self.prev_blobs), len(self.curr_blobs)))
             
             for i, blob in enumerate(self.curr_blobs):
-                for j, p_blob in enumerate(self.past_blobs):
+                for j, p_blob in enumerate(self.prev_blobs):
                     distance = blob.get_distance_from(p_blob)
                     d_mat[j][i] = distance
                     
@@ -145,12 +147,28 @@ class Scene():
             
             np.set_printoptions(precision=2)
             print(d_mat)
-            
         
-        self.past_blobs = self.curr_blobs
+        self.update_blob_hist()
+        
+        self.prev_blobs = self.curr_blobs
+        
         
         return self.curr_blobs
+    
+    def update_blob_hist(self):
         
+        index_to_move = []
+        
+        for idx, b in enumerate(self.prev_blobs):
+            live_time = self.ts - b.ts
+            if live_time > self.BLOB_TIMEOUT:
+                # self.hist_blobs.append(b)
+                index_to_move.append(idx)
+        
+        while len(index_to_move) > 0:
+            idx = index_to_move.pop()
+            self.hist_blobs.append(self.prev_blobs.pop(idx))
+            
     
 class Blob():
     def __init__(self, data, ts, nf, blob_id):
