@@ -4,6 +4,7 @@ Created on Mar 30, 2017
 @author: gustavo
 '''
 from models.sensor import Sensor
+from models.sensor import blob
 import numpy as np
 from sklearn.cluster import DBSCAN
 
@@ -170,45 +171,46 @@ class Scene():
             self.hist_blobs.append(self.prev_blobs.pop(idx))
             
     
-class Blob():
-    def __init__(self, data, ts, nf, blob_id):
-        self.data = data
-        self.ts = ts
-        self.nf = nf
-        self.id = blob_id
-        self.next_blobs = []
-        self.prev_blobs = []
-        self.vel = None
-        self.ang = None
-        
-    def get_features(self):
-        xy = self.data
-        bbox = np.array([min(xy[:,0:1]), min(xy[:,1:2]),max(xy[:,0:1]), max(xy[:,1:2])])
-        self.area = (bbox[2]-bbox[0])*(bbox[3]-bbox[1])
-        self.dens = len(xy)/self.area
-        self.bbox = bbox
-        self.mean = xy.mean(axis=0)
-        
-    def get_distance_from(self, blob):
-        return abs(np.linalg.norm(self.mean - blob.mean))
+# class Blob():
+#     def __init__(self, data, ts, nf, blob_id):
+#         self.data = data
+#         self.ts = ts
+#         self.nf = nf
+#         self.id = blob_id
+#         self.next_blobs = []
+#         self.prev_blobs = []
+#         self.vel = None
+#         self.ang = None
+#         
+#     def get_features(self):
+#         xy = self.data
+#         bbox = np.array([min(xy[:,0:1]), min(xy[:,1:2]),max(xy[:,0:1]), max(xy[:,1:2])])
+#         self.area = (bbox[2]-bbox[0])*(bbox[3]-bbox[1])
+#         self.dens = len(xy)/self.area
+#         self.bbox = bbox
+#         self.mean = xy.mean(axis=0)
+#         
+#     def get_distance_from(self, blob):
+#         return abs(np.linalg.norm(self.mean - blob.mean))
+#     
+#     def set_connection_from(self, blob):
+#         self.prev_blobs = blob.prev_blobs + [blob.id]
+#         blob.next_blobs.append(self.id)
+#         
+#         self.vel = self.get_distance_from(blob)/(self.ts - blob.ts)
+#         self.ang = self._angle_between(self.mean, blob.mean)
+#     
+#     def add_connection_to(self, blob):
+#         self.next_blobs.append(blob.id)
+# 
+#     @staticmethod
+#     def _unit_vector(vector):
+#         """ Returns the unit vector of the vector.  """
+#         return vector / np.linalg.norm(vector)
+# 
+#      
+#     def _angle_between(self, v1, v2):
+#         v1_u = self._unit_vector(v1)
+#         v2_u = self._unit_vector(v2)
+#         return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
     
-    def set_connection_from(self, blob):
-        self.prev_blobs = blob.prev_blobs + [blob.id]
-        blob.next_blobs.append(self.id)
-        
-        self.vel = self.get_distance_from(blob)/(self.ts - blob.ts)
-        self.ang = self._angle_between(self.mean, blob.mean)
-    
-    def add_connection_to(self, blob):
-        self.next_blobs.append(blob.id)
-
-    @staticmethod
-    def _unit_vector(vector):
-        """ Returns the unit vector of the vector.  """
-        return vector / np.linalg.norm(vector)
-
-     
-    def _angle_between(self, v1, v2):
-        v1_u = self._unit_vector(v1)
-        v2_u = self._unit_vector(v2)
-        return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
