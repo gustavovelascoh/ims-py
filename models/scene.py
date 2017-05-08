@@ -135,19 +135,7 @@ class Scene():
         self.curr_blobs = self.get_blobs()
         
         if len(self.prev_blobs) > 0:
-            
-            d_mat = np.zeros((len(self.prev_blobs), len(self.curr_blobs)))
-            
-            for i, blob in enumerate(self.curr_blobs):
-                for j, p_blob in enumerate(self.prev_blobs):
-                    distance = blob.get_distance_from(p_blob)
-                    d_mat[j][i] = distance
-                    
-                    if distance < 0.6:
-                        blob.set_connection_from(p_blob)
-            
-            np.set_printoptions(precision=2)
-            print(d_mat)
+            self.find_blobs_matches()            
         
         self.update_blob_hist()
         
@@ -155,6 +143,28 @@ class Scene():
         
         
         return self.curr_blobs
+
+    def find_blobs_matches(self):
+        
+        d_mat = np.zeros((len(self.prev_blobs), len(self.curr_blobs)))
+            
+        matches_dict = {}
+        for i, blob in enumerate(self.curr_blobs):
+            for j, p_blob in self.prev_blobs:
+                distance = blob.get_distance_from(p_blob)
+                d_mat[int(j)][i] = distance
+                
+                if distance < 0.6:
+                    if matches_dict[p_blob.id] is None:
+                        matches_dict[p_blob.id] = [blob.id]
+                    else:
+                        matches_dict[p_blob.id].append(blob.id)
+                        
+                    #blob.set_connection_from(p_blob)
+        
+        np.set_printoptions(precision=2)
+        print(d_mat)
+        print(matches_dict)
     
     def update_blob_hist(self):
         
