@@ -4,7 +4,7 @@ Created on Mar 30, 2017
 @author: gustavo
 '''
 from models.sensor import Sensor
-from models.sensor import blob
+from models.blob import Blob
 import numpy as np
 from sklearn.cluster import DBSCAN
 
@@ -27,7 +27,7 @@ class Scene():
             self.has_legs_data = True
         self.blob_count = 0
         self.curr_blobs = []
-        self.prev_blobs = []
+        self.prev_blobs = {}
         self.hist_blobs = []
         pass
     
@@ -137,10 +137,10 @@ class Scene():
         if len(self.prev_blobs) > 0:
             self.find_blobs_matches()            
         
-        self.update_blob_hist()
+        # self.update_blob_hist()
         
-        self.prev_blobs = self.curr_blobs
-        
+        self.update_blob_prev()
+        print(self.prev_blobs)
         
         return self.curr_blobs
 
@@ -150,12 +150,13 @@ class Scene():
             
         matches_dict = {}
         for i, blob in enumerate(self.curr_blobs):
-            for j, p_blob in self.prev_blobs:
+            for j, p_blob in self.prev_blobs.items():
+                print("%s, %s" % (j, p_blob))
                 distance = blob.get_distance_from(p_blob)
                 d_mat[int(j)][i] = distance
                 
                 if distance < 0.6:
-                    if matches_dict[p_blob.id] is None:
+                    if p_blob.id not in matches_dict.keys():
                         matches_dict[p_blob.id] = [blob.id]
                     else:
                         matches_dict[p_blob.id].append(blob.id)
@@ -163,7 +164,7 @@ class Scene():
                     #blob.set_connection_from(p_blob)
         
         np.set_printoptions(precision=2)
-        print(d_mat)
+        # print(d_mat)
         print(matches_dict)
     
     def update_blob_hist(self):
@@ -179,6 +180,13 @@ class Scene():
         while len(index_to_move) > 0:
             idx = index_to_move.pop()
             self.hist_blobs.append(self.prev_blobs.pop(idx))
+    
+    def update_blob_prev(self):
+        curr_dict = {}
+        for i, v in enumerate(self.curr_blobs):
+            curr_dict[v.id] = v
+        
+        self.prev_blobs.update(curr_dict)
             
     
 # class Blob():

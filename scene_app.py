@@ -169,7 +169,7 @@ class SceneApp(tk.Frame):
         '''
         
         start_time = time.time()
-        blob_list = self.scene.get_blobs()
+        # blob_list = self.scene.get_blobs()
         blob_list = self.scene.process_blobs()
         self.ts = self.scene.ts
         p_proc_time = time.time() - start_time
