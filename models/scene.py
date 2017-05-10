@@ -155,7 +155,7 @@ class Scene():
                 distance = blob.get_distance_from(p_blob)
                 d_mat[int(j)][i] = distance
                 
-                if distance < 0.6:
+                if distance < 0.5:
                     if p_blob.id not in matches_dict.keys():
                         matches_dict[p_blob.id] = [blob.id]
                     else:
@@ -164,7 +164,7 @@ class Scene():
                     #blob.set_connection_from(p_blob)
         
         np.set_printoptions(precision=2)
-        # print(d_mat)
+        print(d_mat)
         print(matches_dict)
     
     def update_blob_hist(self):
