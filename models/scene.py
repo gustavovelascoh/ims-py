@@ -28,8 +28,8 @@ class Scene():
         self.blob_count = 0
         self.curr_blobs = []
         self.prev_blobs = {}
-        self.hist_blobs = []
-        pass
+        self.hist_blobs = {}
+        self.blobs_graph = {}
     
     def add_sensor(self, sensor):
         self.sensors[sensor.type].append(sensor)
@@ -148,7 +148,6 @@ class Scene():
         
         d_mat = np.zeros((len(self.prev_blobs), len(self.curr_blobs)))
             
-        matches_dict = {}
         for i, blob in enumerate(self.curr_blobs):
             for j, p_blob in self.prev_blobs.items():
                 print("%s, %s" % (j, p_blob))
@@ -156,30 +155,33 @@ class Scene():
                 d_mat[int(j)][i] = distance
                 
                 if distance < 0.5:
-                    if p_blob.id not in matches_dict.keys():
-                        matches_dict[p_blob.id] = [blob.id]
-                    else:
-                        matches_dict[p_blob.id].append(blob.id)
+                    if p_blob.id not in self.blobs_graph.keys():
+                        self.blobs_graph[p_blob.id] = [blob.id]
+                    #else:
+                    #    matches_dict[p_blob.id].append(blob.id)
                         
                     #blob.set_connection_from(p_blob)
         
         np.set_printoptions(precision=2)
         print(d_mat)
-        print(matches_dict)
+        print("Graph: %s" % self.blobs_graph)
     
     def update_blob_hist(self):
         
-        index_to_move = []
+        keys_to_remove = []
+        blobs_to_hist = {}
         
-        for idx, b in enumerate(self.prev_blobs):
-            live_time = self.ts - b.ts
+        for k, v in self.prev_blobs:
+            live_time = self.ts - v.ts
             if live_time > self.BLOB_TIMEOUT:
                 # self.hist_blobs.append(b)
-                index_to_move.append(idx)
+                keys_to_remove.append(k)
+                blobs_to_hist[k]=v
         
-        while len(index_to_move) > 0:
-            idx = index_to_move.pop()
-            self.hist_blobs.append(self.prev_blobs.pop(idx))
+        self.hist_blobs.update(blobs_to_hist)
+        
+        for k in keys_to_remove:
+            del self.prev_blobs[k]
     
     def update_blob_prev(self):
         curr_dict = {}
