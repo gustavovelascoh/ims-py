@@ -7,12 +7,15 @@ import numpy as np
 import time
 from sklearn.cluster import DBSCAN
 from gui import viewer
+from gui.frames import Legs
 import threading
 import matplotlib
 from models import scene
+import json
 
 matplotlib.use('TkAgg')
 
+dataset_cfg_file = "possi_123.imscfg"
 
 class RangeSensors(tk.Frame):
     def __init__(self, master):
@@ -86,6 +89,9 @@ class SceneApp(tk.Frame):
                            command=self._create_scene)
         button.pack(side="left")
         button_frame.pack(side="top")
+        
+        self.legs_frame = Legs(self)
+        self.legs_frame.pack()
                 
         self.viewer = viewer.Viewer(self)
         self.viewer.pack()
@@ -228,6 +234,15 @@ class SceneApp(tk.Frame):
         self.date_label.config(text=label_str)
     
     def _create_scene(self):
+        
+        with open(dataset_cfg_file) as data_file:    
+            self.cfg_data = json.load(data_file)
+        
+        
+        print("legs info %s" % self.cfg_data["legs"])
+        
+        self.legs_frame.add_rows(self.cfg_data["legs"])
+        
         l=[0,0,0,0,0,0,0,0,0]
         l[1] = self.range_sensors.l1.get()
         l[2] = self.range_sensors.l2.get()
