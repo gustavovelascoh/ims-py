@@ -252,7 +252,7 @@ class SceneApp(tk.Frame):
         l[8] = self.range_sensors.l8.get()                
         # map_scale = 5.13449       
         
-        self.scene = scene.Scene("possi.legs")
+        self.scene = scene.Scene(dataset_cfg_file)
         
         lms1 = sensor.Laser(sensor.Laser.SUBTYPE_SINGLELAYER)
         lms2 = sensor.Laser(sensor.Laser.SUBTYPE_SINGLELAYER)
