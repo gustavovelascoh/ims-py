@@ -4,9 +4,11 @@ Created on Mar 30, 2017
 @author: gustavo
 '''
 from models.sensor import Sensor
+from models.sensor import Laser
 from models.blob import Blob
 import numpy as np
 from sklearn.cluster import DBSCAN
+
 
 class Scene():
     sensors = {Sensor.TYPE_IMAGE: [],
@@ -17,20 +19,31 @@ class Scene():
     ts = 0
     BLOB_TIMEOUT = 5000
     
-    def __init__(self, legs_file=None):
+    def __init__(self, config_file=None):
         
-        if legs_file is not None:
+        if config_file is not None:
             import json
 
-            json_data=open(legs_file).read()            
-            self.legs_data = json.loads(json_data)
-            self.has_legs_data = True
+            with open(config_file) as file:
+                self.config_data = json.load(file)
+            
         self.blob_count = 0
         self.curr_blobs = []
         self.prev_blobs = {}
         self.hist_blobs = {}
         self.blobs_graph = {}
     
+    def import_range_sensors(self, sensor_list):
+        for rs in sensor_list:
+            if rs["type"] == "singlelayer":
+                lms = Laser(Laser.SUBTYPE_SINGLELAYER)
+                lms.set_src_path(rs["src_path"])
+                self.add_sensor(lms)
+                lms.load()
+            else:
+                raise NotImplementedError("type unsupported: %s" % rs["type"])
+        print("Range sensors in the scene: %d" % len(self.sensors["range"]) + "\n")
+        
     def add_sensor(self, sensor):
         self.sensors[sensor.type].append(sensor)
         
