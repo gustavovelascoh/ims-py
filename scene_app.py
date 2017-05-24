@@ -8,6 +8,7 @@ import time
 from sklearn.cluster import DBSCAN
 from gui import viewer
 from gui.frames import Legs
+from gui.frames import DatasetConfig
 import threading
 import matplotlib
 from models import scene
@@ -90,6 +91,8 @@ class SceneApp(tk.Frame):
         button.pack(side="left")
         button_frame.pack(side="top")
         
+        self.dsc_frame = DatasetConfig(self)
+        self.dsc_frame.pack()
         self.legs_frame = Legs(self)
         self.legs_frame.pack()
                 
