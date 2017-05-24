@@ -237,61 +237,12 @@ class SceneApp(tk.Frame):
         self.date_label.config(text=label_str)
     
     def _create_scene(self):
-        
-#         with open(dataset_cfg_file) as data_file:    
-#             self.cfg_data = json.load(data_file)
-#         
-#         
-#         print("legs info %s" % self.cfg_data["legs"])
-#         
-#         self.legs_frame.add_rows(self.cfg_data["legs"])
-#         
-#         l=[0,0,0,0,0,0,0,0,0]
-#         l[1] = self.range_sensors.l1.get()
-#         l[2] = self.range_sensors.l2.get()
-#         l[3] = self.range_sensors.l3.get()
-#         l[5] = self.range_sensors.l5.get()
-#         l[7] = self.range_sensors.l7.get()
-#         l[8] = self.range_sensors.l8.get()                
-#         # map_scale = 5.13449       
-        
         self.scene = scene.Scene(dataset_cfg_file)
-        
-#         lms1 = sensor.Laser(sensor.Laser.SUBTYPE_SINGLELAYER)
-#         lms2 = sensor.Laser(sensor.Laser.SUBTYPE_SINGLELAYER)
-#         lms3 = sensor.Laser(sensor.Laser.SUBTYPE_SINGLELAYER)
-#         lms5 = sensor.Laser(sensor.Laser.SUBTYPE_SINGLELAYER)
-#         lms7 = sensor.Laser(sensor.Laser.SUBTYPE_SINGLELAYER)
-#         lms8 = sensor.Laser(sensor.Laser.SUBTYPE_SINGLELAYER)
-#         
-#         laser_sensors = [0, lms1, lms2, lms3, 0, lms5, 0, lms7, lms8]
-#         lms_files = ["", "possi.lms1","possi.lms2","possi.lms3",
-#                  "", "possi.lms5", "", "possi.lms7","possi.lms8"]
-#         
-#         # MODIFY HERE: Select Laser scanners to use
-#         print(l)
-#         use_laser = [x for x in range(0,9) if l[x] == 1]
-#         print(use_laser)
-#         # use_laser = [1, 2, 3, 5, 7, 8]
-#         # use_laser = [1, 8]        
-#         #Add laser sensors to Scene
-#         for laser_n in use_laser:
-#             print(laser_sensors[laser_n])
-#             laser_sensors[laser_n].set_src_path(self.dataset_path.dataset_path +
-#                                                 '/' + lms_files[laser_n])
-#             self.scene.add_sensor(laser_sensors[laser_n])
-#             
-#         for range_sensor in self.scene.sensors["range"]:
-#             range_sensor.load()    
-#         
-#         #lms1.set_src_path("possi.lms3")
-#         #lms1.load()
+
         process_log="Range sensors in the scene: %d" % len(self.scene.sensors["range"]) + "\n"
         
         print(process_log)
-        
-        #exit()
-        
+                
         theta = np.arange(0, 180.5, 0.5)
         theta = theta * np.pi / 180.0
         
@@ -308,10 +259,6 @@ class SceneApp(tk.Frame):
             angs.append(float(range_sensor.dataset["calib_data"]["ang"]))
         #print(l)
         
-            
-        # xos = [0, 23.7, 13.12, 12.68, -8.62, -2.2]
-        # yos = [-21.4, 15.6, 26.7, -21.74, 17.1, 22.56]
-        # angs = [0.150098, -3.344051, -4.174827, -0.059341, 3.679154, -1.933825]
         map_scale = self.scene.config_data["map"]["scale"]
         max_x = self.scene.config_data["map"]["max_x"]
         max_y = self.scene.config_data["map"]["max_y"]
@@ -331,31 +278,7 @@ class SceneApp(tk.Frame):
                          markerfacecolor='g', markeredgecolor='k',
                          markersize=10)
         self.viewer.save_background()
-        
-#         img=mpimg.imread(self.dataset_path.dataset_path +
-#                                                 '/' +'image.bmp')
-#         self.ax.clear()
-#         imgplot = self.ax.imshow(img, extent=limits, aspect='auto')
-#         
-#         lasers_pts, = self.ax.plot(xos,yos, '.', markerfacecolor='g', markeredgecolor='k', markersize=10)
-#         plt.ylim(ymin=-25,ymax=32)
-#         plt.xlim(xmin=-30,xmax=40)
-#         
-#         nf = 1
-# 
-#         roi={"ymin":-24,"ymax":30,"xmin":-30,"xmax":40}
-#         self.scene.set_roi(roi)
-#         
-#         self.canvas.show()
-#         self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
-#         
-#         data, last, self.ts = self.scene.preprocess_data()
-#         plt.ylim(ymin=roi["ymin"],ymax=roi["ymax"])
-#         plt.xlim(xmin=roi["xmin"],xmax=roi["xmax"])
-#         
-#         self.plot_data, = self.ax.plot(data[:,0], data[:,1], 'b. ')
-#         self.canvas.show()
-        
+                
         
 if __name__ == "__main__":
     main = tk.Tk()
