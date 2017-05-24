@@ -326,8 +326,7 @@ class SceneApp(tk.Frame):
         roi = self.scene.config_data["map"]["roi"]
         self.scene.set_roi(roi)
         self.viewer.set_roi(roi)
-        self.viewer.draw_img(self.dataset_path.dataset_path +
-                                                '/' +'image.bmp', limits)        
+        self.viewer.draw_img(self.scene.config_data["map"]["image_path"], limits)        
         self.viewer.plot(xos,yos, marker='o', linestyle=' ', 
                          markerfacecolor='g', markeredgecolor='k',
                          markersize=10)
