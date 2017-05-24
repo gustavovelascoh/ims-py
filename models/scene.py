@@ -26,6 +26,10 @@ class Scene():
 
             with open(config_file) as file:
                 self.config_data = json.load(file)
+        else:
+            raise Exception("No config file provided")
+        
+        self.import_range_sensors(self.config_data["range_sensors"])
             
         self.blob_count = 0
         self.curr_blobs = []
@@ -35,7 +39,7 @@ class Scene():
     
     def import_range_sensors(self, sensor_list):
         for rs in sensor_list:
-            if rs["type"] == "singlelayer":
+            if rs["subtype"] == "singlelayer":
                 lms = Laser(Laser.SUBTYPE_SINGLELAYER)
                 lms.set_src_path(rs["src_path"])
                 self.add_sensor(lms)
