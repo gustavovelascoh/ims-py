@@ -5,6 +5,27 @@ Created on May 16, 2017
 '''
 import tkinter as tk
 
+class DatasetConfig(tk.Frame):
+    def __init__(self, master,create_cb=None):
+        '''
+        Constructor
+        '''
+        tk.Frame.__init__(self, master)
+        self.master = master
+        l = tk.Label(self, text="Select dataset config file")
+        l.grid(row=0, column=0)
+        self.e = tk.Entry(self)
+        self.e.grid(row=0, column=1)
+        button_b = tk.Button(self, text="Browse", command=self.select_file, 
+                           width=10)
+        button_b.grid(row=0, column=2)
+        button_c = tk.Button(self, text="Create Scene",
+                           command=create_cb)
+        button_c.grid(row=0, column=3)
+    
+    def select_file(self):
+        pass
+
 class Legs(tk.Frame):
     '''
     Legs info viewer
