@@ -2,11 +2,17 @@
   "name": "possi_123578",
   "map": {
       "image_path": "possi/image.bmp",
-      "map_scale" : 4.1345,
+      "scale" : 4.1345,
       "max_x" : 300,
       "max_y" : 225,
       "d_x" : -30.2,
-      "d_y" : -24
+      "d_y" : -24,
+      "roi" : {
+          "ymin": -24,
+          "ymax": 30,
+          "xmin": -30,
+          "xmax":40
+      }
   },
   "range_sensors": [
     {

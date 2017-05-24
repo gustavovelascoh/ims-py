@@ -2,11 +2,17 @@
   "name": "possi_123578",
   "map": {
       "image_path": "possi/image.bmp",
-      "map_scale" : 4.1345,
+      "scale" : 4.1345,
       "max_x" : 300,
       "max_y" : 225,
       "d_x" : -30.2,
-      "d_y" : -24
+      "d_y" : -24,
+      "roi" : {
+          "ymin": -24,
+          "ymax": 30,
+          "xmin": -30,
+          "xmax":40
+      }
   },
   "range_sensors": [
     {
@@ -26,24 +32,6 @@
       "type": "range",
       "subtype": "singlelayer",
       "src_path": "possi/possi.lms3"
-    },
-    {
-      "name": "lms5",
-      "type": "range",
-      "subtype": "singlelayer",
-      "src_path": "possi/possi.lms5"
-    },
-    {
-      "name": "lms7",
-      "type": "range",
-      "subtype": "singlelayer",
-      "src_path": "possi/possi.lms7"
-    },
-    {
-      "name": "lms8",
-      "type": "range",
-      "subtype": "singlelayer",
-      "src_path": "possi/possi.lms8"
     }
   ],
   "legs": [ 
