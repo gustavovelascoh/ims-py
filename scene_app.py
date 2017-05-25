@@ -238,6 +238,8 @@ class SceneApp(tk.Frame):
     
     def _create_scene(self):
         self.scene = scene.Scene(dataset_cfg_file)
+        
+        self.legs_frame.add_rows(self.scene.config_data["legs"])
 
         process_log="Range sensors in the scene: %d" % len(self.scene.sensors["range"]) + "\n"
         
