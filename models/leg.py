@@ -34,3 +34,6 @@ class Leg(object):
         
         if self.is_in(item):
             self.add_item(item)
+    
+    def clear(self):
+        self.occupied_area = 0

@@ -29,16 +29,17 @@ class Scene():
                 self.config_data = json.load(file)
         else:
             raise Exception("No config file provided")
+        self.legs = []
         
         self.import_range_sensors(self.config_data["range_sensors"])
-        
+        self.generate_legs(self.config_data["legs"])
             
         self.blob_count = 0
         self.curr_blobs = []
         self.prev_blobs = {}
         self.hist_blobs = {}
         self.blobs_graph = {}
-        self.legs = []
+        
         self.legs_state = []
     
     
@@ -158,6 +159,15 @@ class Scene():
                     blob.get_features()
                     self.blob_list.append(blob)
                     self.blob_count += 1
+                    
+                    for leg in self.legs:
+                        leg.check_item(blob)
+        
+        self.legs_state = []
+        
+        for leg in self.legs:
+            self.legs_state.append(leg.occupied_area)
+            leg.clear()
         
         return self.blob_list
     
@@ -171,7 +181,7 @@ class Scene():
         # self.update_blob_hist()
         
         self.update_blob_prev()
-        print(self.prev_blobs)
+        #print(self.prev_blobs)
         
         return self.curr_blobs
 
@@ -181,7 +191,7 @@ class Scene():
             
         for i, blob in enumerate(self.curr_blobs):
             for j, p_blob in self.prev_blobs.items():
-                print("%s, %s" % (j, p_blob))
+                #print("%s, %s" % (j, p_blob))
                 distance = blob.get_distance_from(p_blob)
                 d_mat[int(j)][i] = distance
                 
@@ -194,8 +204,8 @@ class Scene():
                     #blob.set_connection_from(p_blob)
         
         np.set_printoptions(precision=2)
-        print(d_mat)
-        print("Graph: %s" % self.blobs_graph)
+        #print(d_mat)
+        #print("Graph: %s" % self.blobs_graph)
     
     def update_blob_hist(self):
         
