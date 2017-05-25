@@ -6,6 +6,7 @@ Created on Mar 30, 2017
 from models.sensor import Sensor
 from models.sensor import Laser
 from models.blob import Blob
+from models.leg import Leg
 import numpy as np
 from sklearn.cluster import DBSCAN
 
@@ -30,13 +31,26 @@ class Scene():
             raise Exception("No config file provided")
         
         self.import_range_sensors(self.config_data["range_sensors"])
+        
             
         self.blob_count = 0
         self.curr_blobs = []
         self.prev_blobs = {}
         self.hist_blobs = {}
         self.blobs_graph = {}
+        self.legs = []
+        self.legs_state = []
     
+    
+    def generate_legs(self, legs_array):
+        for leg_dict in legs_array:
+            leg = Leg(id=leg_dict["id"],
+                      type=leg_dict["type"],
+                      heading=leg_dict["heading"],
+                      bbox=leg_dict["bbox"],
+                      lanes=leg_dict["lanes"])
+            self.legs.append(leg)
+        
     def import_range_sensors(self, sensor_list):
         for rs in sensor_list:
             if rs["subtype"] == "singlelayer":

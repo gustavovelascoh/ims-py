@@ -197,7 +197,10 @@ class SceneApp(tk.Frame):
                     
         plot_time = time.time()
         
-        colors_list = ['blue', 'red', 'green', 'purple']
+        colors_list = ['blue']
+        # colors_list = ['blue', 'red', 'green', 'purple']
+        
+        len_colors_list = len(colors_list)
         
         for b in blob_list:
             
@@ -208,8 +211,8 @@ class SceneApp(tk.Frame):
                 print("c_id: %d, prev: %s" % (c_id, b.prev_blobs))
                        
             self.viewer.plot(b.data[:,0], b.data[:,1], linestyle=' ',
-                             marker='.', color=colors_list[(c_id-1)%4])
-            self.viewer.plot([b.bbox[0],b.bbox[2]],[b.bbox[1], b.bbox[3]],linestyle='-', marker='x', color=colors_list[(c_id-1)%4])
+                             marker='.', color=colors_list[(c_id-1)%len_colors_list])
+            self.viewer.plot([b.bbox.minxy[0],b.bbox.maxxy[0]],[b.bbox.minxy[1], b.bbox.maxxy[1]],linestyle='-', marker='x', color=colors_list[(c_id-1)%len_colors_list])
         
         self.viewer.update()  
         p_plot_time = time.time() - plot_time
