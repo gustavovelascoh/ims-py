@@ -166,7 +166,7 @@ class Scene():
         self.legs_state = []
         
         for leg in self.legs:
-            self.legs_state.append(leg.occupied_area)
+            self.legs_state.append(leg.state)
             leg.clear()
         
         return self.blob_list

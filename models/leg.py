@@ -20,11 +20,12 @@ class Leg(object):
         self.heading = heading
         self.bbox = BoundingBox((bbox[0],bbox[1]),(bbox[2],bbox[3]))
         self.lanes = lanes
-        self.state = None
+        self.state = 0
         self.occupied_area = 0
         
     def add_item(self, item):
         self.occupied_area += item.bbox.area
+        self.state = self.occupied_area/self.bbox.area
     
     def is_in(self, item):
         
