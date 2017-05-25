@@ -24,9 +24,8 @@ class Blob(object):
     def get_features(self):
         xy = self.data
         bbox = np.array([min(xy[:,0:1]), min(xy[:,1:2]),max(xy[:,0:1]), max(xy[:,1:2])])
-        self.area = (bbox[2]-bbox[0])*(bbox[3]-bbox[1])
-        self.dens = len(xy)/self.area
-        self.bbox = bbox
+        self.bbox = BoundingBox((bbox[0], bbox[1]), (bbox[2], bbox[3]))        
+        self.dens = len(xy)/self.bbox.area
         self.mean = xy.mean(axis=0)
         
     def get_distance_from(self, blob):
@@ -60,6 +59,7 @@ class BoundingBox(object):
     width = None
     height = None
     area = None
+    center = None
     
     def __init__(self, minxy, maxxy):
         '''
@@ -72,6 +72,7 @@ class BoundingBox(object):
         self.width = maxxy[0] - minxy[0]
         self.height = maxxy[1] - minxy[1]
         self.area = self.width * self.height
+        self.center = (minxy[0]+(self.width/2), minxy[1]+(self.height/2))
     
     def is_in(self, point):
         '''
