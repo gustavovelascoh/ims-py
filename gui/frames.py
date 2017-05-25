@@ -25,7 +25,49 @@ class DatasetConfig(tk.Frame):
     
     def select_file(self):
         pass
-
+    
+    
+class RangeSensors(tk.Frame):
+    def __init__(self, master):
+        '''
+        Constructor
+        '''
+        tk.Frame.__init__(self, master)
+        self.master = master
+        l = tk.Label(self, text="Range Sensors")
+        l.grid(row=0, columnspan=2)
+        
+        tk.Label(self, text="Name").grid(row=1, column=0)
+        tk.Label(self, text="Type").grid(row=1, column=1)
+        self.curr_row = 2
+    
+    def add_rows(self, sensors):
+        
+        for s in sensors:
+            tk.Label(self, text=s["name"]).grid(row=self.curr_row, column=0)
+            tk.Label(self, text=s["subtype"]).grid(row=self.curr_row, column=1)            
+            self.curr_row += 1
+        
+        
+class Cameras(tk.Frame):
+    def __init__(self, master):
+        '''
+        Constructor
+        '''
+        tk.Frame.__init__(self, master)
+        self.master = master
+        l = tk.Label(self, text="Cameras")
+        l.grid(row=0, columnspan=2)
+        
+        tk.Label(self, text="Name").grid(row=1, column=0)
+        tk.Label(self, text="Type").grid(row=1, column=1)
+        self.curr_row = 2
+        
+    def add_rows(self, cameras):
+        if cameras is None:
+            msg = "No cameras available"
+            tk.Label(self, text=msg).grid(row=self.curr_row, columnspan=2)
+        
 class Legs(tk.Frame):
     '''
     Legs info viewer
