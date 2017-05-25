@@ -67,6 +67,36 @@ class Cameras(tk.Frame):
         if cameras is {}:
             msg = "No cameras available"
             tk.Label(self, text=msg).grid(row=self.curr_row, columnspan=2)
+
+class LegsState(tk.Frame):
+    '''
+    Legs state viewer
+    '''
+    def __init__(self, master):
+        '''
+        Constructor
+        '''
+        tk.Frame.__init__(self, master)
+        self.config(bd=1)
+        self.master = master
+        tk.Label(self, text="Legs State").grid(row=0, columnspan=3)
+        
+        tk.Label(self, text="Leg ID").grid(row=1, column=0)
+        tk.Label(self, text="Status").grid(row=1, column=1)
+        
+        self.status_labels = []
+        
+        self.curr_row = 2
+    
+    def add_rows(self, legs):
+        
+        for leg in legs:
+            tk.Label(self, text=leg["id"]).grid(row=self.curr_row, column=0)
+            st_l = tk.Label(self, text="*****")
+            st_l.grid(row=self.curr_row, column=1)
+            self.status_labels.append(st_l)            
+            self.curr_row += 1
+
         
 class Legs(tk.Frame):
     '''
