@@ -80,19 +80,8 @@ class SceneApp(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master)
         self.master = master
-        
-        self.dataset_path = DatasetPath(self)
-        self.range_sensors = RangeSensors(self) 
-              
-        button_frame = tk.Frame(self)
-        button = tk.Button(button_frame, text="Create Scene",
-                           command=self._create_scene)
-        button.pack(side="left")
-        button_frame.pack(side="top")
-        
-
-        
-        self.dsc_frame = frames.DatasetConfig(self)
+                
+        self.dsc_frame = frames.DatasetConfig(self, self._create_scene)
         self.dsc_frame.pack()
         
         info_frame = tk.Frame(self)
@@ -104,11 +93,14 @@ class SceneApp(tk.Frame):
         self.rs_frame.pack(side="left")
         self.cam_frame = frames.Cameras(info_frame)
         self.cam_frame.pack(side="left")
+        
+        viewer_frame = tk.Frame(self)
+        viewer_frame.pack(side="left")
                 
-        self.viewer = viewer.Viewer(self)
+        self.viewer = viewer.Viewer(viewer_frame)
         self.viewer.pack()
         
-        viewer_toolbar_frame = tk.Frame(self)
+        viewer_toolbar_frame = tk.Frame(viewer_frame)
         
         self.date_label = tk.Label(viewer_toolbar_frame, text="time: NA")
         self.date_label.pack(side="left")
@@ -122,6 +114,9 @@ class SceneApp(tk.Frame):
                            command=self._stop)
         sbutton.pack(side="left")
         viewer_toolbar_frame.pack(side="top")
+        
+        self.legs_state_frame = frames.LegsState(self)
+        self.legs_state_frame.pack(side="left")
         
         self.loop = False
         self.first_frame = True
@@ -249,6 +244,7 @@ class SceneApp(tk.Frame):
         self.scene = scene.Scene(dataset_cfg_file)
         
         self.legs_frame.add_rows(self.scene.config_data["legs"])
+        self.legs_state_frame.add_rows(self.scene.config_data["legs"])
         self.rs_frame.add_rows(self.scene.config_data["range_sensors"])
         self.cam_frame.add_rows(self.scene.config_data["cameras"])
 
