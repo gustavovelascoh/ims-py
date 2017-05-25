@@ -64,7 +64,7 @@ class Cameras(tk.Frame):
         self.curr_row = 2
         
     def add_rows(self, cameras):
-        if cameras is None:
+        if cameras is {}:
             msg = "No cameras available"
             tk.Label(self, text=msg).grid(row=self.curr_row, columnspan=2)
         

@@ -7,8 +7,7 @@ import numpy as np
 import time
 from sklearn.cluster import DBSCAN
 from gui import viewer
-from gui.frames import Legs
-from gui.frames import DatasetConfig
+from gui import frames
 import threading
 import matplotlib
 from models import scene
@@ -91,10 +90,20 @@ class SceneApp(tk.Frame):
         button.pack(side="left")
         button_frame.pack(side="top")
         
-        self.dsc_frame = DatasetConfig(self)
+
+        
+        self.dsc_frame = frames.DatasetConfig(self)
         self.dsc_frame.pack()
-        self.legs_frame = Legs(self)
-        self.legs_frame.pack()
+        
+        info_frame = tk.Frame(self)
+        info_frame.pack()
+        
+        self.legs_frame = frames.Legs(info_frame)
+        self.legs_frame.pack(side="left")
+        self.rs_frame = frames.RangeSensors(info_frame)
+        self.rs_frame.pack(side="left")
+        self.cam_frame = frames.Cameras(info_frame)
+        self.cam_frame.pack(side="left")
                 
         self.viewer = viewer.Viewer(self)
         self.viewer.pack()
@@ -240,6 +249,8 @@ class SceneApp(tk.Frame):
         self.scene = scene.Scene(dataset_cfg_file)
         
         self.legs_frame.add_rows(self.scene.config_data["legs"])
+        self.rs_frame.add_rows(self.scene.config_data["range_sensors"])
+        self.cam_frame.add_rows(self.scene.config_data["cameras"])
 
         process_log="Range sensors in the scene: %d" % len(self.scene.sensors["range"]) + "\n"
         
