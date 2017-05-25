@@ -184,6 +184,14 @@ class SceneApp(tk.Frame):
         start_time = time.time()
         # blob_list = self.scene.get_blobs()
         blob_list = self.scene.process_blobs()
+        
+        status = []
+        
+        for idx, status in enumerate(self.scene.legs_state):
+            self.legs_state_frame.status_labels[idx].config(text=status)
+        
+        print(status)        
+        
         self.ts = self.scene.ts
         p_proc_time = time.time() - start_time
         self.frame_cnt += 1
