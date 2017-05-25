@@ -34,6 +34,7 @@
       "src_path": "possi/possi.lms3"
     }
   ],
+  "cameras": {},
   "legs": [ 
     {
       "id": 0,
