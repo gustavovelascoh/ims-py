@@ -4,6 +4,7 @@ Created on May 7, 2017
 @author: gustavo
 '''
 import numpy as np
+from math import ceil
 
 
 class Blob(object):
@@ -69,8 +70,17 @@ class BoundingBox(object):
         
         self.minxy = minxy
         self.maxxy = maxxy
-        self.width = maxxy[0] - minxy[0]
-        self.height = maxxy[1] - minxy[1]
+        
+        dx = maxxy[0] - minxy[0]
+        dy = maxxy[1] - minxy[1]
+        
+        dx_cm = dx * 100
+        dy_cm = dy * 100
+        
+        grid_k = 50
+        
+        self.width = (ceil((dx_cm) / grid_k)*grid_k)/100
+        self.height = (ceil((dy_cm) / grid_k)*grid_k)/100
         self.area = self.width * self.height
         self.center = (minxy[0]+(self.width/2), minxy[1]+(self.height/2))
     
@@ -89,5 +99,9 @@ class BoundingBox(object):
             
         return ret
     
+    def __str__(self, *args, **kwargs):
+        blob_str = "minxy: (%s,%s)"  % (self.minxy)
+        blob_str += "maxxy: (%s,%s)"  % (self.maxxy)
+        return blob_str
     
     
