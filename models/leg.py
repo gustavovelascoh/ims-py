@@ -26,6 +26,9 @@ class Leg(object):
     def add_item(self, item):
         self.occupied_area += item.bbox.area
         self.state = self.occupied_area/self.bbox.area
+#         print("leg area: %s, bbox area: %s, occupied area: %s" %
+#               (self.bbox.area,item.bbox.area,self.occupied_area))
+#         print("Leg bbox %s, item bbox: %s" % (self.bbox, item.bbox))
     
     def is_in(self, item):
         

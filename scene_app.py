@@ -15,7 +15,7 @@ import json
 
 matplotlib.use('TkAgg')
 
-dataset_cfg_file = "possi_123.imscfg"
+dataset_cfg_file = "possi_123578.imscfg"
 
 class RangeSensors(tk.Frame):
     def __init__(self, master):
@@ -186,11 +186,26 @@ class SceneApp(tk.Frame):
         blob_list = self.scene.process_blobs()
         
         status = []
+        occupancy_levels = [("empty", 0.2),
+             ("low", 2.0),
+             ("medium", 5.0),
+             ("high", 13.0),
+             ("very high", 100.0)]
         
         for idx, status in enumerate(self.scene.legs_state):
-            self.legs_state_frame.status_labels[idx].config(text=status)
+            lvl_val = round(status*100, 2)
+            lvl_str = str(lvl_val)
+            
+            for k, v in occupancy_levels:
+                if lvl_val < v:
+                    lvl_str = k + " (" + lvl_str + ")"
+                    break
+            
+            self.legs_state_frame.status_labels[idx].config(text=lvl_str)
+            
+            
         
-        print(status)        
+        #print(status)        
         
         self.ts = self.scene.ts
         p_proc_time = time.time() - start_time
