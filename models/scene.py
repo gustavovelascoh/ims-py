@@ -156,17 +156,23 @@ class Scene():
                                           self.ts,
                                           self.nf,
                                           self.blob_count)
-                    blob.get_features()
-                    self.blob_list.append(blob)
-                    self.blob_count += 1
-                    
-                    for leg in self.legs:
-                        leg.check_item(blob)
-        
+                    try:
+                        blob.get_features()
+                        self.blob_list.append(blob)
+                        self.blob_count += 1
+                        
+                        for leg in self.legs:
+                            leg.check_item(blob)
+                    except ZeroDivisionError:
+                        pass
+                        
         self.legs_state = []
+        self.legs_areas = []
         
+        # print(self.legs)
         for leg in self.legs:
             self.legs_state.append(leg.state)
+            self.legs_areas.append(leg.bbox.area)
             leg.clear()
         
         return self.blob_list
@@ -175,13 +181,13 @@ class Scene():
         
         self.curr_blobs = self.get_blobs()
         
-        if len(self.prev_blobs) > 0:
-            self.find_blobs_matches()            
-        
-        # self.update_blob_hist()
-        
-        self.update_blob_prev()
-        #print(self.prev_blobs)
+#         if len(self.prev_blobs) > 0:
+#             self.find_blobs_matches()            
+#         
+#         # self.update_blob_hist()
+#         
+#         self.update_blob_prev()
+#         #print(self.prev_blobs)
         
         return self.curr_blobs
 
