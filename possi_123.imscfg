@@ -14,6 +14,7 @@
           "xmax":40
       }
   },
+  "cameras": {},
   "range_sensors": [
     {
       "name": "lms1",
@@ -34,41 +35,48 @@
       "src_path": "possi/possi.lms3"
     }
   ],
-  "cameras": {},
   "legs": [ 
     {
       "id": 0,
       "type": "approach",
       "heading": "N",
-      "bbox": [0.9, 15.0, 12.5, 30.5],
+      "bbox": [6.7, 15.0, 12.5, 30.5],
       "lanes": []
     },
     {
       "id": 1,
       "type": "approach",
       "heading": "E",
-      "bbox": [18.0, 2.45, 42.3, 14.0],
+      "bbox": [18.0, 2.45, 33.6, 13.5],
       "lanes": []
     },
     {
       "id": 2,
       "type": "departure",
       "heading": "E",
-      "bbox": [18.0, -19.3, 42.3, -9.45],
+      "bbox": [18.0, -19.3, 33.6, -9.45],
       "lanes": []
     },
     {
       "id": 3,
       "type": "approach",
       "heading": "W",
-      "bbox": [-30.1, -19.3, -7.5, -8.22],
+      "bbox": [-20.1, -19.3, -7.5, -8.22],
       "lanes": []
     },
     {
       "id": 4,
       "type": "departure",
       "heading": "W",
-      "bbox": [-30.1, 3.35, -7.5, 14.5],
+      "bbox": [-20.1, 3.35, -7.5, 14.5],
+      "lanes": []
+    },
+    {
+      "id": 5,
+      "type": "approach",
+      "heading": "N",
+      "bbox": [0.9, 15.0, 6.7, 30.5],
       "lanes": []
     }
+  ]
 }

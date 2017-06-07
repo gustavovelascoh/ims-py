@@ -16,6 +16,7 @@ import json
 matplotlib.use('TkAgg')
 
 dataset_cfg_file = "possi_123578.imscfg"
+dataset_cfg_file = "possi_123.imscfg"
 
 class RangeSensors(tk.Frame):
     def __init__(self, master):
