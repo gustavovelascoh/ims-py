@@ -88,11 +88,11 @@ class SceneApp(tk.Frame):
         info_frame.pack()
         
         self.legs_frame = frames.Legs(info_frame)
-        self.legs_frame.pack(side="left")
+        self.legs_frame.pack(side="left",padx=50)
         self.rs_frame = frames.RangeSensors(info_frame)
-        self.rs_frame.pack(side="left")
+        self.rs_frame.pack(side="left",padx=50)
         self.cam_frame = frames.Cameras(info_frame)
-        self.cam_frame.pack(side="left")
+        self.cam_frame.pack(side="left",padx=50, expand=True)
         
         viewer_frame = tk.Frame(self)
         viewer_frame.pack(side="left")
