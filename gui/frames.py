@@ -34,18 +34,18 @@ class RangeSensors(tk.Frame):
         '''
         tk.Frame.__init__(self, master)
         self.master = master
-        l = tk.Label(self, text="Range Sensors")
+        l = tk.Label(self, text="Range Sensors",font=("Helvetica", 16))
         l.grid(row=0, columnspan=2)
         
-        tk.Label(self, text="Name").grid(row=1, column=0)
-        tk.Label(self, text="Type").grid(row=1, column=1)
+        tk.Label(self, text="Name",font=("Helvetica", 14)).grid(row=1, column=0)
+        tk.Label(self, text="Type",font=("Helvetica", 14)).grid(row=1, column=1)
         self.curr_row = 2
     
     def add_rows(self, sensors):
         
         for s in sensors:
-            tk.Label(self, text=s["name"]).grid(row=self.curr_row, column=0)
-            tk.Label(self, text=s["subtype"]).grid(row=self.curr_row, column=1)            
+            tk.Label(self, text=s["name"],font=("Helvetica", 12)).grid(row=self.curr_row, column=0)
+            tk.Label(self, text=s["subtype"],font=("Helvetica", 12)).grid(row=self.curr_row, column=1)            
             self.curr_row += 1
         
         
@@ -56,11 +56,11 @@ class Cameras(tk.Frame):
         '''
         tk.Frame.__init__(self, master)
         self.master = master
-        l = tk.Label(self, text="Cameras")
+        l = tk.Label(self, text="Cameras",font=("Helvetica", 16))
         l.grid(row=0, columnspan=2)
         
-        tk.Label(self, text="Name").grid(row=1, column=0)
-        tk.Label(self, text="Type").grid(row=1, column=1)
+        tk.Label(self, text="Name",font=("Helvetica", 14)).grid(row=1, column=0)
+        tk.Label(self, text="Type",font=("Helvetica", 14)).grid(row=1, column=1)
         self.curr_row = 2
         
     def add_rows(self, cameras):
@@ -77,12 +77,12 @@ class LegsState(tk.Frame):
         Constructor
         '''
         tk.Frame.__init__(self, master)
-        self.config(bd=1)
+        self.config(bd=3)
         self.master = master
-        tk.Label(self, text="Legs State").grid(row=0, columnspan=3)
+        tk.Label(self, text="Legs State",font=("Helvetica", 16)).grid(row=0, columnspan=3)
         
-        tk.Label(self, text="Leg ID").grid(row=1, column=0)
-        tk.Label(self, text="Status").grid(row=1, column=1)
+        tk.Label(self, text="Leg ID",font=("Helvetica", 14),width=8).grid(row=1, column=0)
+        tk.Label(self, text="Status",font=("Helvetica", 14),width=30).grid(row=1, column=1)
         
         self.status_labels = []
         
@@ -91,7 +91,7 @@ class LegsState(tk.Frame):
     def add_rows(self, legs):
         
         for leg in legs:
-            tk.Label(self, text=leg["id"]).grid(row=self.curr_row, column=0)
+            tk.Label(self, text=leg["id"],font=("Helvetica", 12)).grid(row=self.curr_row, column=0)
             st_l = tk.Label(self, text="*****")
             st_l.grid(row=self.curr_row, column=1)
             self.status_labels.append(st_l)            
@@ -111,20 +111,20 @@ class Legs(tk.Frame):
         tk.Frame.__init__(self, master)
         self.config(bd=1)
         self.master = master
-        tk.Label(self, text="Legs Info").grid(row=0, columnspan=3)
+        tk.Label(self, text="Legs Info",font=("Helvetica", 16)).grid(row=0, columnspan=3)
         
-        tk.Label(self, text="ID").grid(row=1, column=0)
-        tk.Label(self, text="Type").grid(row=1, column=1)
-        tk.Label(self, text="Heading").grid(row=1, column=2)
+        tk.Label(self, text="ID",font=("Helvetica", 14)).grid(row=1, column=0)
+        tk.Label(self, text="Type",font=("Helvetica", 14)).grid(row=1, column=1)
+        tk.Label(self, text="Heading",font=("Helvetica", 14)).grid(row=1, column=2)
         
         self.curr_row = 2
     
     def add_rows(self, legs):
         
         for leg in legs:
-            tk.Label(self, text=leg["id"]).grid(row=self.curr_row, column=0)
-            tk.Label(self, text=leg["type"]).grid(row=self.curr_row, column=1)
-            tk.Label(self, text=leg["heading"]).grid(row=self.curr_row, column=2)
+            tk.Label(self, text=leg["id"],font=("Helvetica", 12)).grid(row=self.curr_row, column=0)
+            tk.Label(self, text=leg["type"],font=("Helvetica", 12)).grid(row=self.curr_row, column=1)
+            tk.Label(self, text=leg["heading"],font=("Helvetica", 12)).grid(row=self.curr_row, column=2)
             self.curr_row += 1
         
 
