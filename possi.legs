@@ -1,8 +1,8 @@
 [ 
     {"id": 0,
-    "type": "approach",
+    "type": "departure",
     "heading": "N",
-    "bbox": [0.9, 15.0, 12.5, 30.5],
+    "bbox": [6.7, 15.0, 12.5, 30.5],
     "lanes": []
     },
     {"id": 1,
@@ -27,6 +27,12 @@
     "type": "departure",
     "heading": "W",
     "bbox": [-20.1, 3.35, -7.5, 14.5],
+    "lanes": []
+    },
+    {"id": 5,
+    "type": "approach",
+    "heading": "N",
+    "bbox": [0.9, 15.0, 6.7, 30.5],
     "lanes": []
     }
 ]
