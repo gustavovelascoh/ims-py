@@ -313,6 +313,17 @@ class SceneApp(tk.Frame):
         self.viewer.plot(xos,yos, marker='o', linestyle=' ', 
                          markerfacecolor='g', markeredgecolor='k',
                          markersize=10)
+        
+        for leg in self.scene.config_data["legs"]:
+    
+            minx = leg['bbox'][0]
+            miny = leg['bbox'][1]
+            dx = leg['bbox'][2] - minx
+            dy = leg['bbox'][3] - miny
+            color = "purple" if leg["type"] == "departure" else "cyan"
+            
+            self.viewer.plot_box(minx, miny, dx, dy, edgecolor=color)
+        
         self.viewer.save_background()
                 
         

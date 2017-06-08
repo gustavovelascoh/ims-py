@@ -7,6 +7,7 @@ import tkinter as tk
 import matplotlib.image as mpimg
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.patches as patches
 
 
 class Viewer(tk.Frame):
@@ -35,6 +36,12 @@ class Viewer(tk.Frame):
         self.total_lines = 0
         self.used_lines = 0
         self.bg_saved = 0
+        
+        self.rectangles = {"fixed": 0,
+                           "total": 0,
+                           "used": 0}
+        
+        self.rectangles_list = []
         
     def draw_img(self, img_path, limits=None):
         img = mpimg.imread(img_path)
@@ -154,7 +161,19 @@ class Viewer(tk.Frame):
         lines = self.ax.get_lines()
         self.total_lines = len(lines)
         #print("Length lol %d" % len(lines))
-        self.canvas.draw() 
+        self.canvas.draw()
+    
+    def plot_box(self,minx, miny, dx, dy,fill=False, edgecolor="green"):
+        ret = self.ax.add_patch(
+         patches.Rectangle(
+            (minx, miny),
+            dx,
+            dy,
+            fill=fill,      # remove background
+            edgecolor=edgecolor
+         ) )
+        
+        
 
 if __name__ == "__main__":
     main = tk.Tk()
