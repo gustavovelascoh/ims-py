@@ -95,6 +95,7 @@ class Viewer(tk.Frame):
 #         self.plot_data = self.plot_data_tup[0]
         self.canvas.show()
         self.fixed_lines = len(self.ax.get_lines())
+        self.rectangles["fixed"] = len(self.ax.patches)
         self.bg_saved = 1
     
     def __update_plot_data(self, *args, line_idx=0):
