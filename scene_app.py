@@ -229,14 +229,18 @@ class SceneApp(tk.Frame):
         for b in blob_list:
             
             c_id = b.id
+            b_color=colors_list[(c_id-1)%len_colors_list]
             
             if len(b.prev_blobs) != 0:
                 c_id = min(b.prev_blobs)
                 print("c_id: %d, prev: %s" % (c_id, b.prev_blobs))
                        
-            self.viewer.plot(b.data[:,0], b.data[:,1], linestyle=' ',
-                             marker='.', color=colors_list[(c_id-1)%len_colors_list])
-            self.viewer.plot([b.bbox.minxy[0],b.bbox.maxxy[0]],[b.bbox.minxy[1], b.bbox.maxxy[1]],linestyle='-', marker='x', color=colors_list[(c_id-1)%len_colors_list])
+#             self.viewer.plot(b.data[:,0], b.data[:,1], linestyle=' ',
+#                              marker='.', color=colors_list[(c_id-1)%len_colors_list])
+            minx, miny = b.bbox.minxy
+            self.viewer.plot_box(minx, miny, b.bbox.width, b.bbox.height, edgecolor=b_color)
+            
+            self.viewer.plot([b.bbox.minxy[0],b.bbox.maxxy[0]],[b.bbox.minxy[1], b.bbox.maxxy[1]],linestyle='-', marker='x', color=b_color)
         
         self.viewer.update()  
         p_plot_time = time.time() - plot_time

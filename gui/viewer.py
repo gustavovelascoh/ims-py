@@ -37,11 +37,11 @@ class Viewer(tk.Frame):
         self.used_lines = 0
         self.bg_saved = 0
         
-        self.rectangles = {"fixed": 0,
-                           "total": 0,
-                           "used": 0}
+        self.boxes = {"fixed": 0,
+                       "total": 0,
+                       "used": 0}
         
-        self.rectangles_list = []
+        self.boxes_list = []
         
     def draw_img(self, img_path, limits=None):
         img = mpimg.imread(img_path)
@@ -62,10 +62,10 @@ class Viewer(tk.Frame):
     def plot(self, *args, **kwargs):
         
         self.available_lines = self.total_lines - self.fixed_lines - self.used_lines
-#         print("Available lines: %d-%d-%d : %d" % (self.total_lines,
-#                                                self.fixed_lines,
-#                                                self.used_lines,
-#                                                self.available_lines))
+        print("Available lines: %d-%d-%d : %d" % (self.total_lines,
+                                               self.fixed_lines,
+                                               self.used_lines,
+                                               self.available_lines))
         if self.available_lines > 0:
 #             print("Updating line ")
             line_idx = (self.fixed_lines + self.used_lines)            
@@ -80,8 +80,8 @@ class Viewer(tk.Frame):
             #self.canvas.show()
             self.total_lines = len(self.ax.get_lines())
         
-        #if self.bg_saved:    
-        self.used_lines += 1
+        if self.bg_saved:    
+            self.used_lines += 1
         
             
     def save_background(self):
@@ -95,7 +95,8 @@ class Viewer(tk.Frame):
 #         self.plot_data = self.plot_data_tup[0]
         self.canvas.show()
         self.fixed_lines = len(self.ax.get_lines())
-        self.rectangles["fixed"] = len(self.ax.patches)
+        self.boxes["fixed"] = len(self.ax.patches)
+        
         self.bg_saved = 1
     
     def __update_plot_data(self, *args, line_idx=0):
@@ -158,22 +159,55 @@ class Viewer(tk.Frame):
             #print("removing...")
             lines[-1].remove()
         
+        boxes_to_discard = self.boxes["total"] - self.boxes["fixed"] - self.boxes["used"]
+        
+        for i in range(0,boxes_to_discard):
+            self.boxes_list[-1].remove()
+            del self.boxes_list[-1]
+        
         self.used_lines = 0
         lines = self.ax.get_lines()
         self.total_lines = len(lines)
+        self.boxes["used"] = 0
+        self.boxes["total"] = len(self.boxes_list)
         #print("Length lol %d" % len(lines))
         self.canvas.draw()
     
     def plot_box(self,minx, miny, dx, dy,fill=False, edgecolor="green"):
-        ret = self.ax.add_patch(
-         patches.Rectangle(
-            (minx, miny),
-            dx,
-            dy,
-            fill=fill,      # remove background
-            edgecolor=edgecolor
-         ) )
         
+        self.boxes["total"] = len(self.boxes_list)
+        available_boxes = self.boxes["total"] - self.boxes["fixed"] - self.boxes["used"]
+        print("Available boxes: %d-%d-%d : %d" % (self.boxes["total"],
+                                               self.boxes["fixed"],
+                                               self.boxes["used"],
+                                               available_boxes))
+        if available_boxes > 0:
+            
+            av_idx = self.boxes["fixed"]
+            av_idx += self.boxes["used"]
+            
+            curr_box = self.boxes_list[av_idx]
+            
+            curr_box.set_bounds(minx, miny, dx, dy)
+            curr_box.set_fill(fill)
+            curr_box.set_edgecolor(edgecolor)
+            
+            
+        else:        
+            patch = self.ax.add_patch(
+             patches.Rectangle(
+                (minx, miny),
+                dx,
+                dy,
+                fill=fill,      # remove background
+                edgecolor=edgecolor
+             ) )
+            
+            self.boxes_list.append(patch)
+            self.boxes["total"] = len(self.boxes_list)
+        
+        #if (self.bg_saved):
+        self.boxes["used"] += 1
         
 
 if __name__ == "__main__":
