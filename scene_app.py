@@ -15,8 +15,8 @@ import json
 
 matplotlib.use('TkAgg')
 
-dataset_cfg_file = "possi_123578.imscfg"
-dataset_cfg_file = "possi_123.imscfg"
+dataset_cfg_file_default = "possi_123578.imscfg"
+dataset_cfg_file_default = "possi_123.imscfg"
 
 class RangeSensors(tk.Frame):
     def __init__(self, master):
@@ -55,34 +55,15 @@ class RangeSensors(tk.Frame):
         
         self.pack(side="top")
 
-class DatasetPath(tk.Frame):
-    def __init__(self, master):
-        tk.Frame.__init__(self, master)
-        l = tk.Label(self, text="Set Dataset Path")
-        l.pack(side="left")
-        self.e = tk.Entry(self)
-        self.e.pack(side="left")
-        button = tk.Button(self, text="Browse", command=self.select_folder, 
-                           width=10)
-        button.pack(side="left")
-        
-        self.pack(side="top")
-        ims_path="/home/gustavo/devel/personal/python/ims-py/possi"
-        self.dataset_path = ims_path
-        
-    def select_folder(self):
-        ims_path="/home/gustavo/devel/python/ims/possi"
-        self.dataset_path = ims_path
-        self.dataset_path = tk.filedialog.askdirectory(initialdir=ims_path)
-        print("FOLDER OK -> %s" % self.dataset_path)
-        self.e.insert(0, self.dataset_path)
-        
+
 class SceneApp(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master)
         self.master = master
                 
-        self.dsc_frame = frames.DatasetConfig(self, self._create_scene)
+        self.dsc_frame = frames.DatasetConfig(self,
+                                              self._create_scene,
+                                             dataset_cfg_file_default)
         self.dsc_frame.pack()
         
         info_frame = tk.Frame(self)
@@ -272,7 +253,11 @@ class SceneApp(tk.Frame):
         self.date_label.config(text=label_str)
     
     def _create_scene(self):
-        self.scene = scene.Scene(dataset_cfg_file)
+        if self.dsc_frame.filename:
+            self.scene = scene.Scene(self.dsc_frame.filename)
+        else:
+            print("NO FILE SELECTED")
+            return
         
         self.legs_frame.add_rows(self.scene.config_data["legs"])
         self.legs_state_frame.add_rows(self.scene.config_data["legs"])
