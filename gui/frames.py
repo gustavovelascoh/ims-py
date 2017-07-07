@@ -6,7 +6,7 @@ Created on May 16, 2017
 import tkinter as tk
 
 class DatasetConfig(tk.Frame):
-    def __init__(self, master,create_cb=None):
+    def __init__(self, master,create_cb=None,default_file="scene.imscfg"):
         '''
         Constructor
         '''
@@ -16,15 +16,24 @@ class DatasetConfig(tk.Frame):
         l.grid(row=0, column=0)
         self.e = tk.Entry(self)
         self.e.grid(row=0, column=1)
+        self.e.insert(0,default_file)
         button_b = tk.Button(self, text="Browse", command=self.select_file, 
                            width=10)
         button_b.grid(row=0, column=2)
         button_c = tk.Button(self, text="Create Scene",
                            command=create_cb)
         button_c.grid(row=0, column=3)
+        self.filename = default_file
     
     def select_file(self):
-        pass
+        ims_path="/home/gustavo/devel/python/ims/possi"
+        self.dataset_path = ims_path
+        print("hello button")
+        self.filename = tk.filedialog.askopenfilename(
+            initialdir=ims_path,
+            filetypes=[('IMS config file','*.imscfg')])
+        print("FOLDER OK -> %s" % self.filename)
+        self.e.insert(0, self.filename)
     
     
 class RangeSensors(tk.Frame):
