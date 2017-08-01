@@ -171,7 +171,7 @@ class Scene():
         
         # print(self.legs)
         for leg in self.legs:
-            self.legs_state.append(leg.state)
+            self.legs_state.append(leg.get_state())
             self.legs_areas.append(leg.bbox.area)
             leg.clear()
         
