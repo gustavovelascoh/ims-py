@@ -62,10 +62,10 @@ class Viewer(tk.Frame):
     def plot(self, *args, **kwargs):
         
         self.available_lines = self.total_lines - self.fixed_lines - self.used_lines
-        print("Available lines: %d-%d-%d : %d" % (self.total_lines,
-                                               self.fixed_lines,
-                                               self.used_lines,
-                                               self.available_lines))
+#         print("Available lines: %d-%d-%d : %d" % (self.total_lines,
+#                                                self.fixed_lines,
+#                                                self.used_lines,
+#                                                self.available_lines))
         if self.available_lines > 0:
 #             print("Updating line ")
             line_idx = (self.fixed_lines + self.used_lines)            
@@ -177,10 +177,10 @@ class Viewer(tk.Frame):
         
         self.boxes["total"] = len(self.boxes_list)
         available_boxes = self.boxes["total"] - self.boxes["fixed"] - self.boxes["used"]
-        print("Available boxes: %d-%d-%d : %d" % (self.boxes["total"],
-                                               self.boxes["fixed"],
-                                               self.boxes["used"],
-                                               available_boxes))
+#         print("Available boxes: %d-%d-%d : %d" % (self.boxes["total"],
+#                                                self.boxes["fixed"],
+#                                                self.boxes["used"],
+#                                                available_boxes))
         if available_boxes > 0:
             
             av_idx = self.boxes["fixed"]

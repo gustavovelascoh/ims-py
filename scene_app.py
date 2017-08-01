@@ -174,9 +174,14 @@ class SceneApp(tk.Frame):
              ("high", 13.0),
              ("very high", 100.0)]
         
-        for idx, status in enumerate(self.scene.legs_state):
+        states_str=str(self.scene.nf)
+        
+        for idx, status in enumerate(self.scene.legs_state):            
+            
             lvl_val = round(status*100, 2)
             lvl_str = str(lvl_val)
+            
+            states_str += '\t'+lvl_str
             
             for k, v in occupancy_levels:
                 if lvl_val < v:
@@ -185,7 +190,7 @@ class SceneApp(tk.Frame):
             
             self.legs_state_frame.status_labels[idx].config(text=lvl_str)
             
-            
+        self.f_hist.write(states_str+'\n')    
         
         #print(status)        
         
@@ -258,6 +263,8 @@ class SceneApp(tk.Frame):
         else:
             print("NO FILE SELECTED")
             return
+        
+        self.f_hist = open(self.dsc_frame.filename+'legs_hist.log','w')
         
         self.legs_frame.add_rows(self.scene.config_data["legs"])
         self.legs_state_frame.add_rows(self.scene.config_data["legs"])
