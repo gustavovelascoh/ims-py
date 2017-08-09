@@ -2,10 +2,8 @@
 
 # note that module name has changed from Tkinter in Python 2 to tkinter in Python 3
 import tkinter as tk
-from models import sensor
 import numpy as np
 import time
-from sklearn.cluster import DBSCAN
 from gui import viewer
 from gui import frames
 import threading
@@ -133,36 +131,7 @@ class SceneApp(tk.Frame):
         self.loop = False
         
     def _next_frame(self):
-        
-        '''
-        start_time = time.time()
-        data, last, self.ts = self.scene.preprocess_data()
-        p_proc_time = time.time() - start_time
-        self.frame_cnt += 1
-        self.processing_time_avg = ((self.processing_time_avg * (self.frame_cnt-1) + p_proc_time)/self.frame_cnt) 
-        proc_fps = (1/self.processing_time_avg)
-        print("Processing: %s, Avg: %s, FPS: %4.4f" % (p_proc_time,
-                                                        self.processing_time_avg,
-                                                        proc_fps))
-                    
-        plot_time = time.time()
-        self.viewer.plot(data[:,0], data[:,1], linestyle=' ', marker='.', color='blue')
-        self.viewer.update()
-        p_plot_time = time.time() - plot_time
-        
-        self.plotting_time_avg = ((self.plotting_time_avg * (self.frame_cnt-1) + p_plot_time)/self.frame_cnt) 
-        plot_fps = (1/self.plotting_time_avg)
-        total_time = self.plotting_time_avg+self.processing_time_avg
-        self.total_time_avg = ((self.total_time_avg * (self.frame_cnt-1) + p_plot_time)/self.frame_cnt)
-        total_fps = 1/self.total_time_avg
-        print("Plotting: %s, Avg: %s, FPS: %4.4f" % (p_plot_time,
-                                                         self.plotting_time_avg,
-                                                         plot_fps ))
-        print("Total: %s, Avg: %s, FPS: %4.4f" % (p_plot_time+p_proc_time,
-                                                      total_time,
-                                                      total_fps))
-        '''
-        
+                
         start_time = time.time()
         # blob_list = self.scene.get_blobs()
         blob_list = self.scene.process_blobs()
