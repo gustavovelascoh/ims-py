@@ -40,13 +40,19 @@ class Leg(object):
                 self.state_buffer.append(self.state)
         else:
             try:
-                self.state_buffer.append(self.state)
-                del self.state_buffer[0]
+                if len(self.state_buffer) > self.buffer_size:
+                    self.state_buffer[-1] = self.state
+                else:
+                    self.state_buffer.append(self.state)
+                # del self.state_buffer[0]
             except Exception as e:
                 print(e)
 
     def get_state(self):
-        return np.mean(self.state_buffer) 
+        if len(self.state_buffer) > self.buffer_size:
+            del self.state_buffer[0]
+        mean_state = np.mean(self.state_buffer) 
+        return mean_state
             
     def is_in(self, item):
         
