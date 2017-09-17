@@ -11,6 +11,7 @@ This is part of my MSc project "Multisensor architecture for an intersection man
 
 Screenshots:
 ===========
-
+![Main view](screenshots/ims-py_003.png "This is the main view (Boxes plotting and Scene Information)")
 ![Main view](screenshots/ims-py_001.png "This is the main view (preprocessing only)")
 ![Main view](screenshots/ims-py_002.png "This is the main view (Blobs extraction)")
+
