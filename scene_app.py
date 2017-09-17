@@ -82,6 +82,7 @@ class SceneApp(tk.Frame):
         
         viewer_toolbar_frame = tk.Frame(viewer_frame)
         
+        self.draw_check = tk.IntVar()
         self.date_label = tk.Label(viewer_toolbar_frame, text="time: NA")
         self.date_label.pack(side="left")
         nbutton = tk.Button(viewer_toolbar_frame, text="Next",
@@ -93,6 +94,14 @@ class SceneApp(tk.Frame):
         sbutton = tk.Button(viewer_toolbar_frame, text="Stop",
                            command=self._stop)
         sbutton.pack(side="left")
+        self.draw_check = 1
+        self.draw_check_tk = tk.IntVar()
+        draw_ch_btn = tk.Checkbutton(viewer_toolbar_frame,
+                                     text="Draw blobs",
+                                     variable=self.draw_check_tk,
+                                     command=self.__draw_check_cb)
+        draw_ch_btn.select()
+        draw_ch_btn.pack(side="left")                             
         viewer_toolbar_frame.pack(side="top")
         
         self.legs_state_frame = frames.LegsState(self)
@@ -106,6 +115,9 @@ class SceneApp(tk.Frame):
         self.plotting_time_avg = 0
         self.total_time_avg = 0
         self.elapsed_time = 0
+    
+    def __draw_check_cb(self):
+        self.draw_check = self.draw_check_tk.get()
         
     def _loop(self):
         self.loop = True
@@ -172,38 +184,49 @@ class SceneApp(tk.Frame):
         proc_fps = (1/self.processing_time_avg)
 #         print("Processing: %s, Avg: %s, FPS: %4.4f" % (p_proc_time,
 #                                                         self.processing_time_avg,
-#                                                         proc_fps))
-                    
-        plot_time = time.time()
+#       # START DRAWING SECTION                                                  proc_fps))
         
-        colors_list = ['blue']
-        # colors_list = ['blue', 'red', 'green', 'purple']
-        
-        len_colors_list = len(colors_list)
-        
-        for b in blob_list:
+        if self.draw_check:            
+            plot_time = time.time()
             
-            c_id = b.id
-            b_color=colors_list[(c_id-1)%len_colors_list]
+            colors_list = ['blue']
+            # colors_list = ['blue', 'red', 'green', 'purple']
             
-            if len(b.prev_blobs) != 0:
-                c_id = min(b.prev_blobs)
-                print("c_id: %d, prev: %s" % (c_id, b.prev_blobs))
-                       
-#             self.viewer.plot(b.data[:,0], b.data[:,1], linestyle=' ',
-#                              marker='.', color=colors_list[(c_id-1)%len_colors_list])
-            minx, miny = b.bbox.minxy
-            self.viewer.plot_box(minx, miny, b.bbox.width, b.bbox.height, edgecolor=b_color)
+            len_colors_list = len(colors_list)
             
-            self.viewer.plot([b.bbox.minxy[0],b.bbox.maxxy[0]],[b.bbox.minxy[1], b.bbox.maxxy[1]],linestyle='-', marker='x', color=b_color)
+            for b in blob_list:
+                
+                c_id = b.id
+                b_color=colors_list[(c_id-1)%len_colors_list]
+                
+                if len(b.prev_blobs) != 0:
+                    c_id = min(b.prev_blobs)
+                    print("c_id: %d, prev: %s" % (c_id, b.prev_blobs))
+                           
+    #             self.viewer.plot(b.data[:,0], b.data[:,1], linestyle=' ',
+    #                              marker='.', color=colors_list[(c_id-1)%len_colors_list])
+                minx, miny = b.bbox.minxy
+                self.viewer.plot_box(minx, miny, b.bbox.width, b.bbox.height, edgecolor=b_color)
+                
+                self.viewer.plot([b.bbox.minxy[0],b.bbox.maxxy[0]],[b.bbox.minxy[1], b.bbox.maxxy[1]],linestyle='-', marker='x', color=b_color)
+            
+            self.viewer.update()
+            
+              
+            p_plot_time = time.time() - plot_time
         
-        self.viewer.update()  
-        p_plot_time = time.time() - plot_time
-        
-        self.plotting_time_avg = (
-            (self.plotting_time_avg * (self.frame_cnt-1) + p_plot_time) /
-            self.frame_cnt) 
-        plot_fps = (1/self.plotting_time_avg)
+        # END DRAWING SECTION
+        if self.draw_check:
+            self.plotting_time_avg = (
+                (self.plotting_time_avg * (self.frame_cnt-1) + p_plot_time) /
+                self.frame_cnt) 
+            plot_fps = (1/self.plotting_time_avg)
+        else:
+            p_plot_time = 0
+            self.plotting_time_avg = 0
+            plot_fps = 0
+            
+            
         total_time = self.plotting_time_avg+self.processing_time_avg
         self.total_time_avg = (
             (self.total_time_avg * (self.frame_cnt-1) + p_plot_time)/
