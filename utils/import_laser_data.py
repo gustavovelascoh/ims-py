@@ -3,6 +3,7 @@ import pickle
 import os
 import struct
 from _operator import mod
+from builtins import quit
 
 def pdk(a,level=0):
     t=''.join(['.' for x in range(0,level)])
@@ -20,17 +21,33 @@ parser.add_argument('output_file', metavar='output_file',
                     help='pickle file')
 parser.add_argument('name', metavar='name',
                     help='variable name')
+parser.add_argument('--sf', metavar='sf',
+                    help='start frame', type=int)
+parser.add_argument('--ef', metavar='ef',
+                    help='end frame', type=int)
 
 args = parser.parse_args()
 print("File: %s" % args.file)
 print("outputfile: %s" % args.output_file)
-print("variable name: %s" % args.name)
+
+sf = 0
+ef = -1
+
+if args.sf != None:
+    sf = args.sf
+
+if args.ef != None:
+    ef = args.ef
+        
+print("variable name: %s, %d, %d" % (args.name, sf, ef))
 
 f = open(args.file, "rb")
 fo = open(args.output_file, "wb")
 
 data={}
 
+
+curr_frame = 0
 
 try:
     bytes_data = f.read(4)    
@@ -55,9 +72,10 @@ try:
     
     scan_n = 0
     
-    while True:
+    while scan_n <= ef:
     
-        scan={"ms":0, 'data':[]}
+        
+        scan={"ms":0, 'data':[]}    
         
         bytes_data = f.read(4)
         
@@ -78,8 +96,12 @@ try:
             print("scan # %d" % scan_n)    
             print(scan)
         
+        
+        
+        if (scan_n >= sf):
+            data["scans"].append(scan)
+            
         scan_n+=1
-        data["scans"].append(scan)
     #bytes_data = f.read(4+2*maxlen)
     
 finally:
