@@ -1,7 +1,7 @@
 {
   "name": "possi_1_8800_13200",
   "map": {
-      "image_path": "possi/image.bmp",
+      "image_path": "possi_8800_13200/image.bmp",
       "scale" : 4.1345,
       "max_x" : 300,
       "max_y" : 225,
@@ -20,7 +20,7 @@
       "name": "lms1",
       "type": "range",
       "subtype": "singlelayer",
-      "src_path": "possi/possi_lms1_8800_13200.data"
+      "src_path": "possi_8800_13200/possi_lms1_8800_13200.data"
     }
   ],
   "legs": [ 
