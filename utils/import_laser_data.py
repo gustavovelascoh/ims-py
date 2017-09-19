@@ -92,9 +92,9 @@ try:
             scan['data'].append(meas)
         
         
-        if mod(scan_n,100) == 0:
+        if mod(scan_n,1000) == 0:
             print("scan # %d" % scan_n)    
-            print(scan)
+            #print(scan)
         
         
         
@@ -120,7 +120,7 @@ calib_file = temp + "calib"
 print("bgfile: %s" % bg_file)
 
 f = open(bg_file, "rb")
-
+scan={"ms":0, 'data':[]}
 try:
     bytes_data = f.read(4)
         
@@ -136,7 +136,7 @@ try:
             meas = int.from_bytes(bytes_data, 'little', signed=False)
             scan['data'].append(meas)
 finally:
-    print("bg_model %s" % scan)
+    print("bg_model(%d)" % (len(scan["data"])))
     data["bg_model"]=scan
     f.close()
     #pickle.dump(data, fo, pickle.HIGHEST_PROTOCOL)
@@ -148,8 +148,8 @@ with open(calib_file) as cf:
     while True:
         line = cf.readline()
         if line:
-            print(line)
-            print(line[0:4])
+            #print(line)
+            #print(line[0:4])
             
             if line[0:4] == "LD "+args.file[-1]:
                 line_data = line.split(" ")
