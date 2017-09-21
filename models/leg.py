@@ -12,7 +12,7 @@ class Leg(object):
     '''
     
 
-    def __init__(self, id, type, heading, bbox, lanes, buffer_size=30):
+    def __init__(self, id, type, heading, bbox, lanes, buffer_size=90):
         '''
         Constructor
         '''
