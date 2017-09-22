@@ -258,6 +258,7 @@ class SceneApp(tk.Frame):
         
         self.f_hist = open(self.dsc_frame.filename+'legs_hist.log','w')
         
+        # GUI
         self.legs_frame.add_rows(self.scene.config_data["legs"])
         self.legs_state_frame.add_rows(self.scene.config_data["legs"])
         self.rs_frame.add_rows(self.scene.config_data["range_sensors"])

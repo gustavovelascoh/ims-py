@@ -56,7 +56,7 @@
   "legs": [ 
     {
       "id": 0,
-      "type": "approach",
+      "type": "departure",
       "heading": "N",
       "bbox": [6.7, 15.0, 12.5, 30.5],
       "lanes": []
