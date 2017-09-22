@@ -6,4 +6,4 @@ build/
 
 *.clus*
 *.lms*
-scene_*
+#scene_*
