@@ -24,19 +24,19 @@ pgf_with_latex = {                      # setup matplotlib to use latex for outp
     "pgf.texsystem": "pdflatex",        # change this if using xetex or lautex
     "text.usetex": True,                # use LaTeX to write all text
     "font.family": "serif",
-    "font.serif": [],                   # blank entries should cause plots to inherit fonts from the document
-    "font.sans-serif": [],
-    "font.monospace": [],
-    "axes.labelsize": 10,               # LaTeX default is 10pt font.
-    "text.fontsize": 10,
-    "legend.fontsize": 8,               # Make the legend/label fonts a little smaller
-    "xtick.labelsize": 8,
-    "ytick.labelsize": 8,
+#     "font.serif": [],                   # blank entries should cause plots to inherit fonts from the document
+#     "font.sans-serif": [],
+#     "font.monospace": [],
+#     "axes.labelsize": 10,               # LaTeX default is 10pt font.
+     "text.fontsize": 10,
+#     "legend.fontsize": 8,               # Make the legend/label fonts a little smaller
+#     "xtick.labelsize": 8,
+#     "ytick.labelsize": 8,
     "figure.figsize": (30/10,22.5/10),     # default fig size of 0.9 textwidth
-    "pgf.preamble": [
-        r"\usepackage[utf8x]{inputenc}",    # use utf8 fonts becasue your computer can handle it :)
-        r"\usepackage[T1]{fontenc}",        # plots will be generated using this preamble
-        ]
+#     "pgf.preamble": [
+#         r"\usepackage[utf8x]{inputenc}",    # use utf8 fonts becasue your computer can handle it :)
+#         r"\usepackage[T1]{fontenc}",        # plots will be generated using this preamble
+#         ]
     }
 mpl.rcParams.update(pgf_with_latex)
 
@@ -48,8 +48,8 @@ from matplotlib.figure import Figure
 import matplotlib.patches as patches
 
 def savefig(filename):
-    plt.savefig('{}.pgf'.format(filename))
-    plt.savefig('{}.pdf'.format(filename))
+    plt.savefig('{}.pgf'.format(filename), bbox_inches='tight')
+    plt.savefig('{}.pdf'.format(filename), bbox_inches='tight')
 
 scene = scene.Scene("/home/gustavo/devel/personal/python/ims-py/possi_123578.imscfg")
 
@@ -77,8 +77,9 @@ limits = np.concatenate((
 roi = scene.config_data["map"]["roi"]
 scene.set_roi(roi)
 
-fig = Figure(figsize=(30/3,22.5/3))
+fig = Figure(figsize=(30/9,22.5/9))
 ax = fig.add_subplot(111)
+ax.set_frame_on(False)
 
 img = mpimg.imread(scene.config_data["map"]["image_path"])
 
@@ -92,13 +93,13 @@ print(np.shape(img))
 
 plt.plot(xos,yos, marker='o', linestyle=' ', 
                          markerfacecolor='b', markeredgecolor='k',
-                         markersize=7)
+                         markersize=4)
 
 ax = plt.gca()
 
 for ind, ang in enumerate(angs):
-    dy = 2.5*np.sin(ang+np.pi/2)
-    dx = 2.5*np.cos(ang+np.pi/2)
+    dy = 3*np.sin(ang+np.pi/2)
+    dx = 3*np.cos(ang+np.pi/2)
     print("ang: %s, dx: %s, dy: %s" % (ang, dx, dy))
     ax.add_patch(
         patches.Arrow(
@@ -106,25 +107,25 @@ for ind, ang in enumerate(angs):
             yos[ind],
             dx,
             dy,
-            width=3.0,
+            width=1.0,
             color="blue"
             ))
     
     
+dxl = 2
 
-
-ax.text(xos[0]-1, yos[0], "LMS1",
+ax.text(xos[0]-dxl, yos[0], "LMS1",
         horizontalalignment='right',
-        verticalalignment='top', size='small')
-ax.text(xos[1]+1, yos[1], "LMS2", size='small')
-ax.text(xos[2]+1, yos[2], "LMS3",
-        verticalalignment='top', size='small')
-ax.text(xos[3]+1, yos[3], "LMS5",
-        verticalalignment='top', size='small')
-ax.text(xos[4]-1, yos[4], "LMS7",
-        horizontalalignment='right', size='small')
-ax.text(xos[5]-1, yos[5], "LMS8",
-        horizontalalignment='right', size='small')
+        verticalalignment='top', size=6)
+ax.text(xos[1]+dxl, yos[1], "LMS2", size=6)
+ax.text(xos[2]+dxl, yos[2], "LMS3",
+        verticalalignment='top', size=6)
+ax.text(xos[3]+dxl, yos[3], "LMS5",
+        verticalalignment='top', size=6)
+ax.text(xos[4]-dxl, yos[4], "LMS7",
+        horizontalalignment='right', size=6)
+ax.text(xos[5]-dxl, yos[5], "LMS8",
+        horizontalalignment='right', size=6)
 
 # Extract legs data
 for leg in scene.config_data["legs"]:
@@ -142,7 +143,7 @@ for leg in scene.config_data["legs"]:
                 dy,
                 fill=False,      # remove background
                 edgecolor=color,
-                lw=2.0
+                lw=1.0
              ) )
     
 leg_idx = 1    
@@ -192,12 +193,14 @@ for leg in scene.legs:
         )
     leg_idx += 1
 
-imgplot = plt.imshow(img, aspect='auto', extent=limits)
-
+imgplot = plt.imshow(img, aspect='auto', extent=limits*1.05)
+print(limits*1.1)
 #ax.show()
 ax.set_title("Intersection Configuration", size='small')
 ax.set_xlabel("x [m]", size='small')
-ax.set_ylabel("y [m]", size='small')
+ax.set_ylabel("y [m]", size='small', va='bottom')
+
+print(ax.margins())
 
 savefig('intersection-config2')
 
