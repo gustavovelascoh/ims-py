@@ -9,6 +9,7 @@ from models.blob import Blob
 from models.leg import Leg
 import numpy as np
 from sklearn.cluster import DBSCAN
+from models.occupancygrid import OccupancyGrid
 
 
 class Scene():
@@ -41,6 +42,8 @@ class Scene():
         self.blobs_graph = {}
         
         self.legs_state = []
+        
+        #
     
     
     def generate_legs(self, legs_array):
@@ -69,6 +72,29 @@ class Scene():
     def read_data(self):
         pass
     
+    def add_meas_to_grid(self, range_sensor):
+        d_x = float(range_sensor.calib_data["sx"])
+        d_y = float(range_sensor.calib_data["sy"])
+        
+        x = range_sensor.x_nobg
+        y = range_sensor.y_nobg
+        
+        x = x/100
+        y = y/100
+        
+        data = np.array([x,y]).transpose()
+        
+        #print("datalen pre ",(np.shape(data)))
+        if self.roi:
+            data = self._apply_roi(data, self.roi)
+        #print("datalen post ",(np.shape(data)))   
+        x = data[:,0]
+        y = data[:,1]
+        
+        self.occ_grid.set_origin(d_x, d_y)
+        self.occ_grid.add_meas(x, y)
+        
+    
     def preprocess_data(self):
         '''
         Preprocessing (Background removal, calibration, conversion 
@@ -89,6 +115,8 @@ class Scene():
             ts_array.append(range_sensor.ts)
             range_sensor.remove_bg()
             range_sensor.calibrate()
+            
+            self.add_meas_to_grid(range_sensor)
             #print(len(range_sensor.x_nobg))
             #print(range_sensor.x_nobg)
             if x is not None:
@@ -99,6 +127,9 @@ class Scene():
             else:
                 x = range_sensor.x_nobg
                 y = range_sensor.y_nobg
+        
+        self.occ_grid.update()
+        #print(self.occ_grid.grid)
             
         #print("ts_array: %s, span: %s" % (ts_array,(max(ts_array)-min(ts_array))))
         self.ts = max(ts_array)
@@ -113,7 +144,8 @@ class Scene():
         return data, last, self.ts       
     
     def set_roi(self, roi):
-        self.roi = {"ymin":-24,"ymax":30,"xmin":-30,"xmax":40}
+        self.roi = roi
+        self.occ_grid = OccupancyGrid(**self.roi, cell_size=0.2)
         
     @staticmethod
     def _apply_roi(data, roi):

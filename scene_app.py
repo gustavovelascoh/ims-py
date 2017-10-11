@@ -107,6 +107,12 @@ class SceneApp(tk.Frame):
         self.legs_state_frame = frames.LegsState(self)
         self.legs_state_frame.pack(side="left")
         
+        grid_frame = tk.Frame(self)
+        grid_frame.pack(side="left")
+                
+        self.grid = viewer.Viewer(grid_frame, figsize=(30/6,22.5/6))
+        self.grid.pack()
+        
         self.loop = False
         self.first_frame = True
         self.last_ts = 0
@@ -186,9 +192,14 @@ class SceneApp(tk.Frame):
 #                                                         self.processing_time_avg,
 #       # START DRAWING SECTION                                                  proc_fps))
         
+        
+        
         if self.draw_check:            
             plot_time = time.time()
-            
+            self.grid.draw_array(self.scene.occ_grid.grid, limits=self.limits)
+            print(self.scene.occ_grid.grid)
+            print(np.max(self.scene.occ_grid.grid))
+            print(np.min(self.scene.occ_grid.grid))
             colors_list = ['blue']
             # colors_list = ['blue', 'red', 'green', 'purple']
             
@@ -290,7 +301,7 @@ class SceneApp(tk.Frame):
         d_x = self.scene.config_data["map"]["d_x"]
         d_y = self.scene.config_data["map"]["d_y"]
         
-        limits = np.concatenate((
+        self.limits = np.concatenate((
                              ((np.array([0,max_x])/map_scale)+d_x),
                              ((np.array([0,max_y])/map_scale)+d_y)
                              ))
@@ -298,7 +309,7 @@ class SceneApp(tk.Frame):
         roi = self.scene.config_data["map"]["roi"]
         self.scene.set_roi(roi)
         self.viewer.set_roi(roi)
-        self.viewer.draw_img(self.scene.config_data["map"]["image_path"], limits)        
+        self.viewer.draw_img(self.scene.config_data["map"]["image_path"], self.limits)        
         self.viewer.plot(xos,yos, marker='o', linestyle=' ', 
                          markerfacecolor='g', markeredgecolor='k',
                          markersize=10)

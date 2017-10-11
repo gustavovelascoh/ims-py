@@ -17,19 +17,22 @@ class OccupancyGrid(object):
         '''
         self.xmin = xmin
         self.ymin = ymin
+        self.xmax = xmax
+        self.ymax = ymax
         self.cell_size = cell_size
         
         dx = xmax-xmin
         dy = ymax-ymin
         
-        self.cols = np.ceil(dx/cell_size) + 1
-        self.rows = np.ceil(dy/cell_size) + 1
+        self.cols = int(np.ceil(dx/cell_size)) + 1
+        self.rows = int(np.ceil(dy/cell_size)) + 1
         
         self.meas_grid=np.zeros((self.rows, self.cols))
         self.grid=np.zeros((self.rows, self.cols))
-        print((np.shape(self.grid)))
+        #print((np.shape(self.grid)))
         
     def point2index(self, x, y):
+        
         col = np.ceil((x - self.xmin)/self.cell_size - 0.5)
         row = np.ceil((y - self.ymin)/self.cell_size - 0.5)
         return int(col), int(row)
@@ -39,14 +42,18 @@ class OccupancyGrid(object):
         self.yo = yo
         
         self.col_o, self.row_o = self.point2index(xo, yo)
-        self.mark_fill(xo, yo)
+        #self.mark_fill(xo, yo)
     
-    def mark_fill(self, col, row, val=0.9):       
-        self.meas_grid[row,col] = val
+    def mark_fill(self, col, row, val=0.9):
+        if col < self.cols -1 and col > 0 and row < self.rows and row > 0:      
+            self.meas_grid[row,col] = val
     
     def mark_empty(self, col, row):
-        if (self.meas_grid[row,col]== 0):
-            self.meas_grid[row,col] = -0.7
+        #print(col, row)
+        if col < self.cols and col > 0 and row < self.rows and row > 0:
+        
+            if (self.meas_grid[row,col]== 0):
+                self.meas_grid[row,col] = -0.7
             
     def add_meas(self, xs, ys, xo=None, yo=None):
         self.mark_fill(self.col_o, self.row_o)
@@ -56,6 +63,7 @@ class OccupancyGrid(object):
                                 (x_c, y_r))
             
             xe, ye = lop[-1]
+            #print(lop)
             for c, r in lop[1:-1]:
                 self.mark_empty(c, r)
             self.mark_fill(xe, ye)
@@ -63,6 +71,11 @@ class OccupancyGrid(object):
     def update(self):
         
         self.grid = self.meas_grid + self.grid
+        min = np.abs(np.min(self.grid))
+        max = np.abs(np.max(self.grid))
+        
+        q = max if max > min else min
+        self.grid /= q
         self.meas_grid = np.zeros((self.rows, self.cols))
             
             
@@ -80,9 +93,9 @@ class OccupancyGrid(object):
             
             x_c, y_r = self.point2index(x, y)
             
-            print((self.col_o, self.row_o), (x_c, y_r))
+            #print((self.col_o, self.row_o), (x_c, y_r))
             lop = self.get_line((self.col_o, self.row_o), (x_c, y_r))
-            print(lop)
+            #print(lop)
             
             for xx,yy in lop[1:-2]:
                 if (self.grid[xx,yy]== 0.5):
@@ -146,7 +159,7 @@ class OccupancyGrid(object):
         # Iterate over bounding box generating points between start and end
         y = y1
         points = []
-        print(x1, x2 + 1)
+        #print(x1, x2 + 1)
         for x in range(x1, x2 + 1):
             coord = (y, x) if is_steep else (x, y)
             points.append(coord)

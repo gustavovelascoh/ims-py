@@ -14,7 +14,7 @@ class Viewer(tk.Frame):
     '''
     classdocs
     '''    
-    def __init__(self, master):
+    def __init__(self, master, figsize=None):
         '''
         Constructor
         '''        
@@ -22,8 +22,10 @@ class Viewer(tk.Frame):
         
         self.master = master
         self.roi = None
-        self.loop = False        
-        self.fig = Figure(figsize=(30/3,22.5/3))
+        self.loop = False
+        if figsize == None:
+            figsize = (30/3,22.5/3)
+        self.fig = Figure(figsize=figsize)
         #ax = fig.add_subplot(111, projection='polar')
         self.ax = self.fig.add_subplot(111)
          
@@ -48,7 +50,11 @@ class Viewer(tk.Frame):
         imgplot = self.ax.imshow(img, aspect='auto', extent=limits)
         self.__fit_to_roi()
         self.canvas.show()
-        
+    
+    def draw_array(self, array, limits=None):
+        imgplot = self.ax.imshow(array, aspect='auto', extent=limits, cmap='gray')
+        self.__fit_to_roi()
+        self.canvas.show()    
         
     def __fit_to_roi(self):
         if self.roi != None:
