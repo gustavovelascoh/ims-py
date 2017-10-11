@@ -25,7 +25,8 @@ class OccupancyGrid(object):
         self.cols = np.ceil(dx/cell_size) + 1
         self.rows = np.ceil(dy/cell_size) + 1
         
-        self.grid=0.5*np.ones((self.rows, self.cols))
+        self.meas_grid=np.zeros((self.rows, self.cols))
+        self.grid=np.zeros((self.rows, self.cols))
         print((np.shape(self.grid)))
         
     def point2index(self, x, y):
@@ -41,12 +42,13 @@ class OccupancyGrid(object):
         self.mark_fill(xo, yo)
     
     def mark_fill(self, col, row, val=0.9):       
-        self.grid[row,col] = val
+        self.meas_grid[row,col] = val
     
     def mark_empty(self, col, row):
-        if (self.grid[row,col]== 0.5):
-            self.grid[row,col] = 0.1
-    def update(self, xs, ys, xo=None, yo=None):
+        if (self.meas_grid[row,col]== 0):
+            self.meas_grid[row,col] = -0.7
+            
+    def add_meas(self, xs, ys, xo=None, yo=None):
         self.mark_fill(self.col_o, self.row_o)
         for x, y in zip(xs, ys):
             x_c, y_r = self.point2index(x, y)
@@ -57,6 +59,11 @@ class OccupancyGrid(object):
             for c, r in lop[1:-1]:
                 self.mark_empty(c, r)
             self.mark_fill(xe, ye)
+            
+    def update(self):
+        
+        self.grid = self.meas_grid + self.grid
+        self.meas_grid = np.zeros((self.rows, self.cols))
             
             
             
