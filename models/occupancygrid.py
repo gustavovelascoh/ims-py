@@ -11,7 +11,9 @@ class OccupancyGrid(object):
     '''
 
 
-    def __init__(self, xmin, ymin, xmax, ymax, cell_size=0.3):
+    def __init__(self, xmin, ymin, xmax, ymax,
+                 cell_size=0.3,
+                 method='logodd'):
         '''
         Constructor
         '''
@@ -20,6 +22,7 @@ class OccupancyGrid(object):
         self.xmax = xmax
         self.ymax = ymax
         self.cell_size = cell_size
+        self.method = method
         
         dx = xmax-xmin
         dy = ymax-ymin
@@ -27,8 +30,12 @@ class OccupancyGrid(object):
         self.cols = int(np.ceil(dx/cell_size)) + 1
         self.rows = int(np.ceil(dy/cell_size)) + 1
         
-        self.meas_grid=np.zeros((self.rows, self.cols))
-        self.grid=np.zeros((self.rows, self.cols))
+        if method == 'logodd':
+            self.meas_grid=np.zeros((self.rows, self.cols))
+            self.grid=np.zeros((self.rows, self.cols))
+        elif method == "velca":
+            self.meas_grid = np.zeros((self.rows, self.cols))
+            self.grid = 0.5*np.ones((self.rows, self.cols))
         #print((np.shape(self.grid)))
         
     def point2index(self, x, y):
@@ -44,16 +51,24 @@ class OccupancyGrid(object):
         self.col_o, self.row_o = self.point2index(xo, yo)
         #self.mark_fill(xo, yo)
     
-    def mark_fill(self, col, row, val=0.9):
-        if col < self.cols -1 and col > 0 and row < self.rows and row > 0:      
-            self.meas_grid[row,col] = val
+    def mark_fill(self, col, row, val=0.1):
+        if self.method == "logodd":
+            if col < self.cols -1 and col > 0 and row < self.rows and row > 0:      
+                self.meas_grid[row,col] = val
+        elif self.method == "velca":
+            if col < self.cols -1 and col > 0 and row < self.rows and row > 0:      
+                self.meas_grid[row,col] = 1
     
     def mark_empty(self, col, row):
         #print(col, row)
-        if col < self.cols and col > 0 and row < self.rows and row > 0:
-        
-            if (self.meas_grid[row,col]== 0):
-                self.meas_grid[row,col] = -0.7
+        if self.method == "logodd":
+            if col < self.cols and col > 0 and row < self.rows and row > 0:
+                if (self.meas_grid[row,col]== 0):
+                    self.meas_grid[row,col] = -0.9
+        elif self.method == "velca":
+            if col < self.cols and col > 0 and row < self.rows and row > 0:
+                if (self.meas_grid[row,col]== 0):
+                    self.meas_grid[row,col] = -1
             
     def add_meas(self, xs, ys, xo=None, yo=None):
         self.mark_fill(self.col_o, self.row_o)
@@ -69,50 +84,40 @@ class OccupancyGrid(object):
             self.mark_fill(xe, ye)
             
     def update(self):
-        
-        self.grid = self.meas_grid + self.grid
-        min = np.abs(np.min(self.grid))
-        max = np.abs(np.max(self.grid))
-        
-        q = max if max > min else min
-        self.grid /= q
-        self.meas_grid = np.zeros((self.rows, self.cols))
+        if self.method == "logodd":
+            self.grid = self.meas_grid + self.grid           
+            #q = np.sum(self.grid)
+            #self.grid /= q
+            self.meas_grid = np.zeros((self.rows, self.cols))
+        elif self.method == "velca":
             
+            occ_val = {"0.1": 0.4,
+                       "0.4": 0.5,
+                       "0.5": 0.6,
+                       "0.6": 0.9,
+                       "0.9": 0.9}
             
-            
-    def add_point_set(self, xs, ys):
-        
-        dxs = xs - self.xo
-        dys = ys - self.yo
-        
-        m = dys/dxs
-        print("m: ", m)
-        b = ys - m*xs
-        
-        for x, y, mc, bc in zip(xs, ys, m, b):
-            
-            x_c, y_r = self.point2index(x, y)
-            
-            #print((self.col_o, self.row_o), (x_c, y_r))
-            lop = self.get_line((self.col_o, self.row_o), (x_c, y_r))
-            #print(lop)
-            
-            for xx,yy in lop[1:-2]:
-                if (self.grid[xx,yy]== 0.5):
-                    self.grid[xx,yy] = 0.1
-            
-            self.mark_fill(x, y)
-            
-            xt_0 = x if x < self.xo else self.xo
-            xt_1 = x if x > self.xo else self.xo
+            emp_val = {"0.1": 0.1,
+                       "0.4": 0.1,
+                       "0.5": 0.4,
+                       "0.6": 0.5,
+                       "0.9": 0.6}
+            for i,r in enumerate(self.meas_grid):
+                for j,c in enumerate(r):
+                    
+                    curr_val = self.grid[i,j]
+                    
+                    if c == 1:
+                        self.grid[i,j] = occ_val[str(curr_val)]
+                    elif c == -1:
+                        self.grid[i,j] = emp_val[str(curr_val)]
+            #self.grid = self.meas_grid + self.grid           
+            #q = np.sum(self.grid)
+            #self.grid /= q
+            self.meas_grid = np.zeros((self.rows, self.cols))
 
-            xt = np.ogrid[xt_0:xt_1:0.5*self.cell_size]
-            yt = mc*xt + bc
-            
-            for xe, ye in zip(xt, yt):
-                self.mark_empty(xe, ye)
     
-    def get_line(self, start, end):
+    def get_line(self, start, end): 
         """Bresenham's Line Algorithm
         From:
         http://www.roguebasin.com/index.php?title=Bresenham%27s_Line_Algorithm#Python

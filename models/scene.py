@@ -145,7 +145,7 @@ class Scene():
     
     def set_roi(self, roi):
         self.roi = roi
-        self.occ_grid = OccupancyGrid(**self.roi, cell_size=0.2)
+        self.occ_grid = OccupancyGrid(**self.roi, cell_size=0.2,method="velca")
         
     @staticmethod
     def _apply_roi(data, roi):
