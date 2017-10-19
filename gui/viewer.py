@@ -44,6 +44,7 @@ class Viewer(tk.Frame):
                        "used": 0}
         
         self.boxes_list = []
+        self.array = None
         
     def draw_img(self, img_path, limits=None):
         img = mpimg.imread(img_path)
@@ -52,9 +53,14 @@ class Viewer(tk.Frame):
         self.canvas.show()
     
     def draw_array(self, array, limits=None):
-        imgplot = self.ax.imshow(array, aspect='auto', extent=limits, cmap='gray')
-        self.__fit_to_roi()
-        self.canvas.show()    
+        if self.array is None:
+            self.array = self.ax.imshow(array, aspect='auto', extent=limits, cmap='gray')
+            self.__fit_to_roi()
+            self.canvas.show()
+        else:
+            self.array.set_data(array)
+            self.__fit_to_roi()
+            self.canvas.show()
         
     def __fit_to_roi(self):
         if self.roi != None:
