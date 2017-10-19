@@ -192,14 +192,16 @@ class SceneApp(tk.Frame):
 #                                                         self.processing_time_avg,
 #       # START DRAWING SECTION                                                  proc_fps))
         
-        
+        if np.mod(self.frame_cnt,30) == 0:
+            self.grid.draw_array(self.scene.occ_grid.grid, limits=self.limits)
         
         if self.draw_check:            
             plot_time = time.time()
-            self.grid.draw_array(self.scene.occ_grid.grid, limits=self.limits)
-            print(self.scene.occ_grid.grid)
-            print(np.max(self.scene.occ_grid.grid))
-            print(np.min(self.scene.occ_grid.grid))
+            
+            
+#             print(self.scene.occ_grid.grid)
+#             print(np.max(self.scene.occ_grid.grid))
+#             print(np.min(self.scene.occ_grid.grid))
             colors_list = ['blue']
             # colors_list = ['blue', 'red', 'green', 'purple']
             
