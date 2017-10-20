@@ -3,14 +3,13 @@ Created on Mar 30, 2017
 
 @author: gustavo
 '''
-import pyximport; pyximport.install()
 from models.sensor import Sensor
 from models.sensor import Laser
 from models.blob import Blob
 from models.leg import Leg
 import numpy as np
 from sklearn.cluster import DBSCAN
-from models.occupancygrid_cy import OccupancyGrid
+from models.occupancygrid import OccupancyGrid
 
 
 class Scene():

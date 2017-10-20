@@ -4,12 +4,18 @@ Created on Oct 2, 2017
 @author: gustavo
 '''
 import numpy as np
+from builtins import int
+cimport numpy as np
 
-class OccupancyGrid(object):
+cdef class OccupancyGrid(object):
     '''
     classdocs
     '''
-
+    cdef public double xmin, ymin, xmax, ymax, cell_size, xo, yo
+    cdef public int col_o, row_o, cols, rows
+    cdef public str method
+    cdef public double[:,:] grid, meas_grid
+    cdef dict occ_val, emp_val
 
     def __init__(self, xmin, ymin, xmax, ymax,
                  cell_size=0.3,
@@ -52,6 +58,9 @@ class OccupancyGrid(object):
         
     def point2index(self, x, y):
         
+        cdef int col = 0
+        cdef int row = 0
+        
         col = np.ceil((x - self.xmin)/self.cell_size - 0.5)
         row = self.rows - np.ceil((y - self.ymin)/self.cell_size - 0.5)
         return int(col), int(row)
@@ -89,6 +98,7 @@ class OccupancyGrid(object):
                     self.meas_grid[row,col] = -1
             
     def add_meas(self, xs, ys, xo=None, yo=None):
+        cdef int x_c, y_r, xe, ye, c, r
         self.mark_fill(self.col_o, self.row_o)
         
         cols, rows = self.points2indexes(xs, ys)
@@ -107,7 +117,7 @@ class OccupancyGrid(object):
             
     def update(self):
         if self.method == "logodd":
-            self.grid = self.meas_grid + self.grid           
+            self.grid = np.array(self.meas_grid) + np.array(self.grid)           
             #q = np.sum(self.grid)
             #self.grid /= q
             self.meas_grid = np.zeros((self.rows, self.cols))
@@ -129,7 +139,7 @@ class OccupancyGrid(object):
             self.meas_grid = np.zeros((self.rows, self.cols))
 
     
-    def get_line(self, start, end): 
+    def get_line(self,  start, end): 
         """Bresenham's Line Algorithm
         From:
         http://www.roguebasin.com/index.php?title=Bresenham%27s_Line_Algorithm#Python
@@ -143,6 +153,8 @@ class OccupancyGrid(object):
         >>> print points2
         [(3, 4), (2, 3), (1, 2), (1, 1), (0, 0)]
         """
+        
+        cdef int x1, x2, y1, y2, dx, dy, is_steep, error, x, ystep, y
         # Setup initial conditions
         x1, y1 = start
         x2, y2 = end
@@ -190,6 +202,8 @@ class OccupancyGrid(object):
             points.reverse()
         return points
         
+    def get_grid(self, double threshold):
+        return (np.array(self.grid) > threshold) * np.array(self.grid)
         
         
         

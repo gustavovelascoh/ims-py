@@ -149,12 +149,13 @@ class SceneApp(tk.Frame):
         self.loop = False
         
     def _next_frame(self):
-                
+
+# Start processing section                
         start_time = time.time()
         # blob_list = self.scene.get_blobs()
         blob_list = self.scene.process_blobs()
         
-        status = []
+        status = []       
         occupancy_levels = [("empty", 0.2),
              ("low", 2.0),
              ("medium", 5.0),
@@ -183,6 +184,7 @@ class SceneApp(tk.Frame):
         
         self.ts = self.scene.ts
         p_proc_time = time.time() - start_time
+        
         self.frame_cnt += 1
         self.processing_time_avg = (
             (self.processing_time_avg * (self.frame_cnt-1) + p_proc_time) /
@@ -193,7 +195,8 @@ class SceneApp(tk.Frame):
 #       # START DRAWING SECTION                                                  proc_fps))
         
         if np.mod(self.frame_cnt,30) == 0:
-            self.grid.draw_array(self.scene.occ_grid.grid, limits=self.limits)
+            xa = self.scene.occ_grid.get_grid(0.6)
+            self.grid.draw_array(xa, limits=self.limits)
         
         if self.draw_check:            
             plot_time = time.time()
