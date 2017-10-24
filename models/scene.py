@@ -6,7 +6,7 @@ Created on Mar 30, 2017
 import pyximport; pyximport.install()
 from models.sensor import Sensor
 from models.sensor import Laser
-from models.blob import Blob
+from models.blob_cy import Blob
 from models.leg import Leg
 import numpy as np
 from sklearn.cluster import DBSCAN

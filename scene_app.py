@@ -194,7 +194,7 @@ class SceneApp(tk.Frame):
 #                                                         self.processing_time_avg,
 #       # START DRAWING SECTION                                                  proc_fps))
         
-        if np.mod(self.frame_cnt,30) == 0:
+        if np.mod(self.frame_cnt,10) == 0:
             xa = self.scene.occ_grid.get_grid(0.6)
             self.grid.draw_array(xa, limits=self.limits)
         

@@ -4,7 +4,8 @@ Created on May 16, 2017
 @author: gustavo
 '''
 import numpy as np
-from .blob import BoundingBox
+cimport numpy as np
+from .blob_cy import BoundingBox
 
 class Leg(object):
     '''

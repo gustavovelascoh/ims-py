@@ -65,20 +65,20 @@ cdef class OccupancyGrid(object):
         row = self.rows - np.ceil((y - self.ymin)/self.cell_size - 0.5)
         return int(col), int(row)
 
-    def points2indexes(self, x, y):
+    def points2indexes(self, np.ndarray[double, ndim=1] x, np.ndarray[double, ndim=1] y):
         
         cols = np.ceil((x - self.xmin)/self.cell_size - 0.5)
         rows = self.rows - np.ceil((y - self.ymin)/self.cell_size - 0.5)
         return cols.astype(int), rows.astype(int)
     
-    def set_origin(self, xo, yo):
+    def set_origin(self, double xo, double yo):
         self.xo = xo
         self.yo = yo
         
         self.col_o, self.row_o = self.point2index(xo, yo)
         #self.mark_fill(xo, yo)
     
-    def mark_fill(self, col, row, val=0.1):
+    def mark_fill(self, int col, int row, val=0.1):
         if self.method == "logodd":
             if col < self.cols -1 and col > 0 and row < self.rows and row > 0:      
                 self.meas_grid[row,col] = val
@@ -86,7 +86,7 @@ cdef class OccupancyGrid(object):
             if col < self.cols -1 and col > 0 and row < self.rows and row > 0:      
                 self.meas_grid[row,col] = 1
     
-    def mark_empty(self, col, row):
+    def mark_empty(self, int col, int row):
         #print(col, row)
         if self.method == "logodd":
             if col < self.cols and col > 0 and row < self.rows and row > 0:
@@ -97,7 +97,7 @@ cdef class OccupancyGrid(object):
                 if (self.meas_grid[row,col]== 0):
                     self.meas_grid[row,col] = -1
             
-    def add_meas(self, xs, ys, xo=None, yo=None):
+    def add_meas(self, np.ndarray[double, ndim=1] xs, np.ndarray[double, ndim=1] ys, xo=None, yo=None):
         cdef int x_c, y_r, xe, ye, c, r
         self.mark_fill(self.col_o, self.row_o)
         
