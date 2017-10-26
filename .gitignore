@@ -7,3 +7,6 @@ build/
 *.clus*
 *.lms*
 #scene_*
+*.so
+*.c
+logs/*
