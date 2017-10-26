@@ -4,11 +4,12 @@ Created on Mar 30, 2017
 @author: gustavo
 '''
 import pyximport; pyximport.install()
+import numpy as np
 from models.sensor import Sensor
 from models.sensor import Laser
 from models.blob_cy import Blob
-from models.leg import Leg
-import numpy as np
+from models.leg_cy import Leg
+
 from sklearn.cluster import DBSCAN
 from models.occupancygrid_cy import OccupancyGrid
 

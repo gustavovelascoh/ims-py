@@ -221,10 +221,10 @@ class SceneApp(tk.Frame):
                            
     #             self.viewer.plot(b.data[:,0], b.data[:,1], linestyle=' ',
     #                              marker='.', color=colors_list[(c_id-1)%len_colors_list])
-                minx, miny = b.bbox.minxy
+                minx, miny = b.bbox.minx, b.bbox.miny
                 self.viewer.plot_box(minx, miny, b.bbox.width, b.bbox.height, edgecolor=b_color)
                 
-                self.viewer.plot([b.bbox.minxy[0],b.bbox.maxxy[0]],[b.bbox.minxy[1], b.bbox.maxxy[1]],linestyle='-', marker='x', color=b_color)
+                self.viewer.plot([b.bbox.minx,b.bbox.maxx],[b.bbox.miny, b.bbox.maxy],linestyle='-', marker='x', color=b_color)
             
             self.viewer.update()
             

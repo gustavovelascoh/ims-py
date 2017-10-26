@@ -33,8 +33,8 @@ cdef class OccupancyGrid(object):
         dx = xmax-xmin
         dy = ymax-ymin
         
-        self.cols = int(np.ceil(dx/cell_size)) + 1
-        self.rows = int(np.ceil(dy/cell_size)) + 1
+        self.cols = int(np.floor(dx/cell_size)) + 1
+        self.rows = int(np.floor(dy/cell_size)) + 1
         
         if method == 'logodd':
             self.meas_grid=np.zeros((self.rows, self.cols))
@@ -56,19 +56,19 @@ cdef class OccupancyGrid(object):
                        "0.9": 0.6}
         #print((np.shape(self.grid)))
         
-    def point2index(self, x, y):
+    def point2index(self, double x, double y):
         
         cdef int col = 0
         cdef int row = 0
         
-        col = np.ceil((x - self.xmin)/self.cell_size - 0.5)
-        row = self.rows - np.ceil((y - self.ymin)/self.cell_size - 0.5)
+        col = np.floor((x - self.xmin)/self.cell_size)
+        row = self.rows - np.floor((y - self.ymin)/self.cell_size)
         return int(col), int(row)
 
     def points2indexes(self, np.ndarray[double, ndim=1] x, np.ndarray[double, ndim=1] y):
         
-        cols = np.ceil((x - self.xmin)/self.cell_size - 0.5)
-        rows = self.rows - np.ceil((y - self.ymin)/self.cell_size - 0.5)
+        cols = np.floor((x - self.xmin)/self.cell_size)
+        rows = self.rows - np.floor((y - self.ymin)/self.cell_size)
         return cols.astype(int), rows.astype(int)
     
     def set_origin(self, double xo, double yo):
@@ -116,6 +116,9 @@ cdef class OccupancyGrid(object):
             self.mark_fill(xe, ye)
             
     def update(self):
+        
+        cdef int i,j
+        
         if self.method == "logodd":
             self.grid = np.array(self.meas_grid) + np.array(self.grid)           
             #q = np.sum(self.grid)

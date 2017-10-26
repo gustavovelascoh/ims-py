@@ -4,25 +4,33 @@ Created on May 7, 2017
 @author: gustavo
 '''
 import numpy as np
+cimport numpy as np
 from math import ceil
 
 
-class Blob(object):
+cdef class Blob(object):
     '''
     classdocs
     '''
+    cdef object data
+    cdef public object bbox
+    cdef object mean
+    cdef public int ts, nf, id
+    cdef double vel, ang, dens
+    cdef public list next_blobs, prev_blobs
 
-    def __init__(self, data, ts, nf, blob_id):
+    def __init__(self,np.ndarray[double, ndim=2]  data, int ts, int nf, int blob_id):
         self.data = data
         self.ts = ts
         self.nf = nf
         self.id = blob_id
         self.next_blobs = []
         self.prev_blobs = []
-        self.vel = None
-        self.ang = None
+        self.vel = 0.0
+        self.ang = 0.0
         
     def get_features(self):
+        cdef np.ndarray[double, ndim=2] xy
         xy = self.data
         bbox = np.array([min(xy[:,0:1]), min(xy[:,1:2]),max(xy[:,0:1]), max(xy[:,1:2])])
         self.bbox = BoundingBox((bbox[0], bbox[1]), (bbox[2], bbox[3]))        
@@ -53,14 +61,17 @@ class Blob(object):
         v2_u = self._unit_vector(v2)
         return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
     
-class BoundingBox(object):
+cdef class BoundingBox(object):
     
-    minxy = None
-    maxxy = None
-    width = None
-    height = None
-    area = None
-    center = None
+    cdef public double width, height, area, center_x, center_y
+    cdef public double minx, miny, maxx, maxy
+    
+#     minxy = None
+#     maxxy = None
+#     width = None
+#     height = None
+#     area = None
+#     center = None
     
     def __init__(self, minxy, maxxy):
         '''
@@ -68,8 +79,12 @@ class BoundingBox(object):
         @param maxxy: Tuple of max coordinate point of bounding box e.g. (2,5)
         '''
         
-        self.minxy = minxy
-        self.maxxy = maxxy
+        #self.minxy = minxy
+        #self.maxxy = maxxy
+        self.minx = minxy[0]
+        self.miny = minxy[1]
+        self.maxx = maxxy[0]
+        self.maxy = maxxy[1]
         
         dx = maxxy[0] - minxy[0]
         dy = maxxy[1] - minxy[1]
@@ -82,7 +97,7 @@ class BoundingBox(object):
         self.width = (ceil((dx_cm) / grid_k)*grid_k)/100
         self.height = (ceil((dy_cm) / grid_k)*grid_k)/100
         self.area = self.width * self.height
-        self.center = (minxy[0]+(self.width/2), minxy[1]+(self.height/2))
+        self.center_x, self.center_y = (minxy[0]+(self.width/2), minxy[1]+(self.height/2))
     
     def is_in(self, point):
         '''
@@ -93,15 +108,15 @@ class BoundingBox(object):
         
         ret = False
         
-        if point[0] >= self.minxy[0] and point[0] <= self.maxxy[0]:
-            if point[1] >= self.minxy[1] and point[1] <= self.maxxy[1]:
+        if point[0] >= self.minx and point[0] <= self.maxx:
+            if point[1] >= self.miny and point[1] <= self.maxy:
                 ret = True
             
         return ret
     
-    def __str__(self, *args, **kwargs):
-        blob_str = "minxy: (%s,%s)"  % (self.minxy)
-        blob_str += "maxxy: (%s,%s)"  % (self.maxxy)
+    def __str__(self):
+        blob_str = "minxy: (%s,%s)"  % (self.minx, self.miny)
+        blob_str += "maxxy: (%s,%s)"  % (self.maxx, self.maxy)
         return blob_str
     
     

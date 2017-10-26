@@ -7,11 +7,15 @@ import numpy as np
 cimport numpy as np
 from .blob_cy import BoundingBox
 
-class Leg(object):
+cdef class Leg(object):
     '''
     Class for intersection legs
     '''
-    
+    cdef public int id, buffer_size, b_idx
+    cdef public double state, occupied_area
+    cdef public str type, heading
+    cdef public object state_buffer
+    cdef public object bbox, lanes
 
     def __init__(self, id, type, heading, bbox, lanes, buffer_size=90):
         '''
@@ -28,7 +32,7 @@ class Leg(object):
         self.buffer_size = buffer_size
         self.b_idx = 0;
         
-    def add_item(self, item):
+    cpdef add_item(self, item):
         self.occupied_area += item.bbox.area
         self.state = self.occupied_area/self.bbox.area
 #         print("leg area: %s, bbox area: %s, occupied area: %s" %
@@ -57,7 +61,7 @@ class Leg(object):
             
     def is_in(self, item):
         
-        return self.bbox.is_in(item.bbox.center)
+        return self.bbox.is_in([item.bbox.center_x, item.bbox.center_y])
     
     def check_item(self, item):
         
