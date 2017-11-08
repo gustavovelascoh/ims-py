@@ -13,6 +13,8 @@ import json
 
 matplotlib.use('TkAgg')
 
+print(hasattr(tk,"filedialog"))
+
 dataset_cfg_file_default = "possi_123578.imscfg"
 dataset_cfg_file_default = "possi_123.imscfg"
 
