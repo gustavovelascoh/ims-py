@@ -9,6 +9,7 @@ from models.sensor import Sensor
 from models.sensor import Laser
 from models.blob_cy import Blob
 from models.leg_cy import Leg
+from models import sensor
 
 from sklearn.cluster import DBSCAN
 from models.occupancygrid_cy import OccupancyGrid
@@ -74,12 +75,24 @@ class Scene():
     def read_data(self):
         pass
     
-    def add_meas_to_grid(self, range_sensor):
+    def add_meas_to_grid(self, range_sensor, method="raw"):
         d_x = float(range_sensor.calib_data["sx"])
         d_y = float(range_sensor.calib_data["sy"])
+        d_th = float(range_sensor.calib_data["ang"])
         
-        x = range_sensor.x_nobg
-        y = range_sensor.y_nobg
+        if method == "no_bg":
+            x = range_sensor.x_nobg
+            y = range_sensor.y_nobg
+            
+            
+            
+        if method == "raw":
+            raw_th = range_sensor.raw_theta + d_th
+            x, y = sensor.pol2cart(range_sensor.scan,
+                                   raw_th)
+            
+            x += 100*d_x
+            y += 100*d_y        
         
         x = x/100
         y = y/100
@@ -118,7 +131,7 @@ class Scene():
             range_sensor.remove_bg()
             range_sensor.calibrate()
             
-            self.add_meas_to_grid(range_sensor)
+            self.add_meas_to_grid(range_sensor)#, method="no_bg")
             #print(len(range_sensor.x_nobg))
             #print(range_sensor.x_nobg)
             if x is not None:
