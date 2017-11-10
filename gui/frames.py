@@ -4,6 +4,7 @@ Created on May 16, 2017
 @author: gustavo
 '''
 import tkinter as tk
+from tkinter import filedialog
 
 class DatasetConfig(tk.Frame):
     def __init__(self, master,create_cb=None,default_file="scene.imscfg"):
@@ -23,16 +24,31 @@ class DatasetConfig(tk.Frame):
         button_c = tk.Button(self, text="Create Scene",
                            command=create_cb)
         button_c.grid(row=0, column=3)
+        
+        self.rec_check = 1
+        self.rec_check_tk = tk.IntVar()
+        rec_ch_btn = tk.Checkbutton(self,
+                                     text="Save data to file",
+                                     variable=self.rec_check_tk,
+                                     command=self.__rec_check_cb)
+        
+        rec_ch_btn.grid(row=0, column=4)
+        
         self.filename = default_file
+    
+    def __rec_check_cb(self):
+        self.rec_check = self.rec_check_tk.get()
     
     def select_file(self):
         ims_path="/home/gustavo/devel/python/ims/possi"
         self.dataset_path = ims_path
         print("hello button")
+        print(hasattr(tk,"filedialog"))        
         self.filename = tk.filedialog.askopenfilename(
             initialdir=ims_path,
             filetypes=[('IMS config file','*.imscfg')])
-        print("FOLDER OK -> %s" % self.filename)
+        if self.filename:
+            print("FOLDER OK -> %s" % self.filename)
         self.e.insert(0, self.filename)
     
     
