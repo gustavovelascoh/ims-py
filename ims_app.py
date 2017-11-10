@@ -3,9 +3,9 @@
 import tkinter as tk
 from gui import frames
 from gui import viewer
+from models import scene_occ
+import threading
 
-
-print(hasattr(tk,"filedialog"))
 
 class ImsApp(tk.Frame):
     def __init__(self, master):
@@ -47,7 +47,7 @@ class ImsApp(tk.Frame):
         
     def _load_dataset(self):
         if self.dsc_frame.filename:
-            self.scene = scene.Scene(self.dsc_frame.filename)
+            self.scene = scene_occ.SceneOcc(self.dsc_frame.filename)
         else:
             print("NO FILE SELECTED")
             return
@@ -71,7 +71,7 @@ class ImsApp(tk.Frame):
                     self.last_ts = self.ts              
                 diff = self.ts - self.last_ts
                 self.last_ts = self.ts
-                time.sleep((diff/1000.0)-self.elapsed_time)
+                #time.sleep((diff/1000.0)-self.elapsed_time)
 #                 print("Elapsed ts %s" % (self.ts - self.last_ts))
             else:
                 self.first_frame = False                
