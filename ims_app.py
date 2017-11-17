@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 
 import tkinter as tk
+import numpy as np
 from gui import frames
 from gui import viewer
 from models import scene_occ
 import threading
-
+import pickle
 
 class ImsApp(tk.Frame):
     def __init__(self, master):
@@ -25,7 +26,7 @@ class ImsApp(tk.Frame):
         viewer_frame = tk.Frame(self)
         viewer_frame.pack(side="left")
                 
-        self.grid = viewer.Viewer(viewer_frame, figsize=(30/6,22.5/6))
+        self.grid = viewer.Viewer(viewer_frame, figsize=(30/4,22.5/4))
         self.grid.pack()
         
         viewer_toolbar_frame = tk.Frame(viewer_frame)
@@ -51,10 +52,50 @@ class ImsApp(tk.Frame):
         else:
             print("NO FILE SELECTED")
             return
-        pass
+        
+        map_scale = self.scene.config_data["map"]["scale"]
+        max_x = self.scene.config_data["map"]["max_x"]
+        max_y = self.scene.config_data["map"]["max_y"]
+        d_x = self.scene.config_data["map"]["d_x"]
+        d_y = self.scene.config_data["map"]["d_y"]
+        
+        self.limits = np.concatenate((
+                             ((np.array([0,max_x])/map_scale)+d_x),
+                             ((np.array([0,max_y])/map_scale)+d_y)
+                             ))
+        
+        roi = self.scene.config_data["map"]["roi"]
+        self.scene.set_roi(roi)
+        
+        self.ts = 0
+        
+        self.save_file = self.dsc_frame.rec_check
+        print("save to file? %s" % self.save_file)
+        
+        if self.save_file:
+            self.grid_array = []
+        
     
     def _next(self):
-        pass
+        last = self.scene.process_frame()
+        
+        self.frame_cnt += 1
+        if np.mod(self.frame_cnt,10) == 0:
+            xa = self.scene.occ_grid_th
+            self.grid.draw_array(xa, limits=self.limits)
+        
+        self.ts = self.scene.ts
+        
+        if self.save_file:
+            self.grid_array.append(self.scene.occ_grid_th)
+            
+        if last:
+            self.loop = False
+            
+            if self.save_file:
+                with open(self.dsc_frame.filename+".grid","wb") as gf:
+                    pickle.dump(self.grid_array,gf)
+        
     
     def _loop(self):
         self.loop = True
@@ -62,7 +103,7 @@ class ImsApp(tk.Frame):
         t1.start()
     
     def _stop(self):
-        pass
+        self.loop = False
     
     def _loop_thread(self):
         while self.loop:
@@ -75,7 +116,7 @@ class ImsApp(tk.Frame):
 #                 print("Elapsed ts %s" % (self.ts - self.last_ts))
             else:
                 self.first_frame = False                
-            self._next_frame()
+            self._next()
         
 if __name__ == "__main__":
     main = tk.Tk()

@@ -25,7 +25,7 @@ class DatasetConfig(tk.Frame):
                            command=create_cb)
         button_c.grid(row=0, column=3)
         
-        self.rec_check = 1
+        self.rec_check = 0
         self.rec_check_tk = tk.IntVar()
         rec_ch_btn = tk.Checkbutton(self,
                                      text="Save data to file",

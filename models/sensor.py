@@ -53,6 +53,7 @@ class Laser(Sensor):
     SUBTYPE_MULTILAYER = "Multilayer"
     scan = None
     ts = None
+    bg_removed = False
     
     def __init__(self, laser_type):
         self.subtype = laser_type
@@ -84,6 +85,7 @@ class Laser(Sensor):
     
     def read_scan(self):
         #print(len(self.dataset["scans"]))
+        self.bg_removed = False
         self.scan = np.array(self.dataset["scans"][0]["data"])
         self.ts = self.dataset["scans"][0]["ms"]
         #print(self.scan)
@@ -100,6 +102,7 @@ class Laser(Sensor):
         
         self.data_nobg = self.scan[bg_delta > 15]
         self.theta_nobg = self.raw_theta[bg_delta > 15]
+        self.bg_removed = True
     
     def calibrate(self):
         
@@ -107,8 +110,12 @@ class Laser(Sensor):
         d_x = float(self.calib_data["sx"])
         d_y = float(self.calib_data["sy"])
         
-        #print(self.theta_nobg)
-        self.theta_nobg += d_th
+        if not self.bg_removed:
+            self.data_nobg = self.scan
+            self.theta_nobg = self.raw_theta +d_th
+        
+        else:#print(self.theta_nobg)
+            self.theta_nobg += d_th
         #print(self.theta_nobg)
         
         self.x_nobg, self.y_nobg = pol2cart(self.data_nobg, self.theta_nobg)
