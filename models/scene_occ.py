@@ -36,7 +36,7 @@ class SceneOcc():
         self.legs = []
         
         self.import_range_sensors(self.config_data["range_sensors"])
-        self.generate_legs(self.config_data["legs"])
+        #self.generate_legs(self.config_data["legs"])
             
         self.blob_count = 0
         self.curr_blobs = []
@@ -167,9 +167,32 @@ class SceneOcc():
         data = data[data[:,1] <= roi["ymax"]]
         return data
     
+    def process_legs(self):
+        
+        self.legs_state = []
+        self.legs_areas = []
+        
+        for leg_dict in self.config_data["legs"]:
+            
+            min_ind_r, min_ind_c = self.occ_grid.point2index(
+                leg_dict["bbox"][0],
+                leg_dict["bbox"][1]
+                )
+            max_ind_r, max_ind_c = self.occ_grid.point2index(
+                leg_dict["bbox"][2],
+                leg_dict["bbox"][3]
+                )
+            
+            leg_grid = self.occ_grid_th[min_ind_r:max_ind_r,
+                                        min_ind_c:max_ind_c]
+            
+            self.legs_state.append(np.sum(leg_grid))
+            
+    
     def process_frame(self):
         last = self.preprocess_data()
         self.occ_grid_th = self.occ_grid.get_grid(0.6)
+        self.process_legs()
         return last
         
     
