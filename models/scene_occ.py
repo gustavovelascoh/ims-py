@@ -183,8 +183,22 @@ class SceneOcc():
                 leg_dict["bbox"][3]
                 )
             
-            leg_grid = self.occ_grid_th[min_ind_r:max_ind_r,
-                                        min_ind_c:max_ind_c]
+            if (min_ind_r <= max_ind_r):
+                ra = min_ind_r
+                rb = max_ind_r
+            else:
+                rb = min_ind_r
+                ra = max_ind_r
+                
+            if (min_ind_c <= max_ind_c):
+                ca = min_ind_c
+                cb = max_ind_c
+            else:
+                cb = min_ind_c
+                ca = max_ind_c
+            
+            leg_grid = self.occ_grid_th[ra:rb,
+                                        ca:cb]
             
             self.legs_state.append(np.sum(leg_grid))
             
@@ -193,6 +207,7 @@ class SceneOcc():
         last = self.preprocess_data()
         self.occ_grid_th = self.occ_grid.get_grid(0.6)
         self.process_legs()
+        print("legs_state: %s" % self.legs_state)
         return last
         
     
