@@ -73,7 +73,7 @@ class ImsApp(tk.Frame):
         print("save to file? %s" % self.save_file)
         
         if self.save_file:
-            self.grid_array = []
+            self.data_array = []
         
     
     def _next(self):
@@ -87,14 +87,15 @@ class ImsApp(tk.Frame):
         self.ts = self.scene.ts
         
         if self.save_file:
-            self.grid_array.append(self.scene.occ_grid_th)
+            data = {"ts": self.ts, "legs_state": self.scene.legs_state}
+            self.data_array.append(data)
             
         if last:
             self.loop = False
             
             if self.save_file:
-                with open(self.dsc_frame.filename+".grid","wb") as gf:
-                    pickle.dump(self.grid_array,gf)
+                with open(self.dsc_frame.filename+".data","wb") as gf:
+                    pickle.dump(self.data_array,gf)
         
     
     def _loop(self):
