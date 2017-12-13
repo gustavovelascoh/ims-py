@@ -54,7 +54,7 @@ class Viewer(tk.Frame):
     
     def draw_array(self, array, limits=None):
         if self.array is None:
-            self.array = self.ax.imshow(array, aspect='auto', extent=limits, cmap='gray')
+            self.array = self.ax.imshow(array, aspect='auto', extent=limits)#, cmap='gray')
             self.__fit_to_roi()
             self.canvas.show()
         else:
