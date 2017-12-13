@@ -206,7 +206,7 @@ cdef class OccupancyGrid(object):
         return points
         
     def get_grid(self, double threshold):
-        return (np.array(self.grid) > threshold) * np.array(self.grid)
+        return (np.array(self.grid) > threshold) * 1.0
         
         
         
