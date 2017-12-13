@@ -81,7 +81,7 @@ class ImsApp(tk.Frame):
         
         self.frame_cnt += 1
         if np.mod(self.frame_cnt,10) == 0:
-            xa = self.scene.occ_grid_th
+            xa = self.scene.occ_grid_th3
             self.grid.draw_array(xa, limits=self.limits)
         
         self.ts = self.scene.ts

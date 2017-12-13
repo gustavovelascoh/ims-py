@@ -9,7 +9,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-filename = "../possi_123578.cs03th06a.data"
+filename = "../possi_123578.cs03th06aa.data"
 data = None
 with open(filename,"rb") as f:
     data = pickle.load(f)

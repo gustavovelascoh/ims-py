@@ -167,18 +167,18 @@ class SceneOcc():
         data = data[data[:,1] <= roi["ymax"]]
         return data
     
-    def process_legs(self):
+    def process_legs(self, method='area'):
         
         self.legs_state = []
         self.legs_areas = []
         
         for leg_dict in self.config_data["legs"]:
             
-            min_ind_r, min_ind_c = self.occ_grid.point2index(
+            min_ind_c, min_ind_r = self.occ_grid.point2index(
                 leg_dict["bbox"][0],
                 leg_dict["bbox"][1]
                 )
-            max_ind_r, max_ind_c = self.occ_grid.point2index(
+            max_ind_c, max_ind_r = self.occ_grid.point2index(
                 leg_dict["bbox"][2],
                 leg_dict["bbox"][3]
                 )
@@ -197,16 +197,74 @@ class SceneOcc():
                 cb = min_ind_c
                 ca = max_ind_c
             
+            print("(%s, %s)-(%s, %s) -> (%s, %s)-(%s, %s)" % (
+                leg_dict["bbox"][0],
+                leg_dict["bbox"][1],
+                leg_dict["bbox"][2],
+                leg_dict["bbox"][3],
+                ra,ca,rb,cb
+                ))
+            
             leg_grid = self.occ_grid_th[ra:rb,
                                         ca:cb]
-            
-            self.legs_state.append(np.sum(leg_grid))
-            
+            if method == "area":
+                self.legs_state.append(np.sum(leg_grid))
+            elif method == "queue":
+                if leg_dict["heading"] in ["N","S"]:
+                    queue_sum = np.sum(leg_grid, axis=1);
+                else:
+                    queue_sum = np.sum(leg_grid, axis=0);
+                    
+                lim_idx, = np.where(queue_sum != 0)
+                print(lim_idx)
+                
+                if len(lim_idx) != 0:
+                    self.legs_state.append(lim_idx[-1] - lim_idx[0])
+                else:
+                    self.legs_state.append(0)
     
+    def draw_legs(self):
+        
+        for leg_dict in self.config_data["legs"]:
+            
+            min_ind_c, min_ind_r = self.occ_grid.point2index(
+                leg_dict["bbox"][0],
+                leg_dict["bbox"][1]
+                )
+            max_ind_c, max_ind_r = self.occ_grid.point2index(
+                leg_dict["bbox"][2],
+                leg_dict["bbox"][3]
+                )
+            
+            if (min_ind_r <= max_ind_r):
+                ra = min_ind_r
+                rb = max_ind_r
+            else:
+                rb = min_ind_r
+                ra = max_ind_r
+                
+            if (min_ind_c <= max_ind_c):
+                ca = min_ind_c
+                cb = max_ind_c
+            else:
+                cb = min_ind_c
+                ca = max_ind_c
+                
+            self.occ_grid_th3[ra:rb,ca,:] = np.array([1,0,0])
+            self.occ_grid_th3[ra:rb,cb,:] = [1,0,0]
+            self.occ_grid_th3[ra,ca:cb,:] = [1,0,0]
+            self.occ_grid_th3[rb,ca:cb,:] = [1,0,0]
+        
     def process_frame(self):
         last = self.preprocess_data()
-        self.occ_grid_th = self.occ_grid.get_grid(0.6)
-        self.process_legs()
+        self.occ_grid_th = self.occ_grid.get_grid(0.6)        
+        self.process_legs()#method='queue')
+        
+        self.occ_grid_th3 = self.occ_grid_th * 255
+        self.occ_grid_th3 = np.stack((self.occ_grid_th,
+                                     self.occ_grid_th,
+                                     self.occ_grid_th),axis =2)
+        self.draw_legs()
         print("legs_state: %s" % self.legs_state)
         return last
         
