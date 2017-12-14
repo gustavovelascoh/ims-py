@@ -158,21 +158,11 @@ class SceneOcc():
         self.roi = roi
         self.occ_grid = OccupancyGrid(**self.roi, cell_size=0.3,method="velca")
         
-    @staticmethod
-    def _apply_roi(data, roi):
-        data = data[data[:,0] >= roi["xmin"]]
-        data = data[data[:,0] <= roi["xmax"]]
-        
-        data = data[data[:,1] >= roi["ymin"]]
-        data = data[data[:,1] <= roi["ymax"]]
-        return data
-    
-    def process_legs(self, method='area'):
-        
         self.legs_state = []
         self.legs_areas = []
+        self.legs_regions = []
         
-        for leg_dict in self.config_data["legs"]:
+        for idx, leg_dict in enumerate(self.config_data["legs"]):
             
             min_ind_c, min_ind_r = self.occ_grid.point2index(
                 leg_dict["bbox"][0],
@@ -197,18 +187,38 @@ class SceneOcc():
                 cb = min_ind_c
                 ca = max_ind_c
             
-            print("(%s, %s)-(%s, %s) -> (%s, %s)-(%s, %s)" % (
-                leg_dict["bbox"][0],
-                leg_dict["bbox"][1],
-                leg_dict["bbox"][2],
-                leg_dict["bbox"][3],
-                ra,ca,rb,cb
-                ))
+            self.legs_regions.append({"ra":ra, "rb":rb, "ca":ca, "cb":cb})    
+            self.legs_state.append([])
+            self.legs_areas.append((rb-ra)*(cb-ca))
+        
+    @staticmethod
+    def _apply_roi(data, roi):
+        data = data[data[:,0] >= roi["xmin"]]
+        data = data[data[:,0] <= roi["xmax"]]
+        
+        data = data[data[:,1] >= roi["ymin"]]
+        data = data[data[:,1] <= roi["ymax"]]
+        return data
+    
+    def update_leg_status(self, idx):
+        pass
+    
+    def process_legs(self, method='area'):
+        
+        #self.legs_state = []
+        #self.legs_areas = []
+        
+        for idx, leg_dict in enumerate(self.config_data["legs"]):
+            
+            ra = self.legs_regions[idx]["ra"]
+            rb = self.legs_regions[idx]["rb"]
+            ca = self.legs_regions[idx]["ca"]
+            cb = self.legs_regions[idx]["cb"]
             
             leg_grid = self.occ_grid_th[ra:rb,
                                         ca:cb]
             if method == "area":
-                self.legs_state.append(np.sum(leg_grid))
+                self.legs_state[idx] = np.sum(leg_grid)
             elif method == "queue":
                 if leg_dict["heading"] in ["N","S"]:
                     queue_sum = np.sum(leg_grid, axis=1);
