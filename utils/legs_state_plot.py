@@ -9,7 +9,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-filename = "../possi_123578.cs03th06am.data"
+filename = "../possi_123578.cs03th06amp.data"
 data = None
 with open(filename,"rb") as f:
     data = pickle.load(f)
@@ -32,8 +32,8 @@ print(np.shape(ts))
 print(np.shape(legs_state))
 
 # plt.subplot(2,2,4)
-plt.plot(legs_state.T)
-
+h = plt.plot(legs_state.T)
+plt.legend(h,["leg0","leg1","leg2","leg3","leg4","leg5"])
 plt.show()
     
     
