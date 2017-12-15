@@ -87,8 +87,10 @@ class ImsApp(tk.Frame):
         self.ts = self.scene.ts
         
         if self.save_file:
-            data = {"ts": self.ts, "legs_state": self.scene.legs_state}
+            data = {"ts": self.ts, "legs_state": np.array(self.scene.legs_state)}
+            #print(self.frame_cnt, data)
             self.data_array.append(data)
+            #print(self.data_array)
             
         if last:
             self.loop = False

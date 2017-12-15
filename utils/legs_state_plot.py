@@ -9,13 +9,14 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-filename = "../possi_123578.cs03th06aa.data"
+filename = "../possi_123578.cs03th06am.data"
 data = None
 with open(filename,"rb") as f:
     data = pickle.load(f)
     
 print(np.shape(data))
 print(data[0])
+print(data[1])
 
 ts = np.array([])
 legs_state = np.array([])

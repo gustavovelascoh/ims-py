@@ -159,6 +159,7 @@ class SceneOcc():
         self.occ_grid = OccupancyGrid(**self.roi, cell_size=0.3,method="velca")
         
         self.legs_state = []
+        self.legs_state_buf = []
         self.legs_areas = []
         self.legs_regions = []
         
@@ -188,7 +189,8 @@ class SceneOcc():
                 ca = max_ind_c
             
             self.legs_regions.append({"ra":ra, "rb":rb, "ca":ca, "cb":cb})    
-            self.legs_state.append([])
+            self.legs_state.append(0)
+            self.legs_state_buf.append([])
             self.legs_areas.append((rb-ra)*(cb-ca))
         
     @staticmethod
@@ -200,8 +202,16 @@ class SceneOcc():
         data = data[data[:,1] <= roi["ymax"]]
         return data
     
-    def update_leg_status(self, idx):
-        pass
+    def update_leg_status(self, idx, val):
+        self.legs_state_buf[idx].append(val)
+        curr_len = len(self.legs_state_buf[idx]) 
+        
+        if curr_len > 30:
+            self.legs_state_buf[idx] = self.legs_state_buf[idx][1:-1]
+            curr_len = len(self.legs_state_buf[idx])
+        
+        self.legs_state[idx] = np.sum(self.legs_state_buf[idx])/curr_len
+        self.legs_state[idx] = self.legs_state[idx]/self.legs_areas[idx]
     
     def process_legs(self, method='area'):
         
@@ -218,7 +228,8 @@ class SceneOcc():
             leg_grid = self.occ_grid_th[ra:rb,
                                         ca:cb]
             if method == "area":
-                self.legs_state[idx] = np.sum(leg_grid)
+                #self.legs_state[idx] = np.sum(leg_grid)
+                self.update_leg_status(idx, np.sum(leg_grid))
             elif method == "queue":
                 if leg_dict["heading"] in ["N","S"]:
                     queue_sum = np.sum(leg_grid, axis=1);
@@ -275,7 +286,7 @@ class SceneOcc():
                                      self.occ_grid_th,
                                      self.occ_grid_th),axis =2)
         self.draw_legs()
-        print("legs_state: %s" % self.legs_state)
+        #print("legs_state: %s" % self.legs_state)
         return last
         
     
