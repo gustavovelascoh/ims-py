@@ -34,10 +34,22 @@ class DatasetConfig(tk.Frame):
         
         rec_ch_btn.grid(row=0, column=4)
         
+        self.plot_check = 0
+        self.plot_check_tk = tk.IntVar()
+        plot_ch_btn = tk.Checkbutton(self,
+                                     text="Plot",
+                                     variable=self.plot_check_tk,
+                                     command=self.__plot_check_cb)
+        
+        plot_ch_btn.grid(row=0, column=5)
+        
         self.filename = default_file
     
     def __rec_check_cb(self):
         self.rec_check = self.rec_check_tk.get()
+    
+    def __plot_check_cb(self):
+        self.plot_check = self.plot_check_tk.get()
     
     def select_file(self):
         ims_path="/home/gustavo/devel/python/ims/possi"

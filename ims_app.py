@@ -72,6 +72,9 @@ class ImsApp(tk.Frame):
         self.save_file = self.dsc_frame.rec_check
         print("save to file? %s" % self.save_file)
         
+        self.plot = self.dsc_frame.plot_check
+        print("plot? %s" % self.plot)
+        
         if self.save_file:
             self.data_array = []
         
@@ -80,9 +83,11 @@ class ImsApp(tk.Frame):
         last = self.scene.process_frame()
         
         self.frame_cnt += 1
-        if np.mod(self.frame_cnt,10) == 0:
-            xa = self.scene.occ_grid_th3
-            self.grid.draw_array(xa, limits=self.limits)
+        
+        if self.plot:
+            if np.mod(self.frame_cnt,10) == 0:
+                xa = self.scene.occ_grid_th3
+                self.grid.draw_array(xa, limits=self.limits)
         
         self.ts = self.scene.ts
         
@@ -98,6 +103,7 @@ class ImsApp(tk.Frame):
             if self.save_file:
                 with open(self.dsc_frame.filename+".data","wb") as gf:
                     pickle.dump(self.data_array,gf)
+            print("End of data")
         
     
     def _loop(self):
