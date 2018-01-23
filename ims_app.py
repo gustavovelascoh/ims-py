@@ -7,6 +7,8 @@ from gui import viewer
 from models import scene_occ
 import threading
 import pickle
+from models.publisher import Publisher
+import json
 
 class ImsApp(tk.Frame):
     def __init__(self, master):
@@ -45,6 +47,8 @@ class ImsApp(tk.Frame):
         self.first_frame = True
         self.last_ts = 0
         self.frame_cnt = 0
+        
+        self.pub = Publisher()
         
     def _load_dataset(self):
         if self.dsc_frame.filename:
@@ -91,8 +95,12 @@ class ImsApp(tk.Frame):
         
         self.ts = self.scene.ts
         
+        data = {"ts": self.ts, "legs_state": self.scene.legs_state}
+        self.pub.publish("legs_state_plotter", json.dumps(data))
+        
+        
         if self.save_file:
-            data = {"ts": self.ts, "legs_state": np.array(self.scene.legs_state)}
+            #data = {"ts": self.ts, "legs_state": np.array(self.scene.legs_state)}
             #print(self.frame_cnt, data)
             self.data_array.append(data)
             #print(self.data_array)

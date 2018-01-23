@@ -34,7 +34,7 @@ def subscriber_cb(msg):
     time_array = np.append(time_array, payload["ts"])
     print(time_array)
     
-    curr_data_array = np.array([payload["data"]])
+    curr_data_array = np.array([payload["legs_state"]])
     
     print(np.shape(curr_data_array))
     print(curr_data_array)
@@ -53,6 +53,6 @@ def subscriber_cb(msg):
     
     p.update(xmin=time_array[0], xmax=time_array[-1])
 
-s = Subscriber({"test_topic": subscriber_cb})
+s = Subscriber({"legs_state_plotter": subscriber_cb})
 s.run()
 tk.mainloop()
