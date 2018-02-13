@@ -51,7 +51,7 @@ def subscriber_cb(msg):
     for dat in data_array:
         p.plot(time_array, dat)
     
-    p.update(xmin=time_array[0], xmax=time_array[-1])
+    p.update(xmin=time_array[0], xmax=time_array[-1], ymin=0, ymax=1)
 
 s = Subscriber({"legs_state_plotter": subscriber_cb})
 s.run()

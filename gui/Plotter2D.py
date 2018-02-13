@@ -59,7 +59,7 @@ class Plotter2D(tk.Frame):
         
         self.ax.draw_artist(curr_line)  
     
-    def update(self, xmin=None, xmax=None):
+    def update(self, xmin=None, xmax=None, ymin=None, ymax=None):
         
         
         lines_to_discard = self.total_lines - self.fixed_lines - self.used_lines
@@ -72,8 +72,10 @@ class Plotter2D(tk.Frame):
             #print("removing...")
             lines[-1].remove()
         
-        if xmin:
+        if xmin is not None:
             self.ax.set_xlim(xmin=xmin,xmax=xmax)
+        if ymin is not None:
+            self.ax.set_ylim(ymin=ymin,ymax=ymax)
         
         self.used_lines = 0
         lines = self.ax.get_lines()

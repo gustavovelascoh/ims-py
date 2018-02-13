@@ -1,0 +1,7 @@
+#!/bin/bash
+
+config_file=$1
+config_data=$(cat $config_file | tr -s '\n\t ' ' ')
+redis-cli hset ims config "$config_data"
+redis-cli hset ims base_path "/home/gustavo/devel/personal/python/ims-py/"
+
