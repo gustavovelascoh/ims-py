@@ -33,7 +33,7 @@ class SceneConfigViewer(tk.Frame):
         
         self.__generate_limits()
         
-        v.draw_img(self.ims_path + self.config["map"]["image_path"], limits=self.limits)
+        v.draw_img(self.ims_path + "/" +self.config["map"]["image_path"], limits=self.limits)
         
         for int_bb in self.config["intersection"]:
             pts = int_bb["bbox"]
