@@ -6,9 +6,15 @@ config_data=$(cat $config_file | tr -s '\n\t ' ' ')
 
 echo "Loading configuration file $1"
 
+redis-cli hset ims config_file "$IMS_PATH/$1"
 redis-cli hset ims config "$config_data"
 redis-cli hset ims base_path "$IMS_PATH"
 
 echo "Starting scene_config_viewer process"
 python3 $IMS_PATH/gui/scene_config_viewer.py &
+redis-cli lpush ims_pids $!
+
+echo "Starting ims_app process"
+redis-cli hset ims_app plot 1
+python3 $IMS_PATH/ims_app.py &
 redis-cli lpush ims_pids $!

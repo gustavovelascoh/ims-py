@@ -9,6 +9,7 @@ import threading
 import pickle
 from models.publisher import Publisher
 import json
+import redis
 
 class ImsApp(tk.Frame):
     def __init__(self, master):
@@ -136,9 +137,28 @@ class ImsApp(tk.Frame):
             self._next()
         
 if __name__ == "__main__":
+    
+    r = redis.StrictRedis()
+    
+    config_file = r.hget("ims", "config_file")
+    
+    if config_file is None:
+        print("No IMS config file found. Select one in the GUI")
+    else:
+        config_file = config_file.decode("utf-8")
+    
     main = tk.Tk()
     main.wm_title("Intersection Management System")
     # Code to add widgets will go here...
-    ImsApp(main).pack(side="top", fill="both", expand="True")
+    ims = ImsApp(main)
+    ims.pack(side="top", fill="both", expand="True")
+    
+    if config_file:
+        ims.dsc_frame.filename = config_file
+        ims._load_dataset()
+        
+        plot = r.hget("ims_app","plot")
+        ims.plot = int(plot.decode("utf-8"))
+    
     
     tk.mainloop()

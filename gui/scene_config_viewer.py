@@ -26,7 +26,7 @@ class SceneConfigViewer(tk.Frame):
         self.config = json.loads(config_b.decode("utf-8"))
         self.ims_path = path_b.decode("utf-8")
         
-        print(self.config)
+        #print(self.config)
         
         v = Viewer(self)
         v.pack()
