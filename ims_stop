@@ -1,0 +1,11 @@
+#!/bin/bash
+
+curr_pid=$(redis-cli lpop ims_pids)
+
+while [ $curr_pid ]; do
+	kill $curr_pid;
+	echo "Killing process $curr_pid"
+	curr_pid=$(redis-cli lpop ims_pids)
+done
+
+echo "All ims processes finished. Bye"
