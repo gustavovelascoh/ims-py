@@ -14,6 +14,10 @@ echo "Starting scene_config_viewer process"
 python3 $IMS_PATH/gui/scene_config_viewer.py &
 redis-cli lpush ims_pids $!
 
+echo "Starting legs_state_plotter process"
+python3 $IMS_PATH/utils/legs_state_plotter.py &
+redis-cli lpush ims_pids $!
+
 echo "Starting ims_app process"
 redis-cli hset ims_app plot 1
 python3 $IMS_PATH/ims_app.py &

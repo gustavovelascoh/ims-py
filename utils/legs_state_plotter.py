@@ -53,6 +53,6 @@ def subscriber_cb(msg):
     
     p.update(xmin=time_array[0], xmax=time_array[-1], ymin=0, ymax=1)
 
-s = Subscriber({"legs_state_plotter": subscriber_cb})
+s = Subscriber({"ims/legs/state_og": subscriber_cb})
 s.run()
 tk.mainloop()

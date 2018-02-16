@@ -97,7 +97,7 @@ class ImsApp(tk.Frame):
         self.ts = self.scene.ts
         
         data = {"ts": self.ts, "legs_state": self.scene.legs_state}
-        self.pub.publish("legs_state_plotter", json.dumps(data))
+        self.pub.publish("ims/legs/state_og", json.dumps(data))
         
         
         if self.save_file:
