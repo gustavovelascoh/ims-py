@@ -10,3 +10,6 @@ build/
 *.so
 *.c
 logs/*
+*.log
+*.pdf
+*.data
