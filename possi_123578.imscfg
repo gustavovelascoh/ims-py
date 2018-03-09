@@ -58,42 +58,42 @@
       "id": 0,
       "type": "departure",
       "heading": "N",
-      "bbox": [6.7, 17.0, 12.5, 28.5],
+      "bbox": [6.7, 25.0, 12.5, 26.0],
       "lanes": []
     },
     {
       "id": 1,
       "type": "approach",
       "heading": "E",
-      "bbox": [19.0, 2.45, 33.6, 11.5],
+      "bbox": [29.0, 2.45, 30.0, 14.5],
       "lanes": []
     },
     {
       "id": 2,
       "type": "departure",
       "heading": "E",
-      "bbox": [19.0, -19.3, 31.6, -9.45],
+      "bbox": [29.0, -19.3, 30.0, -9.45],
       "lanes": []
     },
     {
       "id": 3,
       "type": "approach",
       "heading": "W",
-      "bbox": [-19.1, -19.3, -7.5, -9.22],
+      "bbox": [-17.1, -18.3, -16.1, -9.22],
       "lanes": []
     },
     {
       "id": 4,
       "type": "departure",
       "heading": "W",
-      "bbox": [-20.1, 2.35, -7.5, 11.5],
+      "bbox": [-17.1, 4.35, -16.1, 14.5],
       "lanes": []
     },
     {
       "id": 5,
       "type": "approach",
       "heading": "N",
-      "bbox": [0.9, 17.0, 6.7, 28.5],
+      "bbox": [0.9, 25.0, 6.7, 26.0],
       "lanes": []
     }
   ],

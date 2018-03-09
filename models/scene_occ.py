@@ -13,9 +13,13 @@ from models.leg_cy import Leg
 from sklearn.cluster import DBSCAN
 from models.occupancygrid_cy import OccupancyGrid
 from models import sensor
+import cv2
+
+
 
 
 class SceneOcc():
+    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(5,5))
     sensors = {Sensor.TYPE_IMAGE: [],
                Sensor.TYPE_RANGE: [],
                }
@@ -278,7 +282,13 @@ class SceneOcc():
         
     def process_frame(self):
         last = self.preprocess_data()
-        self.occ_grid_th = self.occ_grid.get_grid(0.6)        
+        self.occ_grid_th = self.occ_grid.get_grid(0.5)
+        
+        #test opencv
+        #self.occ_grid_th = cv2.morphologyEx(self.occ_grid_th, cv2.MORPH_CLOSE, self.kernel)
+        #self.occ_grid_th = cv2.morphologyEx(self.occ_grid_th, cv2.MORPH_OPEN, self.kernel)
+        #end test opencv
+                
         self.process_legs()#method='queue')
         
         self.occ_grid_th3 = self.occ_grid_th * 255

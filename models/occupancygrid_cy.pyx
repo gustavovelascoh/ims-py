@@ -7,6 +7,8 @@ import numpy as np
 from builtins import int
 cimport numpy as np
 
+import cv2
+
 cdef class OccupancyGrid(object):
     '''
     classdocs
@@ -118,6 +120,7 @@ cdef class OccupancyGrid(object):
     def update(self):
         
         cdef int i,j
+        #kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(2,2))
         
         if self.method == "logodd":
             self.grid = np.array(self.meas_grid) + np.array(self.grid)           
@@ -126,6 +129,10 @@ cdef class OccupancyGrid(object):
             self.meas_grid = np.zeros((self.rows, self.cols))
         elif self.method == "velca":
             
+            #test opencv
+            #npgrid = cv2.morphologyEx(np.array(self.meas_grid), cv2.MORPH_CLOSE, kernel)
+            #self.meas_grid = cv2.morphologyEx(npgrid, cv2.MORPH_OPEN, kernel)
+            #end test opencv
 
             for i,r in enumerate(self.meas_grid):
                 for j,c in enumerate(r):
