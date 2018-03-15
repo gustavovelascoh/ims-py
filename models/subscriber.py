@@ -9,8 +9,8 @@ import redis
 class Subscriber(object):
     
     def __init__(self, handlers):
-        r = redis.StrictRedis(host='localhost', port=6379)
-        self.p = r.pubsub()# See https://github.com/andymccurdy/redis-py/#publish--subscribe
+        self.r = redis.StrictRedis(host='localhost', port=6379)
+        self.p = self.r.pubsub()# See https://github.com/andymccurdy/redis-py/#publish--subscribe
         self.p.subscribe(**handlers)
     
     def run(self):

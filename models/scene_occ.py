@@ -27,6 +27,7 @@ class SceneOcc():
     nf = 0
     ts = 0
     BLOB_TIMEOUT = 5000
+    ts_0 = []
     
     def __init__(self, config_file=None):
         
@@ -69,9 +70,11 @@ class SceneOcc():
                 lms.set_src_path(rs["src_path"])
                 self.add_sensor(lms)
                 lms.load()
+                self.ts_0.append(lms.ts_0)
             else:
                 raise NotImplementedError("type unsupported: %s" % rs["type"])
         print("Range sensors in the scene: %d" % len(self.sensors["range"]) + "\n")
+        print("ts_0: %s" % self.ts_0)
         
     def add_sensor(self, sensor):
         self.sensors[sensor.type].append(sensor)
@@ -143,7 +146,7 @@ class SceneOcc():
         self.occ_grid.update()
         #print(self.occ_grid.grid)
             
-        #print("ts_array: %s, span: %s" % (ts_array,(max(ts_array)-min(ts_array))))
+        print("ts_array: %s, span: %s" % (ts_array,(max(ts_array)-min(ts_array))))
         self.ts = max(ts_array)
         
         return last

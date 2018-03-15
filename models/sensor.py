@@ -82,6 +82,8 @@ class Laser(Sensor):
         self.bg_data = np.array(self.dataset["bg_model"]["data"])
         self.calib_data = self.dataset["calib_data"]
         print(self.calib_data)
+        
+        self.ts_0 = self.dataset["scans"][0]["ms"]
     
     def read_scan(self):
         #print(len(self.dataset["scans"]))

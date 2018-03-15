@@ -4,6 +4,8 @@ echo "IMS started"
 config_file=$1
 config_data=$(cat $config_file | tr -s '\n\t ' ' ')
 
+redis-cli flushdb
+
 echo "Loading configuration file $1"
 
 redis-cli hset ims config_file "$IMS_PATH/$1"
@@ -22,3 +24,5 @@ echo "Starting ims_app process"
 redis-cli hset ims_app plot 1
 python3 $IMS_PATH/ims_app.py &
 redis-cli lpush ims_pids $!
+
+#-----
