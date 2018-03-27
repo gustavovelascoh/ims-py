@@ -10,6 +10,7 @@ import pickle
 from models.publisher import Publisher
 import json
 import redis
+import time
 
 class ImsApp(tk.Frame):
     def __init__(self, master):
@@ -50,6 +51,7 @@ class ImsApp(tk.Frame):
         self.frame_cnt = 0
         
         self.pub = Publisher()
+        self.offset = None
         
     def _load_dataset(self):
         if self.dsc_frame.filename:
@@ -117,11 +119,22 @@ class ImsApp(tk.Frame):
     
     def _loop(self):
         self.loop = True
+        if self.offset is None:
+            
+            ts_min_b = self.pub.r.hget("ims","laser.t0_min")
+            ts_min = float(ts_min_b.decode("utf-8"))
+            
+            self.pub.r.hset("ims","ts.offset", time.time()-ts_min)
+            self.offset = self.pub.r.hget("ims","ts.offset")
+        
         t1 = threading.Thread(target=self._loop_thread)
         t1.start()
     
     def _stop(self):
         self.loop = False
+        
+        self.offset = None
+        self.pub.r.hdel("ims","ts.offset")
     
     def _loop_thread(self):
         while self.loop:
@@ -133,7 +146,10 @@ class ImsApp(tk.Frame):
                 #time.sleep((diff/1000.0)-self.elapsed_time)
 #                 print("Elapsed ts %s" % (self.ts - self.last_ts))
             else:
-                self.first_frame = False                
+                self.first_frame = False
+                
+                
+                                
             self._next()
         
 if __name__ == "__main__":
