@@ -14,7 +14,8 @@ from sklearn.cluster import DBSCAN
 from models.occupancygrid_cy import OccupancyGrid
 from models import sensor
 import cv2
-
+import redis
+import json
 
 
 
@@ -28,6 +29,7 @@ class SceneOcc():
     ts = 0
     BLOB_TIMEOUT = 5000
     ts_0 = []
+    r = redis.StrictRedis(host="localhost", port=6379)
     
     def __init__(self, config_file=None):
         
@@ -64,17 +66,24 @@ class SceneOcc():
             self.legs.append(leg)
         
     def import_range_sensors(self, sensor_list):
+        laser_names = []
+        
         for rs in sensor_list:
             if rs["subtype"] == "singlelayer":
                 lms = Laser(Laser.SUBTYPE_SINGLELAYER)
                 lms.set_src_path(rs["src_path"])
                 self.add_sensor(lms)
                 lms.load()
-                self.ts_0.append(lms.ts_0)
+                self.ts_0.append(lms.ts_0/1000.0)
+                laser_names.append(rs["name"])
             else:
                 raise NotImplementedError("type unsupported: %s" % rs["type"])
         print("Range sensors in the scene: %d" % len(self.sensors["range"]) + "\n")
         print("ts_0: %s" % self.ts_0)
+        
+        self.r.hset("ims","laser.list", json.dumps(laser_names))
+        self.r.hset("ims","laser.t0_list", json.dumps(self.ts_0))
+        self.r.hset("ims","laser.t0_min", json.dumps(min(self.ts_0)))
         
     def add_sensor(self, sensor):
         self.sensors[sensor.type].append(sensor)
