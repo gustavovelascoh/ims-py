@@ -88,7 +88,8 @@ class Laser(Sensor):
     def read_scan(self):
         #print(len(self.dataset["scans"]))
         self.bg_removed = False
-        self.scan = np.array(self.dataset["scans"][0]["data"])
+        #self.scan = np.array(self.dataset["scans"][0]["data"])
+        self.scan = self.dataset["scans"][0]["data"]
         self.ts = self.dataset["scans"][0]["ms"]
         #print(self.scan)
         del self.dataset["scans"][0]
