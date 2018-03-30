@@ -123,9 +123,12 @@ class ImsApp(tk.Frame):
             
             ts_min_b = self.pub.r.hget("ims","laser.t0_min")
             ts_min = float(ts_min_b.decode("utf-8"))
-            
-            self.pub.r.hset("ims","ts.offset", time.time()-ts_min)
-            self.offset = self.pub.r.hget("ims","ts.offset")
+            self.offset = time.time()-ts_min
+            self.pub.r.hset("ims","ts.offset", self.offset)
+            self.pub.publish("ims/run", json.dumps(
+                {"offset":self.offset}
+                ))
+            #self.offset = self.pub.r.hget("ims","ts.offset")
         
         t1 = threading.Thread(target=self._loop_thread)
         t1.start()
@@ -135,6 +138,9 @@ class ImsApp(tk.Frame):
         
         self.offset = None
         self.pub.r.hdel("ims","ts.offset")
+        self.pub.publish("ims/run", json.dumps(
+            {"offset":0}
+            ))
     
     def _loop_thread(self):
         while self.loop:

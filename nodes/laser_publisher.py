@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 '''
 Created on Mar 14, 2018
 
@@ -7,6 +8,7 @@ import argparse
 from models.sensor import Laser
 from models.subscriber import Subscriber
 import time
+import json
 
 description_str='Read dataset file and publish data to redis'
 parser = argparse.ArgumentParser(description=description_str)
@@ -20,9 +22,13 @@ print(args)
 
 print(args.name)
 
-def ctrl_hdlr(msg):
-    print(msg)
 
+offset = 0
+
+def ctrl_hdlr(msg):
+    global offset
+    data = json.loads(msg["data"].decode("utf-8"))
+    offset = data["offset"]
 #def get_offset():
 #    offset_b = subs.r.hget("ims","ts.offset")
 #    return float(offset_b.decode("utf-8")) if offset_b else None
@@ -47,10 +53,10 @@ last_scan = False
 
 while not last_scan:
     
-    offset_b = subs.r.hget("ims","ts.offset")
-    offset = float(offset_b.decode("utf-8")) if offset_b else None
+    #offset_b = subs.r.hget("ims","ts.offset")
+    #offset = float(offset_b.decode("utf-8")) if offset_b else None
     
-    if (offset):
+    if offset != 0:
         if not pend:
             last_scan = laser_scanner.read_scan()
         curr_ts = time.time()
@@ -69,6 +75,6 @@ while not last_scan:
     else:
         time.sleep(0.005)
         pend = 0
-        print("no off")
+        #print("no off")
     
     
