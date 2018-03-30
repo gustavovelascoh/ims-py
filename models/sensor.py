@@ -1,5 +1,6 @@
 import pickle
 import numpy as np
+import redis
 
 
 
@@ -29,6 +30,7 @@ class Sensor():
     
     def __init__(self,sensor_type):
         self.type = sensor_type
+        self.r = redis.StrictRedis()
 
     def set_src_type(self, src_type):
         self.src_type = src_type
@@ -54,9 +56,12 @@ class Laser(Sensor):
     scan = None
     ts = None
     bg_removed = False
+    name = None
     
-    def __init__(self, laser_type):
+    def __init__(self, laser_type, name=None):
         self.subtype = laser_type
+        if name:
+            self.name = name
         super().__init__(Sensor.TYPE_RANGE)
     
     def load(self):
@@ -84,6 +89,12 @@ class Laser(Sensor):
         print(self.calib_data)
         
         self.ts_0 = self.dataset["scans"][0]["ms"]
+        
+        if self.name:
+            self.r.hset("ims","laser."+self.name+".calib_data",
+                        self.calib_data)
+            self.r.hset("ims","laser."+self.name+".bg_model",
+                        self.bg_data)
     
     def read_scan(self):
         #print(len(self.dataset["scans"]))

@@ -30,7 +30,7 @@ def ctrl_hdlr(msg):
 ctrl_channel = "ims/run"
 output_channel = "ims/laser/"+args.name+"/raw"
 
-laser_scanner = Laser(Laser.SUBTYPE_SINGLELAYER)
+laser_scanner = Laser(Laser.SUBTYPE_SINGLELAYER, name=args.name)
 laser_scanner.set_src_path(args.dataset)
 laser_scanner.load()
 
