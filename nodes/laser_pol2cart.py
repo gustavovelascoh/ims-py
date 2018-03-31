@@ -5,8 +5,10 @@ Created on Mar 29, 2018
 '''
 import argparse
 from models.sensor import Laser
+from models.sensor import pol2cart
 from models.subscriber import Subscriber
 import time
+import numpy as np
 
 description_str='Subscribe to laser data in polar coordinates and transform \
                 it into cartesian coordinates referenced to global system.\n\
@@ -34,5 +36,16 @@ LASER_CHANNEL = args.name+"/"+args.channel
 POLAR_DATA_CHANNEL = "ims/laser/"+ LASER_CHANNEL
 CART_DATA_CHANNEL = POLAR_DATA_CHANNEL + "/cart"
 LASER_MODEL_VAR = "laser." + args.name + ".calib_data"
+DEFAULT_THETA = np.arange(0, 180.5, 0.5)
 
+
+def polar_data_handler(msg):
+    data = dict(msg["data"].decode("utf-8"))
+    
+    rho = np.array(data["data"])
+    
+    if "theta" in data.keys():
+        theta = np.array(data["theta"])
+    else:
+        theta = DEFAULT_THETA
 
