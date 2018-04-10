@@ -38,14 +38,41 @@ CART_DATA_CHANNEL = POLAR_DATA_CHANNEL + "/cart"
 LASER_MODEL_VAR = "laser." + args.name + ".calib_data"
 DEFAULT_THETA = np.arange(0, 180.5, 0.5)
 
+class Laser_Pol2Cart():
+    def __init__(self):
+        self.s = Subscriber({POLAR_DATA_CHANNEL: self.polar_data_handler})
+    
+        self.CALIB_DATA = dict(self.s.r.hget("ims", LASER_MODEL_VAR))
+        self.d_th = self.CALIB_DATA["ang"]
+        self.d_x = self.CALIB_DATA["sx"]
+        self.d_y = self.CALIB_DATA["sy"]
+    
+    
+    def polar_data_handler(self, msg):
+        data = dict(msg["data"].decode("utf-8"))
+        
+        rho = np.array(data["data"])
+        
+        theta = []
+        
+        if "theta" in data.keys():
+            theta = np.array(data["theta"])
+        else:
+            theta = DEFAULT_THETA
+        
+        phi = theta + self.d_th
+        
+        cart_data={}        
+        cart_data["x"], cart_data["y"] = pol2cart(rho, phi)
+        cart_data["x"] += self.d_x
+        cart_data["y"] += self.d_y
+        cart_data["ts"] = data["ts"]
+        
+        self.s.p.publish(CART_DATA_CHANNEL, cart_data)
 
-def polar_data_handler(msg):
-    data = dict(msg["data"].decode("utf-8"))
-    
-    rho = np.array(data["data"])
-    
-    if "theta" in data.keys():
-        theta = np.array(data["theta"])
-    else:
-        theta = DEFAULT_THETA
+l = Laser_Pol2Cart()
+l.s.run()
+
+while True:
+    time.sleep(0.001)
 
