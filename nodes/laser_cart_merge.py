@@ -1,0 +1,83 @@
+'''
+Created on May 7, 2018
+
+@author: gustavo
+'''
+import argparse
+
+description_str='Subscribe to diferent laser channels with cartesian data, \
+                merge it and publishes it into a new channel'
+parser = argparse.ArgumentParser(description=description_str)
+
+chs_help = "List of channels with cartesian data"
+parser.add_argument('--input-channels','-ichs',
+                    nargs='+',
+                    metavar='ICH',
+                    help=chs_help)
+
+och_help = "Channel with merged data"
+parser.add_argument('--output-channel','-och',
+                    nargs='+',
+                    metavar='OCH',
+                    help=och_help)
+
+ts_help = "timeslot in milliseconds"
+parser.add_argument('--timeslot','-ts',
+                    metavar='TS',
+                    help=ts_help)
+
+args = parser.parse_args()
+
+
+from models.subscriber import Subscriber
+import time
+
+class LaserCartMerge():
+    def __init__(self, channels_list, output_channel, ts=30):
+        
+        self.ts = ts
+        self.ts_secs = self.ts / 1000.0
+        self.output_channel = output_channel
+        ch_dict = {}
+        for ch in channels_list:
+            ch_dict[ch] = self.data_handler
+            
+        self.s = Subscriber(ch_dict)
+        self.data_buffer = {}
+        self.data4merging = {}
+        self.busy = False
+        self.merged_data = {}
+    
+    def data_handler(self, msg):
+        while self.busy:
+            time.sleep(0.005)
+            
+        print(msg)
+        # TODO: store data in buffer 
+    
+    def run_subscriber(self):
+        self.s.run()
+        
+    def loop(self):
+        time.sleep(self.ts_secs)        
+        self.merge_data()
+        self.publish_data()
+        
+    
+    def merge_data(self):
+        self.busy = True        
+        self.data4merging = self.data_buffer
+        self.busy = False
+        
+        self.merged_data = {'x': [], 'y': [], 'ts': 0}
+        for data in self.data4merging.items():
+            self.merged_data['x'] += data['x']
+            self.merged_data['y'] += data['y']
+            self.merged_data['ts'] += data['ts']
+        
+        self.merged_data['ts'] = min(self.merged_data['ts'])
+        
+        
+        
+    def publish_data(self):
+        self.s.p.publish(self.output_channel, self.merged_data)
