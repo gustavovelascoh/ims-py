@@ -70,7 +70,7 @@ class SceneOcc():
         
         for rs in sensor_list:
             if rs["subtype"] == "singlelayer":
-                lms = Laser(Laser.SUBTYPE_SINGLELAYER)
+                lms = Laser(Laser.SUBTYPE_SINGLELAYER,rs["name"])
                 lms.set_src_path(rs["src_path"])
                 self.add_sensor(lms)
                 lms.load()
