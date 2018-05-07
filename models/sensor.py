@@ -1,6 +1,7 @@
 import pickle
 import numpy as np
 import redis
+import json
 
 
 
@@ -89,10 +90,9 @@ class Laser(Sensor):
         print(self.calib_data)
         
         self.ts_0 = self.dataset["scans"][0]["ms"]
-        
         if self.name:
             self.r.hset("ims","laser."+self.name+".calib_data",
-                        self.calib_data)
+                        json.dumps(self.calib_data))
             self.r.hset("ims","laser."+self.name+".bg_model",
                         self.bg_data)
     
