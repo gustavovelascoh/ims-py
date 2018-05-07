@@ -66,7 +66,7 @@ while not last_scan:
             print("%s publish raw %s %s" % (pub, laser_scanner.ts/1000.0, curr_ts-offset))
             message = {"ts": offset + laser_scanner.ts/1000.0,
                        "data": laser_scanner.scan}
-            subs.r.publish(output_channel, message)
+            subs.r.publish(output_channel, json.dumps(message))
             pend = 0
         else:
             pend = 1

@@ -8,6 +8,7 @@ from models.sensor import Laser
 from models.sensor import pol2cart
 from models.subscriber import Subscriber
 import time
+import json
 import numpy as np
 
 description_str='Subscribe to laser data in polar coordinates and transform \
@@ -42,14 +43,16 @@ class Laser_Pol2Cart():
     def __init__(self):
         self.s = Subscriber({POLAR_DATA_CHANNEL: self.polar_data_handler})
     
-        self.CALIB_DATA = dict(self.s.r.hget("ims", LASER_MODEL_VAR))
+        self.CALIB_DATA = json.loads(self.s.r.hget("ims", LASER_MODEL_VAR).decode("utf-8"))
         self.d_th = self.CALIB_DATA["ang"]
         self.d_x = self.CALIB_DATA["sx"]
         self.d_y = self.CALIB_DATA["sy"]
     
     
     def polar_data_handler(self, msg):
-        data = dict(msg["data"].decode("utf-8"))
+        data_str = msg["data"].decode("utf-8")
+        print(data_str)
+        data = json.loads(data_str)
         
         rho = np.array(data["data"])
         
