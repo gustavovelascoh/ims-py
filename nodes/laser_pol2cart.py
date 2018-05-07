@@ -25,7 +25,7 @@ parser.add_argument('name',
 channel_help = "channel within laser namespace. e.g. raw, no_bg"
 parser.add_argument('channel',
                     metavar='CHANNEL',
-                    help=name_help)
+                    help=channel_help)
 
 args = parser.parse_args()
 
