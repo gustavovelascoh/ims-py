@@ -31,6 +31,7 @@ args = parser.parse_args()
 
 from models.subscriber import Subscriber
 import time
+import json
 
 class LaserCartMerge():
     def __init__(self, channels_list, output_channel, ts=30):
@@ -51,33 +52,50 @@ class LaserCartMerge():
     def data_handler(self, msg):
         while self.busy:
             time.sleep(0.005)
-            
-        print(msg)
-        # TODO: store data in buffer 
+                    
+        channel = msg["channel"].decode("utf-8")
+        data_str = msg["data"].decode("utf-8")
+        # TODO: store data in buffer
+        self.data_buffer[channel] = json.loads(data_str)
     
     def run_subscriber(self):
         self.s.run()
         
     def loop(self):
-        time.sleep(self.ts_secs)        
-        self.merge_data()
-        self.publish_data()
+        while True:
+            time.sleep(self.ts_secs)
+            
+            if self.data_buffer:        
+                self.merge_data()
+                self.publish_data()
         
     
     def merge_data(self):
+        
         self.busy = True        
         self.data4merging = self.data_buffer
         self.busy = False
         
-        self.merged_data = {'x': [], 'y': [], 'ts': 0}
-        for data in self.data4merging.items():
+        print("d4m %s" % self.data4merging.keys())
+        
+        self.merged_data = {'x': [], 'y': [], 'ts': []}
+        for data in self.data4merging.values():
+            #print(data)
             self.merged_data['x'] += data['x']
             self.merged_data['y'] += data['y']
-            self.merged_data['ts'] += data['ts']
+            self.merged_data['ts'] += [data['ts']]
         
-        self.merged_data['ts'] = min(self.merged_data['ts'])
+        if len(self.merged_data['ts']) > 1:
+            self.merged_data['ts'] = min(self.merged_data['ts'])
         
-        
+        print("md %s" % self.merged_data)
         
     def publish_data(self):
-        self.s.p.publish(self.output_channel, self.merged_data)
+        self.s.r.publish(self.output_channel, self.merged_data)
+        
+lcm = LaserCartMerge(args.input_channels, args.output_channel)
+print(1)
+lcm.run_subscriber()
+print(2)
+lcm.loop()
+print(3)
