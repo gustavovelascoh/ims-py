@@ -44,9 +44,9 @@ class Laser_Pol2Cart():
         self.s = Subscriber({POLAR_DATA_CHANNEL: self.polar_data_handler})
     
         self.CALIB_DATA = json.loads(self.s.r.hget("ims", LASER_MODEL_VAR).decode("utf-8"))
-        self.d_th = self.CALIB_DATA["ang"]
-        self.d_x = self.CALIB_DATA["sx"]
-        self.d_y = self.CALIB_DATA["sy"]
+        self.d_th = float(self.CALIB_DATA["ang"])
+        self.d_x = float(self.CALIB_DATA["sx"])
+        self.d_y = float(self.CALIB_DATA["sy"])
     
     
     def polar_data_handler(self, msg):
@@ -67,11 +67,11 @@ class Laser_Pol2Cart():
         
         cart_data={}        
         cart_data["x"], cart_data["y"] = pol2cart(rho, phi)
-        cart_data["x"] += self.d_x
-        cart_data["y"] += self.d_y
+        cart_data["x"] = (cart_data["x"] + self.d_x).tolist()
+        cart_data["y"] = (cart_data["y"] + self.d_y).tolist()
         cart_data["ts"] = data["ts"]
         
-        self.s.p.publish(CART_DATA_CHANNEL, cart_data)
+        self.s.r.publish(CART_DATA_CHANNEL, json.dumps(cart_data))
 
 l = Laser_Pol2Cart()
 l.s.run()
