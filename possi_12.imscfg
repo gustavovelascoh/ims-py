@@ -1,0 +1,95 @@
+{
+  "name": "possi_12",
+  "map": {
+      "image_path": "possi/image.bmp",
+      "scale" : 4.1345,
+      "max_x" : 300,
+      "max_y" : 225,
+      "d_x" : -30.2,
+      "d_y" : -24,
+      "roi" : {
+          "ymin": -24,
+          "ymax": 30,
+          "xmin": -30,
+          "xmax":40
+      }
+  },
+  "cameras": {},
+  "range_sensors": [
+    {
+      "name": "lms1",
+      "type": "range",
+      "subtype": "singlelayer",
+      "src_path": "possi/possi.lms1"
+    },
+    {
+      "name": "lms2",
+      "type": "range",
+      "subtype": "singlelayer",
+      "src_path": "possi/possi.lms2"
+    }
+  ],
+  "legs": [ 
+    {
+      "id": 0,
+      "type": "departure",
+      "heading": "N",
+      "bbox": [6.7, 25.0, 12.5, 26.0],
+      "lanes": []
+    },
+    {
+      "id": 1,
+      "type": "approach",
+      "heading": "E",
+      "bbox": [29.0, 2.45, 30.0, 14.5],
+      "lanes": []
+    },
+    {
+      "id": 2,
+      "type": "departure",
+      "heading": "E",
+      "bbox": [29.0, -19.3, 30.0, -9.45],
+      "lanes": []
+    },
+    {
+      "id": 3,
+      "type": "approach",
+      "heading": "W",
+      "bbox": [-17.1, -18.3, -16.1, -9.22],
+      "lanes": []
+    },
+    {
+      "id": 4,
+      "type": "departure",
+      "heading": "W",
+      "bbox": [-17.1, 4.35, -16.1, 14.5],
+      "lanes": []
+    },
+    {
+      "id": 5,
+      "type": "approach",
+      "heading": "N",
+      "bbox": [0.9, 25.0, 6.7, 26.0],
+      "lanes": []
+    }
+  ],
+  "intersection":
+  [
+      {
+      "id": 0,
+      "bbox": [6.7, -3.5, 15.75, 13.75]
+      },
+      {
+      "id": 1,
+      "bbox": [6.7, -19.3, 15.75, -3.5]
+      },
+      {
+      "id": 2,
+      "bbox": [-3.3, -19.3, 6.7, -3.5]
+      },
+      {
+      "id": 3,
+      "bbox": [-3.3, -19.3, 6.7, 13.75]
+      }
+  ]
+}
