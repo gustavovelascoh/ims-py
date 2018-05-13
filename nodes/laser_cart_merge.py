@@ -94,8 +94,5 @@ class LaserCartMerge():
         self.s.r.publish(self.output_channel, self.merged_data)
         
 lcm = LaserCartMerge(args.input_channels, args.output_channel)
-print(1)
 lcm.run_subscriber()
-print(2)
 lcm.loop()
-print(3)
