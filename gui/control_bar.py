@@ -9,16 +9,16 @@ import tkinter as tk
 class ControlBar(tk.Frame):
     
     _next = None
-    _loop = None
+    _start = None
     _stop = None
     
-    def __init__(self, master, next_cb=None, loop_cb=None, stop_cb=None):
+    def __init__(self, master, next_cb=None, start_cb=None, stop_cb=None):
         
         if next_cb:
             self._next = next_cb
         
-        if loop_cb:
-            self._loop = loop_cb
+        if start_cb:
+            self._start = start_cb
         
         if stop_cb:
             self._stop = stop_cb    
@@ -29,8 +29,8 @@ class ControlBar(tk.Frame):
         nbutton = tk.Button(toolbar_frame, text="Next",
                            command=self._next)
         nbutton.pack(side="left")
-        lbutton = tk.Button(toolbar_frame, text="Loop",
-                           command=self._loop)
+        lbutton = tk.Button(toolbar_frame, text="Start",
+                           command=self._start)
         lbutton.pack(side="left")
         sbutton = tk.Button(toolbar_frame, text="Stop",
                            command=self._stop)
