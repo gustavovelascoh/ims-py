@@ -18,7 +18,10 @@ class CtrlBar(tk.Frame):
         self.pub = Publisher()
         self.offset = None
         
-        control_bar = ControlBar(self.master).pack()
+        control_bar = ControlBar(self.master,
+                                 start_cb=self._start,
+                                 stop_cb=self._stop)
+        control_bar.pack()
       
     
     def _start(self):
@@ -43,6 +46,12 @@ class CtrlBar(tk.Frame):
             ))
     
 
-if __name__ = "__main__":
-    pass
+if __name__ == "__main__":
+    main = tk.Tk()
+    main.wm_title("Intersection Management System")
+    
+    ctrl_bar = CtrlBar(main)
+    ctrl_bar.pack()
+    
+    tk.mainloop()
     
