@@ -25,7 +25,17 @@ class ImsMain(tk.Frame):
                                  start_cb=self._start,
                                  stop_cb=self._stop)
         control_bar.pack()
-      
+        
+        rs_ts_0_b = self.pub.r.lrange("ims.rs.ts_0", 0, -1)
+        
+        while len(rs_ts_0_b) < len(s.config["range_sensors"]):
+            time.sleep(1)
+            rs_ts_0_b = self.pub.r.lrange("ims.rs.ts_0", 0, -1)
+
+        rs_ts_0 = [float(x) for x in rs_ts_0_b]
+        
+        self.pub.r.hset("ims","laser.t0_list", json.dumps(rs_ts_0))
+        self.pub.r.hset("ims","laser.t0_min", json.dumps(min(rs_ts_0)))
     
     def _start(self):
         self.loop = True

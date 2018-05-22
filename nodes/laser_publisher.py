@@ -46,6 +46,8 @@ laser_scanner.load()
 subs = Subscriber({ctrl_channel: ctrl_hdlr})
 subs.run()
 
+subs.r.rpush("ims.rs.ts_0",laser_scanner.ts_0/1000.0)
+
 pend = 0
 pub = 0
 

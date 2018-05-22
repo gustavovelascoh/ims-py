@@ -22,7 +22,7 @@ class SceneConfigViewer(tk.Frame):
         if config_b is None:
             print("No IMS config found. exiting")
         
-        print("b ",config_b.decode("utf-8"))
+        #print("b ",config_b.decode("utf-8"))
         self.config = json.loads(config_b.decode("utf-8"))
         self.ims_path = path_b.decode("utf-8")
         
@@ -43,6 +43,16 @@ class SceneConfigViewer(tk.Frame):
             pts = leg_bb["bbox"]
             v.plot_box(pts[0], pts[1], pts[2]-pts[0], pts[3]-pts[1],edgecolor="blue")
     
+        rs_src_list_str = ""
+        rs_name_list_str = ""
+        
+        for rs in self.config["range_sensors"]:
+            rs_src_list_str += rs["src_path"] + " "
+            rs_name_list_str += rs["name"] + " "
+            r.set("ims.rs."+rs["name"]+".src",rs["src_path"])
+        
+        r.set("ims.rs_name_list", rs_name_list_str)
+            
     def __generate_limits(self):
         map_scale = self.config["map"]["scale"]
         max_x = self.config["map"]["max_x"]
