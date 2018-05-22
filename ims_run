@@ -21,17 +21,28 @@ redis-cli hset ims config_file "$IMS_PATH/$1"
 redis-cli hset ims config "$config_data"
 redis-cli hset ims base_path "$IMS_PATH"
 
-echo "Starting scene_config_viewer process"
-python3 $IMS_PATH/gui/scene_config_viewer.py &
+echo "Starting ims_main process"
+python3 $IMS_PATH/nodes/ims_main.py &
 redis-cli lpush ims_pids $!
 
 echo "Starting legs_state_plotter process"
 python3 $IMS_PATH/utils/legs_state_plotter.py &
 redis-cli lpush ims_pids $!
 
-echo "Starting ims_app process"
-redis-cli hset ims_app plot 1
-python3 $IMS_PATH/ims_app.py &
-redis-cli lpush ims_pids $!
+sleep 1
+
+# start range publishers
+rs_name_list=$(redis-cli get ims.rs_name_list)
+
+for i in $rs_name_list
+do
+	rs_src=$(redis-cli get ims.rs.$i.src)
+	echo "Starting publisher for range sensor $i: $rs_src"
+	
+	python3 $IMS_PATH/nodes/laser_publisher.py $i $rs_src &
+	redis-cli lpush ims_pids $!
+done
+
+echo $rs_name_list[1]
 
 #-----
