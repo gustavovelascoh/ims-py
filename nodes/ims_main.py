@@ -6,11 +6,12 @@ Created on May 13, 2018
 import tkinter as tk
 from models.publisher import Publisher
 from gui.control_bar import ControlBar
+from gui.scene_config_viewer import SceneConfigViewer
 import json
 import time
 
 
-class CtrlBar(tk.Frame):
+class ImsMain(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master)
         self.master = master
@@ -18,6 +19,8 @@ class CtrlBar(tk.Frame):
         self.pub = Publisher()
         self.offset = None
         
+        s = SceneConfigViewer(self.master)
+        s.pack()        
         control_bar = ControlBar(self.master,
                                  start_cb=self._start,
                                  stop_cb=self._stop)
@@ -50,7 +53,7 @@ if __name__ == "__main__":
     main = tk.Tk()
     main.wm_title("Intersection Management System")
     
-    ctrl_bar = CtrlBar(main)
+    ctrl_bar = ImsMain(main)
     ctrl_bar.pack()
     
     tk.mainloop()

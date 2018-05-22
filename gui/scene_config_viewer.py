@@ -6,7 +6,7 @@ Created on Feb 8, 2018
 
 import redis
 import json
-from viewer import Viewer
+from gui.viewer import Viewer
 import tkinter as tk
 import numpy as np
 
@@ -56,11 +56,11 @@ class SceneConfigViewer(tk.Frame):
                              ))
 
 
-
-main = tk.Tk()
-main.wm_title("Scene config viewer")
-s = SceneConfigViewer(main)
-# Code to add widgets will go here...
-s.pack()#(side="top", fill="both", expand="True")
-
-tk.mainloop()
+if __name__ == "__main__":
+    main = tk.Tk()
+    main.wm_title("Scene config viewer")
+    s = SceneConfigViewer(main)
+    # Code to add widgets will go here...
+    s.pack()#(side="top", fill="both", expand="True")
+    
+    tk.mainloop()
