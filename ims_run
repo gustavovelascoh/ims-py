@@ -37,10 +37,17 @@ rs_name_list=$(redis-cli get ims.rs_name_list)
 for i in $rs_name_list
 do
 	rs_src=$(redis-cli get ims.rs.$i.src)
-	echo "Starting publisher for range sensor $i: $rs_src"
 	
+	echo "Starting publisher for range sensor $i: $rs_src"	
 	python3 $IMS_PATH/nodes/laser_publisher.py $i $rs_src &
 	redis-cli lpush ims_pids $!
+	
+	sleep 0.5
+	
+	echo "Starting pol2cart for range sensor $i: $rs_src"	
+	python3 $IMS_PATH/nodes/laser_pol2cart.py $i "raw" &
+	redis-cli lpush ims_pids $!
+	
 done
 
 echo $rs_name_list[1]
