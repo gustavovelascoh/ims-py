@@ -18,11 +18,6 @@ parser.add_argument('name',
 parser.add_argument('dataset', help="dataset file")
 args = parser.parse_args()
 
-print(args)
-
-print(args.name)
-
-
 offset = 0
 
 def ctrl_hdlr(msg):
@@ -65,7 +60,7 @@ while not last_scan:
         
         if laser_scanner.ts/1000.0 <= curr_ts-offset:
             pub +=1
-            print("%s publish raw %s %s" % (pub, laser_scanner.ts/1000.0, curr_ts-offset))
+            #print("%s publish raw %s %s" % (pub, laser_scanner.ts/1000.0, curr_ts-offset))
             message = {"ts": offset + laser_scanner.ts/1000.0,
                        "data": laser_scanner.scan}
             subs.r.publish(output_channel, json.dumps(message))
@@ -73,7 +68,7 @@ while not last_scan:
         else:
             pend = 1
             time.sleep(0.005)
-            print("pend")
+            #print("pend")
     else:
         time.sleep(0.005)
         pend = 0

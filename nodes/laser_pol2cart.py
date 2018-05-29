@@ -51,7 +51,7 @@ class Laser_Pol2Cart():
     
     def polar_data_handler(self, msg):
         data_str = msg["data"].decode("utf-8")
-        print(data_str)
+        #print(data_str)
         data = json.loads(data_str)
         
         rho = np.array(data["data"])
