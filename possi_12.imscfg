@@ -20,13 +20,15 @@
       "name": "lms1",
       "type": "range",
       "subtype": "singlelayer",
-      "src_path": "possi/possi.lms1"
+      "src_path": "possi/possi_lms1.data",
+      "cfg_path": "possi/possi_lms1.cfg"
     },
     {
       "name": "lms2",
       "type": "range",
       "subtype": "singlelayer",
-      "src_path": "possi/possi.lms2"
+      "src_path": "possi/possi_lms2.data",
+      "cfg_path": "possi/possi_lms2.cfg"
     }
   ],
   "legs": [ 
