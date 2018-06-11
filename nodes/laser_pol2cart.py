@@ -63,12 +63,15 @@ class Laser_Pol2Cart():
         else:
             theta = DEFAULT_THETA
         
+        theta = theta * np.pi / 180.0
         phi = theta + self.d_th
         
         cart_data={}        
         cart_data["x"], cart_data["y"] = pol2cart(rho, phi)
-        cart_data["x"] = (cart_data["x"] + self.d_x).tolist()
-        cart_data["y"] = (cart_data["y"] + self.d_y).tolist()
+        
+        #print("R:%s, P:%s, %s, %s" % (rho,phi, cart_data["x"], cart_data["y"]))
+        cart_data["x"] = (cart_data["x"] + self.d_x*100).tolist()
+        cart_data["y"] = (cart_data["y"] + self.d_y*100).tolist()
         cart_data["ts"] = data["ts"]
         
         self.s.r.publish(CART_DATA_CHANNEL, json.dumps(cart_data))
