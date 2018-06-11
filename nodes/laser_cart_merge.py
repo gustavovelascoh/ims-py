@@ -17,7 +17,6 @@ parser.add_argument('--input-channels','-ichs',
 
 och_help = "Channel with merged data"
 parser.add_argument('--output-channel','-och',
-                    nargs='+',
                     metavar='OCH',
                     help=och_help)
 
@@ -85,13 +84,15 @@ class LaserCartMerge():
             self.merged_data['y'] += data['y']
             self.merged_data['ts'] += [data['ts']]
         
+        print("md ts %s" % self.merged_data['ts'])
+        
         if len(self.merged_data['ts']) > 1:
             self.merged_data['ts'] = min(self.merged_data['ts'])
         
-        print("md %s" % self.merged_data)
+        print("md lens x:%s" % (len(self.merged_data['x'])))
         
     def publish_data(self):
-        self.s.r.publish(self.output_channel, self.merged_data)
+        self.s.r.publish(self.output_channel, json.dumps(self.merged_data))
         
 lcm = LaserCartMerge(args.input_channels, args.output_channel)
 lcm.run_subscriber()
