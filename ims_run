@@ -29,7 +29,7 @@ echo "Starting legs_state_plotter process"
 python3 $IMS_PATH/utils/legs_state_plotter.py &
 redis-cli lpush ims_pids $!
 
-sleep 1
+sleep 2
 
 # start range publishers
 rs_name_list=$(redis-cli get ims.rs_name_list)
@@ -44,8 +44,14 @@ do
 	
 	sleep 0.5
 	
+	echo "Starting bg_remove for range sensor $i: $rs_src"	
+	python3 $IMS_PATH/nodes/laser_bg_remove.py $i &
+	redis-cli lpush ims_pids $!
+	
+	sleep 0.5
+	
 	echo "Starting pol2cart for range sensor $i: $rs_src"	
-	python3 $IMS_PATH/nodes/laser_pol2cart.py $i "raw" &
+	python3 $IMS_PATH/nodes/laser_pol2cart.py $i "no_bg" &
 	redis-cli lpush ims_pids $!
 	
 done
