@@ -94,7 +94,7 @@ class Laser(Sensor):
             self.r.hset("ims","laser."+self.name+".calib_data",
                         json.dumps(self.calib_data))
             self.r.hset("ims","laser."+self.name+".bg_model",
-                        self.bg_data)
+                        json.dumps({"bg_model": self.bg_data.tolist()}))
     
     def read_scan(self):
         #print(len(self.dataset["scans"]))
