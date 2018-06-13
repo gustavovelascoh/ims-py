@@ -82,7 +82,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     main = tk.Tk()
-    main.wm_title("Data viewer")
+    main.wm_title(args.channel)
     
     dv = DataViewer(main, args.channel, args.datatype)
     tk.mainloop()
