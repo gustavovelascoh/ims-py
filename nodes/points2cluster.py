@@ -26,7 +26,9 @@ class Points2Clusters():
         
         clusters_msg = {}
         clusters_msg["ts"] = data["ts"]
-        clusters_msg["data"] = self.get_clusters(xydata)
+        clusters_dict = self.get_clusters(xydata)
+        clusters_msg["data"] = clusters_dict["list"]
+        clusters_msg["n_clusters"] = clusters_dict["n_clusters"]
         clusters_msg["curr_ts"] = time.time()
         print(clusters_msg)
         self.s.r.publish(self.out_ch, json.dumps(clusters_msg))
@@ -56,9 +58,6 @@ class Points2Clusters():
                     clus_msg = {"x": clus_data[:,0].tolist(),
                                 "y": clus_data[:,1].tolist(),
                                 "id": int(k)}
-                    print(type(clus_msg["x"]))
-                    print(type(clus_msg["y"]))
-                    print(type(clus_msg["id"]))
                     clusters_msg["list"].append(clus_msg)
         #print(xydata)
         return clusters_msg
