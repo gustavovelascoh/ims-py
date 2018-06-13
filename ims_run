@@ -65,6 +65,10 @@ echo "Starting laser_cart_merge node"
 python3 nodes/laser_cart_merge.py -ichs $out_ch_list -och ims/laser/all/no_bg/cart &
 redis-cli lpush ims_pids $!
 
+echo "Starting points2cluster_merge node"
+python3 nodes/points2cluster.py ims/laser/all/no_bg/cart ims/laser/clusters &
+redis-cli lpush ims_pids $!
+
 
 
 #-----
