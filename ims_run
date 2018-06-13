@@ -34,6 +34,8 @@ sleep 2
 # start range publishers
 rs_name_list=$(redis-cli get ims.rs_name_list)
 
+out_ch_list = ""
+
 for i in $rs_name_list
 do
 	rs_src=$(redis-cli get ims.rs.$i.src)
@@ -54,8 +56,15 @@ do
 	python3 $IMS_PATH/nodes/laser_pol2cart.py $i "no_bg" &
 	redis-cli lpush ims_pids $!
 	
+	out_ch="ims/laser/$i/no_bg/cart"
+	out_ch_list="$out_ch_list $out_ch"
+	
 done
 
-echo $rs_name_list[1]
+echo "Starting laser_cart_merge node"
+python3 nodes/laser_cart_merge.py -ichs $out_ch_list -och ims/laser/all/no_bg/cart &
+redis-cli lpush ims_pids $!
+
+
 
 #-----
