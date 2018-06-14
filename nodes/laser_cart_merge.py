@@ -73,9 +73,10 @@ class LaserCartMerge():
         
         self.busy = True        
         self.data4merging = self.data_buffer
+        self.data_buffer = []
         self.busy = False
         
-        print("d4m %s" % self.data4merging.keys())
+        #print("d4m %s" % self.data4merging.keys())
         
         self.merged_data = {'x': [], 'y': [], 'ts': []}
         for data in self.data4merging.values():
@@ -84,12 +85,12 @@ class LaserCartMerge():
             self.merged_data['y'] += data['y']
             self.merged_data['ts'] += [data['ts']]
         
-        print("md ts %s" % self.merged_data['ts'])
+        #print("md ts %s" % self.merged_data['ts'])
         
         if len(self.merged_data['ts']) > 1:
             self.merged_data['ts'] = min(self.merged_data['ts'])
         
-        print("md lens x:%s" % (len(self.merged_data['x'])))
+        #print("md lens x:%s" % (len(self.merged_data['x'])))
         
     def publish_data(self):
         self.s.r.publish(self.output_channel, json.dumps(self.merged_data))
