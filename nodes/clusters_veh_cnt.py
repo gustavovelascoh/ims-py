@@ -4,8 +4,10 @@ Created on Jun 13, 2018
 @author: gustavo
 '''
 import json
+import time
 from models.subscriber import Subscriber
-from scipy import cluster
+import numpy as np
+
 
 
 class ClustersVehCnt():
@@ -23,6 +25,18 @@ class ClustersVehCnt():
                 
         bbox_list = self.generate_bbox(data["data"])
         
+        self.check_overlap(bbox_list)
+        
+        #for x in self.vsens:
+            #print(x)
+        
+        vsens_msg = {}
+        vsens_msg["ts"] = data["ts"]
+        vsens_msg["data"] = self.vsens
+        vsens_msg["curr_ts"] = time.time()
+        
+        self.s.r.publish("ims/legs/state", json.dumps(vsens_msg))
+        
     def get_legs_config(self):
         full_cfg_str = self.s.r.hget("ims", "config").decode("utf-8")
         full_cfg = json.loads(full_cfg_str)
@@ -36,10 +50,12 @@ class ClustersVehCnt():
 
             vsens_pts = leg["vsens"]["0"]
             vsens_dict = {id_str: vsens_pts }
-            vsens_dict["area"] = self.get_vsense_area(vsens_pts)
+            vsens_dict["pts"] = vsens_pts
+            vsens_dict["area"] = self.get_area(vsens_pts)
+            vsens_dict["last_occ"] = 0
             self.vsens.append(vsens_dict)
         
-    def get_vsense_area(self, vsens):
+    def get_area(self, vsens):
         return (vsens[2] - vsens[0]) * (vsens[3] - vsens[1])    
     
     def generate_bbox(self, clusters):
@@ -47,20 +63,69 @@ class ClustersVehCnt():
         bbox_list = []
         
         for c in clusters:
-            bbox = [min(c["x"]), min(c["y"]),
-                    max(c["x"]), max(c["y"])]
-            bbox_list.append(bbox)
+            bbox = [min(c["x"])/100.0, min(c["y"])/100.0,
+                    max(c["x"])/100.0, max(c["y"])/100.0]
+            bbox = np.array(bbox)
+            bbox = np.ceil(bbox*50)/50
+            
+            bbox_list.append(bbox.tolist())
         
         return bbox_list
     
     def check_overlap(self, bbox_list):
         
-        for bb in bbox_list:
-            for vs in self.vsens:
-                pass
+        #print(self.vsens, bbox_list)
+        
+        for vs in self.vsens:
+            vs["occpts"] = None
+            for bb in bbox_list:
+                overlap = self.find_overlap(vs["pts"], bb)
                 
-    def update_occupancy(self):
-        pass            
+                if overlap:
+                    if vs["occpts"]:
+                        vs["occpts"] = self.update_occupancy(vs["occpts"], overlap)
+                    else:
+                        vs["occpts"] = overlap
+            
+            if vs["occpts"] is None:
+                vs["occ"] = vs["last_occ"]
+            else:
+                vs["occ"] = self.get_area(vs["occpts"])/vs["area"]
+            
+                print(vs["occ"])
+        
+        #print("**** %s" % (self.vsens))
+                           
+    def update_occupancy(self, curr, overlap):
+        a = curr[0]
+        b = curr[1]
+        c = curr[2]
+        d = curr[3]
+        e = overlap[0]
+        f = overlap[1]
+        g = overlap[2]
+        h = overlap[3]
+        
+        new_occ = [min([a,e]), min([b,f]),
+                   max([c,g]), max([d,h])]
+    
+    def find_overlap(self,pts_a, pts_b):
+        a = pts_a[0]
+        b = pts_a[1]
+        c = pts_a[2]
+        d = pts_a[3]
+        e = pts_b[0]
+        f = pts_b[1]
+        g = pts_b[2]
+        h = pts_b[3]
+        
+        overlap = [max([a,e]), max([b,f]),
+                   min([c,g]), min([d,h])]
+        
+        if overlap[0] > overlap[2] or overlap[1] > overlap[3]:
+            overlap = None
+            
+        return overlap  
 
 if __name__ == "__main__":
     
