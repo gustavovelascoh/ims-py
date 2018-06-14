@@ -45,6 +45,7 @@ subs.r.rpush("ims.rs.ts_0",laser_scanner.ts_0/1000.0)
 
 pend = 0
 pub = 0
+frame = 0
 
 last_scan = False
 
@@ -60,8 +61,10 @@ while not last_scan:
         
         if laser_scanner.ts/1000.0 <= curr_ts-offset:
             pub +=1
+            frame += 1
             #print("%s publish raw %s %s" % (pub, laser_scanner.ts/1000.0, curr_ts-offset))
             message = {"ts": offset + laser_scanner.ts/1000.0,
+                       "frame": frame,
                        "data": laser_scanner.scan}
             subs.r.publish(output_channel, json.dumps(message))
             pend = 0
