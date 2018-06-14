@@ -30,7 +30,7 @@ class Points2Clusters():
         clusters_msg["data"] = clusters_dict["list"]
         clusters_msg["n_clusters"] = clusters_dict["n_clusters"]
         clusters_msg["curr_ts"] = time.time()
-        print(clusters_msg)
+        #print(clusters_msg)
         self.s.r.publish(self.out_ch, json.dumps(clusters_msg))
     
     def get_clusters(self, xydata):

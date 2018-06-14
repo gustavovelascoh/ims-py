@@ -39,13 +39,19 @@ def subscriber_cb(msg):
        
         time_array = np.append(time_array, payload["ts"])
         #print(time_array)
-        
-        curr_data_array = np.array([payload["legs_state"]])
-        
-        #print(np.shape(curr_data_array))
-        #print(curr_data_array)
-        #print(np.transpose(curr_data_array))
-        #print(np.shape(data_array))
+        occ_arr = []
+        for ld in payload["data"]:
+            occ_arr.append(ld["occ"])
+                    
+        curr_data_array = np.array([occ_arr])
+
+                    
+        #curr_data_array = np.array([payload["legs_state"]])
+        print(occ_arr)
+        print("1 ", np.shape(curr_data_array))
+        print(curr_data_array)
+        print("3 ", np.transpose(curr_data_array))
+        print(np.shape(data_array))
             
         if np.shape(data_array)[0] == 0:
             data_array = np.transpose(curr_data_array)
@@ -62,6 +68,6 @@ def subscriber_cb(msg):
     else:
         print("I'm busy")
 
-s = Subscriber({"ims/legs/state_og": subscriber_cb})
+s = Subscriber({"ims/legs/state": subscriber_cb})
 s.run()
 tk.mainloop()
