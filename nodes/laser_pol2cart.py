@@ -73,6 +73,7 @@ class Laser_Pol2Cart():
         cart_data["x"] = (cart_data["x"] + self.d_x*100).tolist()
         cart_data["y"] = (cart_data["y"] + self.d_y*100).tolist()
         cart_data["ts"] = data["ts"]
+        cart_data["frame"] = data["frame"]
         
         self.s.r.publish(CART_DATA_CHANNEL, json.dumps(cart_data))
 

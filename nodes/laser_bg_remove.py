@@ -28,6 +28,7 @@ class LaserBgRemove():
         data = data_dict["data"]
         msg_nobg = self.remove_bg(data)
         msg_nobg["ts"] = data_dict["ts"]
+        msg_nobg["frame"] = data_dict["frame"]
         msg_nobg["curr_ts"] = time.time()
         self.s.r.publish(self.out_ch, json.dumps(msg_nobg))
     

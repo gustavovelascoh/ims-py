@@ -26,6 +26,7 @@ class Points2Clusters():
         
         clusters_msg = {}
         clusters_msg["ts"] = data["ts"]
+        clusters_msg["frame"] = data["frame"]
         clusters_dict = self.get_clusters(xydata)
         clusters_msg["data"] = clusters_dict["list"]
         clusters_msg["n_clusters"] = clusters_dict["n_clusters"]

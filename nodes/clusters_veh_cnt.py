@@ -32,9 +32,11 @@ class ClustersVehCnt():
         
         vsens_msg = {}
         vsens_msg["ts"] = data["ts"]
+        vsens_msg["frame"] = data["frame"]
         vsens_msg["data"] = self.vsens
         vsens_msg["curr_ts"] = time.time()
         
+        print(vsens_msg)
         self.s.r.publish("ims/legs/state", json.dumps(vsens_msg))
         
     def get_legs_config(self):

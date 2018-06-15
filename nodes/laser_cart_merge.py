@@ -73,22 +73,24 @@ class LaserCartMerge():
         
         self.busy = True        
         self.data4merging = self.data_buffer
-        self.data_buffer = []
+        self.data_buffer = {}
         self.busy = False
         
         #print("d4m %s" % self.data4merging.keys())
         
-        self.merged_data = {'x': [], 'y': [], 'ts': []}
+        self.merged_data = {'x': [], 'y': [], 'ts': [], 'frame': []}
         for data in self.data4merging.values():
             #print(data)
             self.merged_data['x'] += data['x']
             self.merged_data['y'] += data['y']
             self.merged_data['ts'] += [data['ts']]
+            self.merged_data['frame'] += [data['frame']]
         
         #print("md ts %s" % self.merged_data['ts'])
         
         if len(self.merged_data['ts']) > 1:
             self.merged_data['ts'] = min(self.merged_data['ts'])
+            self.merged_data['frame'] = min(self.merged_data['frame'])
         
         #print("md lens x:%s" % (len(self.merged_data['x'])))
         
