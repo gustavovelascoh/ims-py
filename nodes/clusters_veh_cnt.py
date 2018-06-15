@@ -36,7 +36,8 @@ class ClustersVehCnt():
         vsens_msg["data"] = self.vsens
         vsens_msg["curr_ts"] = time.time()
         
-        print(vsens_msg)
+        self.print_occ_csv(vsens_msg)
+        
         self.s.r.publish("ims/legs/state", json.dumps(vsens_msg))
         
     def get_legs_config(self):
@@ -94,7 +95,7 @@ class ClustersVehCnt():
             else:
                 vs["occ"] = self.get_area(vs["occpts"])/vs["area"]
             
-                print(vs["occ"])
+                #print(vs["occ"])
         
         #print("**** %s" % (self.vsens))
                            
@@ -127,7 +128,18 @@ class ClustersVehCnt():
         if overlap[0] > overlap[2] or overlap[1] > overlap[3]:
             overlap = None
             
-        return overlap  
+        return overlap
+    
+    def print_occ_csv(self, msg):
+        
+        print("%s, %s, %s, %s, %s, %s, %s" % (msg["ts"],
+                                              msg["data"][0]["occ"],
+                                              msg["data"][1]["occ"],
+                                              msg["data"][2]["occ"],
+                                              msg["data"][3]["occ"],
+                                              msg["data"][4]["occ"],
+                                              msg["data"][5]["occ"],
+                                              ))
 
 if __name__ == "__main__":
     
