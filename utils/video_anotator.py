@@ -97,12 +97,13 @@ def getPoint(event,x,y,flags,param):
 frame = np.zeros((512,512,3), np.uint8)
 cv2.namedWindow('image')
 cv2.setMouseCallback('image',getPoint)
-cap = cv2.VideoCapture("../possi/video.mp4")
+cap = cv2.VideoCapture("./possi/video.mp4")
 frame_n = 0
 
 try:
 
     while(True):
+        key_id = 0
         # Capture frame-by-frame
         ret, frame = cap.read()
         frame_n += 1
@@ -114,16 +115,16 @@ try:
                 cv2.circle(frame,(x,y),5,(255,0,0),-1)
             # Display the resulting frame
             cv2.imshow('image',frame)
-            print("f shape", np.shape(frame))
+            #print("f shape", np.shape(frame))
         else:
             pts = np.array(square_points, dtype = "float32")
             new_frame = four_point_transform(frame, pts)
-            print("f shape", np.shape(new_frame))
+            #print("f shape", np.shape(new_frame))
             cv2.imshow('image', new_frame)
         
-        
-        key_id = cv2.waitKey(0)
-        print(key_id)
+        while key_id != 83:
+            key_id = cv2.waitKey(0)
+        print(frame_n, key_id)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 except Exception as e:
