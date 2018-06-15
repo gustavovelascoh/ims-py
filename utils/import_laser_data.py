@@ -31,7 +31,7 @@ print("File: %s" % args.file)
 print("outputfile: %s" % args.output_file)
 
 sf = 0
-ef = -1
+ef = 999999
 
 if args.sf != None:
     sf = args.sf

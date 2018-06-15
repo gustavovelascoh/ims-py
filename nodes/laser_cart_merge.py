@@ -91,7 +91,11 @@ class LaserCartMerge():
         if len(self.merged_data['ts']) > 1:
             self.merged_data['ts'] = min(self.merged_data['ts'])
             self.merged_data['frame'] = min(self.merged_data['frame'])
+        else:
+            self.merged_data['ts'] = self.merged_data['ts'][0]
+            self.merged_data['frame'] = self.merged_data['frame'][0]
         
+        self.merged_data['curr_ts'] = time.time()
         #print("md lens x:%s" % (len(self.merged_data['x'])))
         
     def publish_data(self):

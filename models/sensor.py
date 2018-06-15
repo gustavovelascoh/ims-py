@@ -87,8 +87,9 @@ class Laser(Sensor):
         
         self.bg_data = np.array(self.dataset["bg_model"]["data"])
         self.calib_data = self.dataset["calib_data"]
-        print(self.calib_data)
-        
+        #print(self.calib_data)
+        #print(np.shape(self.dataset["scans"]))
+        #print(self.dataset["scans"])
         self.ts_0 = self.dataset["scans"][0]["ms"]
         if self.name:
             self.r.hset("ims","laser."+self.name+".calib_data",
