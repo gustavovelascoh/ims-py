@@ -46,18 +46,25 @@ do
 	
 	sleep 0.5
 	
-	echo "Starting bg_remove for range sensor $i: $rs_src"	
+	echo "Starting bg_remove for range sensor $i"	
 	python3 $IMS_PATH/nodes/laser_bg_remove.py $i &
 	redis-cli lpush ims_pids $!
 	
 	sleep 0.5
 	
-	echo "Starting pol2cart for range sensor $i: $rs_src"	
+	echo "Starting pol2cart for range sensor $i"	
 	python3 $IMS_PATH/nodes/laser_pol2cart.py $i "no_bg" &
 	redis-cli lpush ims_pids $!
 	
 	out_ch="ims/laser/$i/no_bg/cart"
 	out_ch_list="$out_ch_list $out_ch"
+	
+	
+	echo "Starting points2occgrid for range sensor $i"
+	p2occ_outch="ims/laser/$i/occgrid"
+	python3 nodes/points2occgrid.py $i ims/laser/$i/no_bg/cart $p2occ_outch &
+	redis-cli lpush ims_pids $!
+	
 	
 done
 
