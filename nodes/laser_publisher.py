@@ -76,5 +76,5 @@ while not last_scan:
         time.sleep(0.005)
         pend = 0
         #print("no off")
-    
+print("%s: End Of Data" % args.name)
     

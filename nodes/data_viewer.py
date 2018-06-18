@@ -8,6 +8,7 @@ from gui.viewer import Viewer
 import json
 import numpy as np
 import tkinter as tk
+from matplotlib.pyplot import grid
 
 
 class DataViewer(tk.Frame):
@@ -17,7 +18,7 @@ class DataViewer(tk.Frame):
         
         if datatype == "points":
             subs_dict = {channel: self.__points_cb}
-        elif datatype == "array":
+        elif datatype == "grid":
             subs_dict = {channel: self.__array_cb}    
         
         self.s = Subscriber(subs_dict)
@@ -30,9 +31,12 @@ class DataViewer(tk.Frame):
         
         self.get_config()
         
-        self.v.set_roi(self.roi)
-        self.v.draw_img(self.img_path, self.limits)
-        self.v.save_background()
+        if datatype == "points":
+            self.v.set_roi(self.roi)
+            self.v.draw_img(self.img_path, self.limits)
+            self.v.save_background()
+        elif datatype == "grid":
+            pass
         
         self.s.run()
         
@@ -67,7 +71,11 @@ class DataViewer(tk.Frame):
         self.v.update()
     
     def __array_cb(self, msg):
-        pass
+        data_s = msg["data"].decode("utf-8")
+        data = json.loads(data_s)
+        #print(data)
+        grid = np.array(data["grid"])
+        self.v.draw_array(grid, self.limits)
 
 if __name__ == "__main__":
     import argparse

@@ -28,9 +28,9 @@ class Points2OccGrid():
         
         self.process_msg(data)
         
-        print("type: %s, shape: %s" % (type(self.og.grid),
-                                       np.shape(self.og.grid)))
-        print(self.og.grid.tolist())
+        #print("type: %s, shape: %s" % (type(self.og.grid),
+                                       #np.shape(self.og.grid)))
+        #print(self.og.grid.tolist())
         out_msg = {}
         out_msg["ts"] = data["ts"]
         out_msg["curr_ts"] = time.time()
