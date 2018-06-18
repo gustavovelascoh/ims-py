@@ -51,7 +51,6 @@ class OccupancyGrid(object):
         #print((np.shape(self.grid)))
         
     def point2index(self, x, y):
-        
         col = np.ceil((x - self.xmin)/self.cell_size - 0.5)
         row = self.rows - np.ceil((y - self.ymin)/self.cell_size - 0.5)
         return int(col), int(row)
@@ -65,7 +64,6 @@ class OccupancyGrid(object):
     def set_origin(self, xo, yo):
         self.xo = xo
         self.yo = yo
-        
         self.col_o, self.row_o = self.point2index(xo, yo)
         #self.mark_fill(xo, yo)
     

@@ -34,7 +34,7 @@ sleep 2
 # start range publishers
 rs_name_list=$(redis-cli get ims.rs_name_list)
 
-out_ch_list = ""
+out_ch_list=""
 
 for i in $rs_name_list
 do
@@ -69,6 +69,6 @@ echo "Starting points2cluster_merge node"
 python3 nodes/points2cluster.py ims/laser/all/no_bg/cart ims/laser/clusters &
 redis-cli lpush ims_pids $!
 
-
+sleep 1000
 
 #-----
