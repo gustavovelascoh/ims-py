@@ -74,8 +74,26 @@ class DataViewer(tk.Frame):
         data_s = msg["data"].decode("utf-8")
         data = json.loads(data_s)
         #print(data)
-        grid = np.array(data["grid"])
-        self.v.draw_array(grid, self.limits)
+        grid = np.array((data["grid"]))
+        
+        grid_img = self.grid2img(grid)
+        self.v.draw_array(grid_img, self.limits)
+    
+    def grid2img(self, grid):
+        grid_img = grid * 255
+        print("-*-*-*")
+        print(np.shape(grid))
+        print(type(grid))
+        try:
+            grid_img = np.stack((grid_img,
+                                     grid_img,
+                                     grid_img),axis =2)
+        except Exception as e:
+            print(e)
+            
+        print(np.shape( grid_img))
+        print(grid_img)
+        return grid_img 
 
 if __name__ == "__main__":
     import argparse
