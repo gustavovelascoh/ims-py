@@ -47,11 +47,11 @@ def subscriber_cb(msg):
 
                     
         #curr_data_array = np.array([payload["legs_state"]])
-        print(occ_arr)
-        print("1 ", np.shape(curr_data_array))
-        print(curr_data_array)
-        print("3 ", np.transpose(curr_data_array))
-        print(np.shape(data_array))
+#         print(occ_arr)
+#         print("1 ", np.shape(curr_data_array))
+#         print(curr_data_array)
+#         print("3 ", np.transpose(curr_data_array))
+#         print(np.shape(data_array))
             
         if np.shape(data_array)[0] == 0:
             data_array = np.transpose(curr_data_array)
