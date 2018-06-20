@@ -10,59 +10,109 @@ from models.subscriber import Subscriber
 from models.occupancygrid import OccupancyGrid
 
 class Points2OccGrid():
-    def __init__(self, in_ch="", out_ch="", src_name=""):
+    def __init__(self, in_ch=[], out_ch=""):
         
         self.out_ch = out_ch
-        self.s= Subscriber({in_ch: self.__points_msg_cb})
+        
+        ch_dict = {}
+        self.names_list = []
+        for ch in in_ch:
+            ch_dict[ch] = self.__points_msg_cb
+            self.names_list.append(self.get_name(ch))
+            
+        print("Names List: %s" % self.names_list)
+        
+        self.s= Subscriber(ch_dict)
         self.load_config()
         self.og = OccupancyGrid(**self.roi, cell_size=0.5, method="velca")
         
-        self.og.set_origin(float(self.calib_data["sx"]),
-                           float(self.calib_data["sy"]))            
+                    
         
         self.s.run()
+        self.data_buffer = {}
+        self.out_msg = {'ts': 0, 'frame': 0}
     
     def __points_msg_cb(self,msg):
         data_str = msg["data"].decode("utf-8")
         data = json.loads(data_str)
         
-        self.process_msg(data)
+        channel = msg["channel"].decode("utf-8")
         
-        #print("type: %s, shape: %s" % (type(self.og.grid),
-                                       #np.shape(self.og.grid)))
-        #print(self.og.grid.tolist())
-        out_msg = {}
-        out_msg["ts"] = data["ts"]
-        out_msg["curr_ts"] = time.time()
-        out_msg["grid"] = self.og.grid.tolist()
-        self.s.r.publish(self.out_ch, json.dumps(out_msg))
+        name = self.get_name(channel)
+        self.data_buffer[name] = data
+        
+        
+    
+    def loop(self):
+        while True:
+            time.sleep(0.030)
+            
+            if self.data_buffer:        
+                self.process_msg()
+                self.publish_data()
 
     def load_config(self):
         config = json.loads(self.s.r.hget("ims", "config").decode("utf-8"))
         self.roi = config["map"]["roi"]
         
-        calib_data_var = "laser." + args.name + ".calib_data"
-        calib_data_b = self.s.r.hget("ims", calib_data_var)
+        self.calib_data = {}
         
-        self.calib_data = json.loads(calib_data_b.decode("utf-8"))
+        for laser_name in self.names_list:
+            calib_data_var = "laser." + laser_name + ".calib_data"
+            calib_data_b = self.s.r.hget("ims", calib_data_var)
+            calib_data = json.loads(calib_data_b.decode("utf-8"))
+            self.calib_data[laser_name] = calib_data
         
-    def process_msg(self, msg):
-        x = np.array(msg["x"])
-        y = np.array(msg["y"])
         
-        x = x/100
-        y = y/100
         
-        data = np.array([x,y]).transpose()
+    def process_msg(self):
         
-        if self.roi:
-            data = self._apply_roi(data, self.roi)
-        #print("datalen post ",(np.shape(data)))   
-        x = data[:,0]
-        y = data[:,1]
+        self.data4merge = self.data_buffer
+        self.data_buffer = {}
         
-        self.og.add_meas(x,y)        
-        self.og.update()
+        self.out_msg = {'ts': [], 'frame': []}
+        
+        for name, msg in self.data4merge.items():
+            #print(msg.keys())
+            self.out_msg['ts'] += [msg['ts']]
+            self.out_msg['frame'] += [msg['frame']]
+            
+            self.og.set_origin(float(self.calib_data[name]["sx"]),
+                           float(self.calib_data[name]["sy"]))
+            x = np.array(msg["x"])
+            y = np.array(msg["y"])
+            
+            x = x/100
+            y = y/100
+            
+            data = np.array([x,y]).transpose()
+            
+            if self.roi:
+                data = self._apply_roi(data, self.roi)
+            #print("datalen post ",(np.shape(data)))   
+            x = data[:,0]
+            y = data[:,1]
+            
+            self.og.add_meas(x,y)        
+            self.og.update()
+            
+        if len(self.out_msg['ts']) > 1:
+            self.out_msg['ts'] = min(self.out_msg['ts'])
+            self.out_msg['frame'] = min(self.out_msg['frame'])
+        else:
+            self.out_msg['ts'] = self.out_msg['ts'][0]
+            self.out_msg['frame'] = self.out_msg['frame'][0]
+        
+                
+        #print("type: %s, shape: %s" % (type(self.og.grid),
+                                       #np.shape(self.og.grid)))
+        #print(self.og.grid.tolist())
+    def publish_data(self):
+        out_msg = {}
+        out_msg["ts"] = self.out_msg['ts']
+        out_msg["curr_ts"] = time.time()
+        out_msg["grid"] = self.og.grid.tolist()
+        self.s.r.publish(self.out_ch, json.dumps(out_msg))
     
     @staticmethod
     def _apply_roi(data, roi):
@@ -72,6 +122,10 @@ class Points2OccGrid():
         data = data[data[:,1] >= roi["ymin"]]
         data = data[data[:,1] <= roi["ymax"]]
         return data
+    @staticmethod
+    def get_name(channel):
+        x = channel.split('/')
+        return x[2]
         
 if __name__ == "__main__":
     
@@ -79,15 +133,14 @@ if __name__ == "__main__":
     
     description_str='Subscribe to cartesian data and generate occgrid'
     parser = argparse.ArgumentParser(description=description_str)
-    parser.add_argument('name',
-                        metavar='name',
-                        help="Source Name")
-    parser.add_argument('ich',
+    parser.add_argument('-ich',
                         metavar='ICH',
+                        nargs='+',
                         help="Input channel")
-    parser.add_argument('och',
+    parser.add_argument('-och',
                         metavar='OCH',
                         help="Output channel")
     args = parser.parse_args()
     
-    p2c = Points2OccGrid(src_name=args.name, in_ch=args.ich, out_ch=args.och)
+    p2c = Points2OccGrid(in_ch=args.ich, out_ch=args.och)
+    p2c.loop()
