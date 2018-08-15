@@ -9,6 +9,13 @@ import cv2
 
 square_points = []
 
+TL = [760, 177]
+TR = [2050, 433]
+BR = [-70,1452]
+BL = [70,260]
+
+square_points = [TL, TR, BR, BL]
+
 def order_points(pts):
     # initialzie a list of coordinates that will be ordered
     # such that the first entry in the list is the top-left,
@@ -36,7 +43,16 @@ def four_point_transform(image, pts):
     # obtain a consistent order of the points and unpack them
     # individually
     rect = order_points(pts)
-    print(rect)
+    print("rect ", rect, type(rect), np.shape(rect))
+    print(rect[0], type(rect[0]))
+
+    rect = np.array(([TL,
+                        TR, 
+                        BR,
+                        BL]), dtype = "float32")
+    print("rect ", rect, type(rect), np.shape(rect))
+    print(rect[0], type(rect[0]))
+
     (tl, tr, br, bl) = rect
  
     # compute the width of the new image, which will be the
@@ -45,6 +61,7 @@ def four_point_transform(image, pts):
     widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
     widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
     maxWidth = max(int(widthA), int(widthB))
+    maxWidth = 1600
  
     # compute the height of the new image, which will be the
     # maximum distance between the top-right and bottom-right
@@ -52,6 +69,7 @@ def four_point_transform(image, pts):
     heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
     heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
     maxHeight = max(int(heightA), int(heightB))
+    maxHeight = 900
  
     # now that we have the dimensions of the new image, construct
     # the set of destination points to obtain a "birds eye view",
@@ -64,6 +82,8 @@ def four_point_transform(image, pts):
         [maxWidth - 1, maxHeight - 1],
         [0, maxHeight - 1]], dtype = "float32")
  
+
+
     # compute the perspective transform matrix and then apply it
     M = cv2.getPerspectiveTransform(rect, dst)
     print(rect, dst, M)
@@ -71,12 +91,39 @@ def four_point_transform(image, pts):
 #     M = np.array([[  3.98331689e+00,   2.79923502e+01,  -9.36619674e+03],
 #        [ -9.00519318e+00,   3.10852342e+01,  -7.19030040e+02],
 #        [  7.37568334e-04,   2.93849985e-02,   1.00000000e+00]])
+
+#*****************
+    # Esta es
+#    M = np.array([[ -2.95982483e+00,  -2.67942037e+01,   6.32997485e+03],
+#       [  9.52838537e+00,  -2.26059344e+01,   1.61259929e+03],
+#       [ -9.52255725e-04,  -2.63745188e-02,   1.00000000e+00]])
+#****************
+
+#[[  718.   229.]
+# [ 1083.   335.]
+# [  414.   479.]
+# [  206.   305.]]
+#[[  718.   229.]
+# [ 1083.   335.]
+# [  414.   479.]
+# [  206.   305.]] [[   0.    0.]
+# [ 379.    0.]
+# [ 379.  683.]
+# [   0.  683.]] [[  3.16129019e+00   2.12971129e+01  -7.14684521e+03]
+# [ -6.75027616e+00   2.32438755e+01  -4.76149197e+02]
+# [  8.17661484e-04   2.12401056e-02   1.00000000e+00]]
+
+
+#M =[[ -2.45834649e+01   8.61614643e+01  -2.35094300e+03]
+# [ -9.89919168e+00  -4.63207460e+01   2.62746960e+04]
+# [  1.25520401e-03   3.96396824e-02   1.00000000e+00]])
+
+#    M = np.array([[ -7.01929243e+00,   2.27615891e+01,  -1.35751753e+02],
+# [ -2.86973941e+00,  -1.21828560e+01,   7.05723068e+03],
+# [  3.79018692e-04,   2.23124648e-02,   1.00000000e+00]])
     
-    M = np.array([[ -2.95982483e+00,  -2.67942037e+01,   6.32997485e+03],
-       [  9.52838537e+00,  -2.26059344e+01,   1.61259929e+03],
-       [ -9.52255725e-04,  -2.63745188e-02,   1.00000000e+00]])
-    
-    warped = cv2.warpPerspective(image, M, (maxWidth*2, maxHeight*2))
+#    warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
+    warped = cv2.warpPerspective(image, M, (1600 , 900))
  
     # return the warped image
     return warped
@@ -101,7 +148,7 @@ cap = cv2.VideoCapture("./possi/video.mp4")
 frame_n = 0
 
 try:
-
+    curr_corn = TL
     while(True):
         key_id = 0
         # Capture frame-by-frame
@@ -109,7 +156,8 @@ try:
         frame_n += 1
         # Our operations on the frame come here
         #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        
+
+#        if frame_n == 1 :
         if (len(square_points) <= 3):
             for x,y in square_points:
                 cv2.circle(frame,(x,y),5,(255,0,0),-1)
@@ -122,8 +170,30 @@ try:
             #print("f shape", np.shape(new_frame))
             cv2.imshow('image', new_frame)
         
-        while key_id != 83:
-            key_id = cv2.waitKey(0)
+        key_list = [81,82,83,84,97,100,101,113]
+        
+        while key_id not in key_list:
+            key_id = cv2.waitKey(100)
+            print( key_id)
+        
+        if key_id == 113:
+            curr_corn = TL
+        elif key_id == 101:
+            curr_corn = TR
+        elif key_id == 100:
+            curr_corn = BR
+        elif key_id == 97:
+            curr_corn = BL
+
+        if key_id == 83: # R
+            curr_corn[0] = curr_corn[0]+15
+        elif key_id == 81: # L
+            curr_corn[0] = curr_corn[0]-15
+        if key_id == 84: # D
+            curr_corn[1] = curr_corn[1]+15
+        elif key_id == 82: # U
+            curr_corn[1] = curr_corn[1]-15
+
         print(frame_n, key_id)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
