@@ -8,6 +8,14 @@ def get_percentage(perc_str):
     pc_str = b.search(perc_str).group()
     return int(pc_str)
 
+def check_class(item):
+    classes = ["car", "bus", "truck"]
+
+    if item[:-1] in classes:
+        return True
+    return False
+
+
 def find_overlap(pts_a, pts_b):
     a = pts_a[0]
     b = pts_a[1]
@@ -26,7 +34,8 @@ def find_overlap(pts_a, pts_b):
         
     return overlap
         
-FILENAME="/home/gustavo/devel/personal/python/ims-py/video_possi.results"
+#FILENAME="/home/gustavo/devel/personal/python/ims-py/video_possi.results"
+FILENAME="/home/gustavo/devel/personal/ims-py/video_possi.results"
 
 frame_n = 1
 results = []
@@ -57,7 +66,7 @@ with open(FILENAME,'r') as f:
                 else:
                     curr_obj_list = line_list[curr_offset:curr_offset+10]
                     
-                if curr_obj_list[0] == 'car:' and get_percentage(curr_obj_list[1])>90:
+                if check_class(curr_obj_list[0]) and get_percentage(curr_obj_list[1])>75:
                     
                     curr_obj_os = 0 if len(curr_obj_list) == 8 else 2
                     
@@ -90,7 +99,7 @@ with open(FILENAME,'r') as f:
             pass
                     
         results.append(objects)
-        print("{0},{1}".format(frame_n, len(objects)))
+        print("{0}".format(len(objects)))
         frame_n += 1
 #     except Exception as e:
 #         print(e)        
