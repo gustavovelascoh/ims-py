@@ -8,6 +8,7 @@ import time
 import numpy as np
 from models.subscriber import Subscriber
 from models.occupancygrid import OccupancyGrid
+#from models.occupancygrid_cy import OccupancyGrid
 
 class Points2OccGrid():
     def __init__(self, in_ch=[], out_ch=""):
@@ -40,16 +41,22 @@ class Points2OccGrid():
         
         name = self.get_name(channel)
         self.data_buffer[name] = data
-        
+        print("cb: msg from %s" % (channel))       
         
     
     def loop(self):
         while True:
-            time.sleep(0.030)
-            
-            if self.data_buffer:        
+            if self.data_buffer:
+                print("init: keys: %s" % (self.data_buffer.keys()))
+                it = time.time()        
                 self.process_msg()
+                print("procmsg: keys: %s" % (self.data_buffer.keys()))
                 self.publish_data()
+                print("p_time: %s, keys: %s" % ((time.time() - it),
+                                                self.data_buffer.keys()))
+            else:
+                print("loop: wait")
+                time.sleep(0.030)
 
     def load_config(self):
         config = json.loads(self.s.r.hget("ims", "config").decode("utf-8"))
@@ -69,6 +76,8 @@ class Points2OccGrid():
         
         self.data4merge = self.data_buffer
         self.data_buffer = {}
+        
+        print("procmsg: keys: %s" % (self.data_buffer.keys()))
         
         self.out_msg = {'ts': [], 'frame': []}
         

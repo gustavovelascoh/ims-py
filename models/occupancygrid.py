@@ -4,6 +4,8 @@ Created on Oct 2, 2017
 @author: gustavo
 '''
 import numpy as np
+import pyximport; pyximport.install()
+from utils import bresenham 
 
 class OccupancyGrid(object):
     '''
@@ -117,8 +119,10 @@ class OccupancyGrid(object):
 #         for x, y in zip(xs, ys):
 #             x_c, y_r = self.point2index(x, y)
         for x_c, y_r in zip(cols, rows):
-            lop = self.get_line((self.col_o, self.row_o),
-                                (x_c, y_r))
+#             lop = self.get_line((self.col_o, self.row_o),
+#                                 (x_c, y_r))
+            lop = bresenham.get_line((self.col_o, self.row_o),
+                                 (x_c, y_r))
             
             xe, ye = lop[-1]
             #print(lop)

@@ -25,9 +25,9 @@ echo "Starting ims_main process"
 python3 $IMS_PATH/nodes/ims_main.py &
 redis-cli lpush ims_pids $!
 
-echo "Starting legs_state_plotter process"
-python3 $IMS_PATH/utils/legs_state_plotter.py &
-redis-cli lpush ims_pids $!
+# echo "Starting legs_state_plotter process"
+# python3 $IMS_PATH/utils/legs_state_plotter.py &
+# redis-cli lpush ims_pids $!
 
 sleep 2
 
@@ -35,6 +35,7 @@ sleep 2
 rs_name_list=$(redis-cli get ims.rs_name_list)
 
 out_ch_list=""
+out_raw_ch_list=""
 
 for i in $rs_name_list
 do
@@ -56,17 +57,22 @@ do
 	python3 $IMS_PATH/nodes/laser_pol2cart.py $i "no_bg" &
 	redis-cli lpush ims_pids $!
 	
-	out_ch="ims/laser/$i/no_bg/cart"
-	out_ch_list="$out_ch_list $out_ch"
-	
-	
-	echo "Starting points2occgrid for range sensor $i"
-	p2occ_outch="ims/laser/$i/occgrid"
-	python3 nodes/points2occgrid.py $i ims/laser/$i/no_bg/cart $p2occ_outch &
+	echo "Starting pol2cart for range sensor $i"	
+	python3 $IMS_PATH/nodes/laser_pol2cart.py $i "raw" &
 	redis-cli lpush ims_pids $!
 	
+	out_ch="ims/laser/$i/no_bg/cart"
+	out_raw_ch="ims/laser/$i/raw/cart"
+	out_ch_list="$out_ch_list $out_ch"
+	out_raw_ch_list="$out_raw_ch_list $out_raw_ch"	
 	
 done
+
+echo "Starting points2occgrid for range sensors"
+echo $out_raw_ch_list 
+p2occ_outch="ims/laser/all/occgrid"
+python3 nodes/points2occgrid.py -ich $out_raw_ch_list -och ims/laser/all/occgrid &
+redis-cli lpush ims_pids $!
 
 echo "Starting laser_cart_merge node"
 python3 nodes/laser_cart_merge.py -ichs $out_ch_list -och ims/laser/all/no_bg/cart &

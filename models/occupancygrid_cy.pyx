@@ -45,17 +45,29 @@ cdef class OccupancyGrid(object):
             self.meas_grid = np.zeros((self.rows, self.cols))
             self.grid = 0.5*np.ones((self.rows, self.cols))
             
-            self.occ_val = {"0.1": 0.4,
-                       "0.4": 0.5,
-                       "0.5": 0.6,
-                       "0.6": 0.9,
-                       "0.9": 0.9}
+            self.occ_val = {"0.0": 0.1,
+                        "0.1": 0.2,
+                        "0.2": 0.3,
+                        "0.3": 0.7,
+                        "0.4": 0.9,
+                        "0.5": 0.9,
+                        "0.6": 1.0,
+                        "0.7": 1.0,
+                        "0.8": 1.0,
+                        "0.9": 1.0,
+                        "1.0": 1.0}
             
-            self.emp_val = {"0.1": 0.1,
-                       "0.4": 0.1,
-                       "0.5": 0.4,
-                       "0.6": 0.5,
-                       "0.9": 0.6}
+            self.emp_val = {"0.0": 0.0,
+                        "0.1": 0.0,
+                        "0.2": 0.1,
+                        "0.3": 0.1,
+                        "0.4": 0.2,
+                        "0.5": 0.3,
+                        "0.6": 0.5,
+                        "0.7": 0.6,
+                        "0.8": 0.7,
+                        "0.9": 0.8,
+                        "1.0": 0.9}
         #print((np.shape(self.grid)))
         
     def point2index(self, double x, double y):

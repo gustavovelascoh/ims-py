@@ -9,6 +9,7 @@ import json
 import numpy as np
 import tkinter as tk
 from matplotlib.pyplot import grid
+import cv2
 
 
 class DataViewer(tk.Frame):
@@ -76,23 +77,36 @@ class DataViewer(tk.Frame):
         #print(data)
         grid = np.array((data["grid"]))
         
-        grid_img = self.grid2img(grid)
-        self.v.draw_array(grid_img, self.limits)
+        grid_img = 255*self.grid2img(grid)
+        print("SHAPE: ", np.shape(grid_img))
+        if "vsens" in data.keys():
+            print(data["vsens"])
+            for vs in data["vsens"]:
+                print(vs, type(vs["idx"][0]))
+                grid_img = cv2.rectangle(grid_img,# (0,0),(20,20),
+                              (vs["idx"][0],vs["idx"][1]),
+                              (vs["idx"][2],vs["idx"][3]),
+                              (0,255,0),
+                              1)
+        #print(grid_img[0:25,0:25])
+        self.v.draw_array(grid_img/255.0 > 0, self.limits)
     
     def grid2img(self, grid):
-        grid_img = grid * 255
+        grid_img = grid# * 255
         print("-*-*-*")
         print(np.shape(grid))
-        print(type(grid))
+        #print(type(grid))
         try:
             grid_img = np.stack((grid_img,
                                      grid_img,
                                      grid_img),axis =2)
+#             grid_img = grid
         except Exception as e:
             print(e)
             
-        print(np.shape( grid_img))
-        print(grid_img)
+        #print(np.shape( grid_img))
+        
+        #print(np.max(grid_img), grid_img[0])
         return grid_img 
 
 if __name__ == "__main__":
