@@ -18,6 +18,19 @@ def load_results_file(filename):
 
     return results
 
+def group_data(data, group):
+    curr_len = len(data)
+    new_len = int(np.floor(curr_len/group))
+    end_idx = group*new_len-curr_len
+
+    if end_idx != 0:
+        data_g = np.reshape(data[0:end_idx],
+			     (group,new_len))
+    else:
+        data_g = np.reshape(data[0:],
+			     (group,new_len))
+    return data_g
+
 def count_cars(gt):
     
     gt_c = [0]
@@ -34,6 +47,17 @@ def count_cars(gt):
 
     return gt_c
 
+def get_flow_bin(count_data, group=30):
+    
+    cnt_g = group_data(count_data, group)
+
+    flow = np.sum(cnt_g,axis=0)/(group/30)
+
+    flow_bin = flow > 0.5
+
+    return flow_bin
+
+
 def max_window(r):
     l = len(r)
     lw = np.copy(r)
@@ -45,9 +69,21 @@ def max_window(r):
 
     return lw
 
+def avg_round(r):
+    l = len(r)
+    lw = np.copy(r)
+    
+#    print(l, r[0:15])
+    for i in range(3,l-3):
+#        print(r[i-1:i+2])
+        lw[i] = np.round(np.mean(r[i-3:i+4]))
+
+    return lw
+
 def compare_detections(gt, res):
     raw_error = gt - res
-
+    print(gt, res)
+#    exit()
     TP = 0
     TN = 0
     FP = 0
@@ -67,6 +103,7 @@ def compare_detections(gt, res):
 
 #    print("TP: {0}, FN: {1}".format(TP,FN))
 #    print("FP: {0}, TN: {1}".format(FP,TN))
+    print( {"TP": TP,"FP": FP, "TN": TN, "FN": FN})
     return {"TP": TP,"FP": FP, "TN": TN, "FN": FN}
 
 def compare_gt (vid,gt):
@@ -91,6 +128,7 @@ def compare_gt (vid,gt):
         
 #    print("TP: {0}, FN: {1}".format(TP,FN))
 #    print("FP: {0}, TN: {1}".format(FP,TN))
+    print({"TP": TP,"FP": FP, "TN": TN, "FN": FN})
     return {"TP": TP,"FP": FP, "TN": TN, "FN": FN}
 
 # cm is a dict {"TP": TP,"FP": FP, "TN": TN, "FN": FN}
@@ -132,10 +170,10 @@ if __name__ == "__main__":
     vid = np.array(vid)
     las = np.array(las)
 
-#    vid = max_window(vid)
-#    las = max_window(las)
-    
-    vid = np.round((vid + las) /2)
+    vid = avg_round(vid)
+#    las = avg_round(las)
+#    vid = las
+#    vid = np.round((vid + las) /2)
 
 
 
@@ -149,9 +187,9 @@ if __name__ == "__main__":
     scores = []
     best_score = 0
 
-    for j in range(1,30):
+    for j in range(1,2):
 
-        for i in range(-60,60):
+        for i in range(-80,80):
             
             if i < 0:
                 gt_temp = gt[0:i]
@@ -198,12 +236,16 @@ if __name__ == "__main__":
             print("Count GTrs: ", sum(gt_c_rs)) 
             print("Count vidrs: ", sum(vid_c_rs)) 
             
+            gt_fb = get_flow_bin(gt_c_rs,30)
+            vid_fb = get_flow_bin(vid_c_rs,30)
+
     #        print("NEW SHAPE ", np.shape(vid_c_rs))
             
     #        print(vid_c_rs)
             
 #            score = compare_gt (vid_c_rs,gt_c_rs)
-            score = compare_detections (gt=gt_temp, res=vid_temp)
+#            score = compare_detections (gt=gt_temp, res=vid_temp)
+            score = compare_detections (gt=gt_fb, res=vid_fb)
             metrics = get_metrics(score)
             curr_score = metrics["TPR"] 
             

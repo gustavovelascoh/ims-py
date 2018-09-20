@@ -1,6 +1,8 @@
 import struct
 from matplotlib import pyplot as plt
 from analyse_results import load_results_file
+from analyse_results import max_window, avg_round 
+
 
 LASER_FILE = "laser_results.csv"
 VIDEO_FILE = "video_results_75_cbt.csv"
@@ -25,11 +27,13 @@ plt.legend(["laser","video","gt"])
 plt.subplot(3,1,2)
 plt.plot(laser_data)
 plt.plot(gt_data)
-plt.legend(["laser","gt"])
+plt.plot(avg_round(laser_data),'k')
+plt.legend(["laser","gt","laserw3"])
 
 plt.subplot(3,1,3)
 plt.plot(video_data)
 plt.plot(gt_data)
-plt.legend(["video","gt"])
+plt.plot(avg_round(video_data),'k')
+plt.legend(["video","gt","videow3"])
 
 plt.show()
