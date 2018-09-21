@@ -7,9 +7,9 @@ LAS_FILE = "laser_results.csv"
 
 def load_results_file(filename):
     results = []
-    v=True      
+    v=True
     with open(filename,'rb') as f:
-            
+
         while v:
             v = f.readline()
             if v == b'':
@@ -32,12 +32,12 @@ def group_data(data, group):
     return data_g
 
 def count_cars(gt):
-    
+
     gt_c = [0]
-    
+
     # count cars, transitions
     for i in range(1,len(gt)):
-        
+
         d = gt[i] - gt[i-1]
 #        print(d)
         if d < -0.33:
@@ -47,11 +47,11 @@ def count_cars(gt):
 
     return gt_c
 
-def get_flow_bin(count_data, group=30):
-    
+def get_flow_bin(count_data, group=30, threshold=0.5):
+
     flow = get_flow(count_data, group)
 
-    flow_bin = flow > 0.5
+    flow_bin = flow > threshold
 
     return flow_bin
 
@@ -65,13 +65,13 @@ def get_flow(count_data, group=30, name="def"):
             flow[i] = 30*np.sum(count_data[i-group:i+1])/group
 #    print("flo",name, flow[4800:4850])
     return flow
-            
+
 
 
 def max_window(r):
     l = len(r)
     lw = np.copy(r)
-    
+
 #    print(l, r[0:15])
     for i in range(1,l-1):
 #        print(r[i-1:i+2])
@@ -79,14 +79,18 @@ def max_window(r):
 
     return lw
 
-def avg_round(r):
+def avg_round(r, w=9):
     l = len(r)
     lw = np.copy(r)
-    
+    temp = w*[]
 #    print(l, r[0:15])
-    for i in range(3,l-3):
+    for i in range(0,l-w):
 #        print(r[i-1:i+2])
-        lw[i] = np.round(np.mean(r[i-3:i+4]))
+        if i >= w:
+            lw[i] = np.round(np.mean(r[i-w:i+w+1]))
+        else:
+            temp.append(r[i])
+            lw[i] = np.mean(temp[-w:])
 
     return lw
 
@@ -113,7 +117,7 @@ def compare_bool(gt, res):
 
 #    print("TP: {0}, FN: {1}".format(TP,FN))
 #    print("FP: {0}, TN: {1}".format(FP,TN))
-#    print( {"TP": TP,"FP": FP, "TN": TN, "FN": FN})
+    print( {"TP": TP,"FP": FP, "TN": TN, "FN": FN})
     return {"TP": TP,"FP": FP, "TN": TN, "FN": FN}
 
 def compare_detections(gt, res):
@@ -161,7 +165,7 @@ def compare_gt (vid,gt):
         elif raw_error[i] < 0:
             FP += 1#raw_error[i]
             #TP -= v + raw_error[i]
-        
+
 #    print("TP: {0}, FN: {1}".format(TP,FN))
 #    print("FP: {0}, TN: {1}".format(FP,TN))
 #    print({"TP": TP,"FP": FP, "TN": TN, "FN": FN})
@@ -181,7 +185,7 @@ def get_metrics(cm):
     metrics["spec"] = cm["TN"]/fptn
     metrics["F1"] = 2*cm["TP"]/(2*cm["TP"]+fpfn)
     metrics["prev"] = tpfn/(tpfn+fptn)
-    
+
     metrics["TPR"] = metrics["reca"]
     metrics["FPR"] = 1 - metrics["spec"]
 
@@ -190,23 +194,23 @@ def get_metrics(cm):
 
     return metrics
 
-def evaluate_results(res, gt, group=30, name="default"):
+def evaluate_results(res, gt, group=30, threshold=0.5, name="default"):
     res_c = count_cars(res)
     gt_c = count_cars(gt)
 
 #    print("cnt", res_c[4800:4850])
-    gt_fb = get_flow_bin(gt_c, group)
-    res_fb = get_flow_bin(res_c, group)
+    gt_fb = get_flow_bin(gt_c, group, threshold)
+    res_fb = get_flow_bin(res_c, group, threshold)
 
 #    print("fbb", res_fb[4800:4850])
-#    print("fbg", gt_fb[4800:4850])    
+#    print("fbg", gt_fb[4800:4850])
 
     score = compare_bool(gt=gt_fb, res=res_fb)
     metrics = get_metrics(score)
-    
+
     print(name, m2str(metrics))
 
-def evaluate_results_f(res1, res2, gt, group=30, method="avg", name="default"):
+def evaluate_results_f(res1, res2, gt, group=30, threshold=0.5, method="avg", name="default"):
 
     MN = 4800
     MX = 4850
@@ -238,8 +242,8 @@ def evaluate_results_f(res1, res2, gt, group=30, method="avg", name="default"):
 #    print("res", res[MN:MX])
 
 
-    res_fb = res > 0.5
-    gt_fb = gt_f > 0.5
+    res_fb = res > threshold
+    gt_fb = gt_f > threshold
 
 #    print("rfb", res_fb[4800:4850])
 #    print("rfb", gt_f[4800:4850])
@@ -247,15 +251,15 @@ def evaluate_results_f(res1, res2, gt, group=30, method="avg", name="default"):
     score = compare_bool(gt=gt_fb, res=res_fb)
     metrics = get_metrics(score)
 
-    print(name, m2str(metrics))    
+    print(name, m2str(metrics))
 
 def m2str(m):
     m_str = ""
     for k,v in m.items():
         m_str += k+": {:.4f}, ".format(v)
-    
+
     return m_str
-    
+
 
 if __name__ == "__main__":
 
@@ -273,14 +277,14 @@ if __name__ == "__main__":
     las = avg_round(las)
 #    vid = las
 #    vidlas = np.round((vid + las) /2)
-    
+
 
 
     #print(len(gt), len(vid))
     print("shape gt: {0}, shape vid: {1}".format(
                                                 np.shape(gt),
                                                 np.shape(vid)
-    
+
                                                 ))
 
     scores = []
@@ -303,20 +307,23 @@ if __name__ == "__main__":
     print(np.shape(vid_temp), np.shape(las_temp.T))
     print(np.shape(vl_max_1))
 
+    G = 150
+    TH = 0.5
+
     # evaluation
-    evaluate_results(vid_temp, gt_temp, 30, "v30")
-    evaluate_results(las_temp, gt_temp, 30, "l30")
-    evaluate_results(vl_avg_1, gt_temp, 30, "vl_avg_1_30")
-    evaluate_results(vl_max_1, gt_temp, 30, "vl_max_1_30")
-    evaluate_results_f(vid_temp, las_temp, gt_temp, 30, "avg", "vl_f_avg_30")
-    evaluate_results_f(vid_temp, las_temp, gt_temp, 30, "max", "vl_f_max_30")
+    evaluate_results(vid_temp, gt_temp, G, TH, "v30")
+    evaluate_results(las_temp, gt_temp, G, TH, "l30")
+    evaluate_results(vl_avg_1, gt_temp, G, TH, "vl_avg_1_30")
+    evaluate_results(vl_max_1, gt_temp, G, TH, "vl_max_1_30")
+    evaluate_results_f(vid_temp, las_temp, gt_temp, G, TH, "avg", "vl_f_avg_30")
+    evaluate_results_f(vid_temp, las_temp, gt_temp, G, TH, "max", "vl_f_max_30")
 #    evaluate_results(vid_temp, gt_temp, 30, "v30")
     exit()
 
     for j in range(1,2):
 
         for i in range(-80,80):
-            
+
             if i < 0:
                 gt_temp = gt[0:i]
                 vid_temp = vid[-i:]
@@ -332,20 +339,20 @@ if __name__ == "__main__":
             # count cars, transitions
             gt_c = count_cars(gt_temp)
             vid_c = count_cars(vid_temp)
-            
-            
-                
-            print("Count GT: ", sum(gt_c)) 
-            print("Count vid: ", sum(vid_c))    
-            
+
+
+
+            print("Count GT: ", sum(gt_c))
+            print("Count vid: ", sum(vid_c))
+
             curr_len = len(gt_c)
             new_len = int(np.floor(curr_len/j))
             end_idx = j*new_len-curr_len
-            
+
     #        print(len(gt_c), j*new_len,new_len)
-            
+
             if end_idx != 0:
-            
+
                 gt_c_rs = np.reshape(gt_c[0:end_idx],
                                      (j,new_len))
                 vid_c_rs = np.reshape(vid_c[0:end_idx],
@@ -355,36 +362,34 @@ if __name__ == "__main__":
                                      (j,new_len))
                 vid_c_rs = np.reshape(vid_c[0:],
                                      (j,new_len))
-                
+
             gt_c_rs = np.sum(gt_c_rs,axis=0)
             vid_c_rs = np.sum(vid_c_rs,axis=0)
-             
-            print("Count GTrs: ", sum(gt_c_rs)) 
-            print("Count vidrs: ", sum(vid_c_rs)) 
-            
+
+            print("Count GTrs: ", sum(gt_c_rs))
+            print("Count vidrs: ", sum(vid_c_rs))
+
             gt_fb = get_flow_bin(gt_c_rs,90)
             vid_fb = get_flow_bin(vid_c_rs,90)
 
     #        print("NEW SHAPE ", np.shape(vid_c_rs))
-            
+
     #        print(vid_c_rs)
-            
+
 #            score = compare_gt (vid_c_rs,gt_c_rs)
 #            score = compare_detections (gt=gt_temp, res=vid_temp)
 #            score = compare_detections (gt=gt_fb, res=vid_fb)
             score = compare_bool(gt=gt_fb, res=vid_fb)
             metrics = get_metrics(score)
-            curr_score = metrics["TPR"] 
-            
+            curr_score = metrics["TPR"]
+
             if best_score < curr_score:
                 best_score = curr_score
                 print("BEST NEW= ", metrics, score, i, j)
-            
+
             scores.append(curr_score)
-        
-        
+
+
 
     print("Best score", np.max(score))
     exit()
-
-
